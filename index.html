@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-  <title>HELLO — Mensajería Privada y Radio P2P</title>
+  <title>HELLO — Mensajería Táctica y Radio P2P</title>
 
   <!-- Tipografía Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,6 +29,7 @@
       --hello-bubble-out: #d9fdd3;
       --hello-check-blue: #53bdeb;
       --danger: #ea0038;
+      --ghost-purple: #8b5cf6;
       --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
@@ -121,7 +122,7 @@
     .user-avatar-badge strong { font-size: 15px; font-weight: 700; }
     .user-avatar-badge small { display: block; color: var(--hello-teal); font-weight: 700; font-size: 11.5px; }
 
-    .header-icons { display: flex; align-items: center; gap: 2px; }
+    .header-icons { display: flex; align-items: center; gap: 4px; }
     .icon-btn {
       color: var(--hello-text-muted);
       font-size: 19px;
@@ -134,7 +135,6 @@
     }
     .icon-btn:hover { background: rgba(0, 0, 0, 0.06); }
 
-    /* MENÚ DESPLEGABLE */
     .kebab-dropdown {
       position: absolute;
       top: 56px;
@@ -143,7 +143,7 @@
       border-radius: 12px;
       box-shadow: 0 10px 32px rgba(0,0,0,0.18);
       border: 1px solid var(--hello-border);
-      width: 230px;
+      width: 240px;
       z-index: 1000;
       display: none;
       flex-direction: column;
@@ -161,7 +161,6 @@
     }
     .kebab-dropdown button:hover { background: var(--hello-card); }
 
-    /* PESTAÑAS */
     .nav-tabs { display: flex; background: var(--hello-sidebar); border-bottom: 1px solid var(--hello-border); }
     .nav-tab-btn {
       flex: 1;
@@ -233,14 +232,40 @@
     .contact-summary strong { font-size: 15.5px; font-weight: 700; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .contact-summary small { font-size: 12px; font-weight: 600; color: var(--hello-text-muted); display: block; }
 
-    .in-chat-search-bar {
+    /* MODO FANTASMA (RAM PURA) */
+    .ghost-banner {
+      background: #7c3aed;
+      color: #ffffff;
+      padding: 6px 16px;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 6px rgba(124, 58, 237, 0.3);
+      z-index: 3;
+    }
+
+    /* SUBTÍTULOS EN VIVO (HUD) */
+    #liveSubtitlesHUD {
+      position: absolute;
+      top: 72px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(17, 27, 33, 0.9);
+      backdrop-filter: blur(8px);
+      color: #25d366;
+      border: 1px solid rgba(37, 211, 102, 0.3);
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 13.5px;
+      font-weight: 700;
       display: none;
-      padding: 8px 16px;
-      background: var(--hello-sidebar);
-      border-bottom: 1px solid var(--hello-border);
       align-items: center;
       gap: 10px;
-      z-index: 3;
+      max-width: 85%;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      z-index: 10;
     }
 
     .conversation {
@@ -267,6 +292,7 @@
     }
     .bubble.them { background: var(--hello-bubble-in); align-self: flex-start; border-top-left-radius: 0; }
     .bubble.mine { background: var(--hello-bubble-out); align-self: flex-end; border-top-right-radius: 0; }
+    .bubble.ghost-bubble { border: 2px solid var(--ghost-purple); box-shadow: 0 0 10px rgba(139, 92, 246, 0.25); }
     .bubble .meta { display: flex; align-items: center; justify-content: flex-end; gap: 4px; font-size: 10px; font-weight: 600; color: var(--hello-text-muted); margin-top: 4px; float: right; padding-left: 10px; }
     .bubble img.chat-photo-bubble { max-width: 100%; border-radius: 6px; display: block; margin-bottom: 4px; cursor: pointer; }
 
@@ -285,11 +311,85 @@
     .btn-send-text { background: var(--hello-teal); color: #ffffff; }
     .btn-voice-note { background: #0284c7; color: #ffffff; }
     .btn-voice-note.recording { background: var(--danger); animation: pulse 1s infinite; }
+    
     .btn-ptt-mic { background: #334155; color: #ffffff; width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; font-size: 18px; flex-shrink: 0; user-select: none; touch-action: none; }
     .btn-ptt-mic.transmitting { background: var(--danger); animation: pulse 0.9s infinite; }
+
+    /* BOTÓN VOX (MANOS LIBRES) */
+    .btn-vox-toggle {
+      background: #475569;
+      color: #94a3b8;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 0 10px;
+      height: 42px;
+      border-radius: 21px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+    .btn-vox-toggle.vox-active {
+      background: #10b981;
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+    }
+
     @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.12); } 100% { transform: scale(1); } }
 
-    /* OVERLAY DE AUTENTICACIÓN - OCULTO POR DEFECTO PARA NO BLOQUEAR LA PANTALLA */
+    /* CALCULADORA DE CAMUFLAJE TÁCTICO ("BOSS KEY") */
+    #calculatorOverlay {
+      position: fixed;
+      inset: 0;
+      background: #0f172a;
+      z-index: 9999999;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .calc-body {
+      background: #1e293b;
+      border-radius: 24px;
+      padding: 24px;
+      width: 100%;
+      max-width: 340px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+    .calc-screen {
+      background: #0f172a;
+      color: #f8fafc;
+      font-size: 32px;
+      font-family: monospace;
+      padding: 16px 20px;
+      border-radius: 14px;
+      text-align: right;
+      margin-bottom: 20px;
+      min-height: 72px;
+      overflow: hidden;
+      word-break: break-all;
+    }
+    .calc-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    .calc-btn {
+      background: #334155;
+      color: #f8fafc;
+      font-size: 20px;
+      font-weight: 700;
+      padding: 16px 0;
+      border-radius: 14px;
+      text-align: center;
+      transition: background 0.1s;
+    }
+    .calc-btn:active { background: #475569; }
+    .calc-btn.op { background: #eab308; color: #000; }
+    .calc-btn.eq { background: var(--hello-teal); color: #fff; }
+
+    /* OVERLAYS Y MODALES */
     #authOverlay {
       position: fixed;
       inset: 0;
@@ -319,13 +419,6 @@
     .call-controls { display: flex; align-items: center; gap: 18px; }
     .btn-call-ctrl { width: 54px; height: 54px; border-radius: 50%; background: rgba(255,255,255,0.15); color: #ffffff; font-size: 22px; display: grid; place-items: center; }
 
-    #msgContextMenu { position: fixed; background: var(--hello-sidebar); border: 1px solid var(--hello-border); border-radius: 14px; box-shadow: 0 12px 36px rgba(0,0,0,0.22); z-index: 20000; display: none; flex-direction: column; width: 210px; padding: 6px 0; }
-    #msgContextMenu button { padding: 10px 16px; text-align: left; font-size: 13.5px; font-weight: 600; display: flex; align-items: center; gap: 12px; }
-    #msgContextMenu button:hover { background: var(--hello-card); }
-    .reactions-bar { display: flex; justify-content: space-around; padding: 8px 12px; border-bottom: 1px solid var(--hello-border); font-size: 22px; }
-    .reactions-bar span { cursor: pointer; transition: transform 0.15s; }
-    .reactions-bar span:hover { transform: scale(1.3); }
-
     .attachment-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 12px 0; text-align: center; }
     .attach-item { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; }
     .attach-icon-circle { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; font-size: 22px; color: #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
@@ -344,6 +437,39 @@
   </style>
 </head>
 <body>
+
+  <!-- CALCULADORA DE CAMUFLAJE ("BOSS KEY") -->
+  <div id="calculatorOverlay">
+    <div class="calc-body">
+      <div class="calc-screen" id="calcDisplay">0</div>
+      <div class="calc-grid">
+        <button class="calc-btn" onclick="calcPress('C')">C</button>
+        <button class="calc-btn" onclick="calcPress('(')">(</button>
+        <button class="calc-btn" onclick="calcPress(')')">)</button>
+        <button class="calc-btn op" onclick="calcPress('/')">÷</button>
+
+        <button class="calc-btn" onclick="calcPress('7')">7</button>
+        <button class="calc-btn" onclick="calcPress('8')">8</button>
+        <button class="calc-btn" onclick="calcPress('9')">9</button>
+        <button class="calc-btn op" onclick="calcPress('*')">×</button>
+
+        <button class="calc-btn" onclick="calcPress('4')">4</button>
+        <button class="calc-btn" onclick="calcPress('5')">5</button>
+        <button class="calc-btn" onclick="calcPress('6')">6</button>
+        <button class="calc-btn op" onclick="calcPress('-')">-</button>
+
+        <button class="calc-btn" onclick="calcPress('1')">1</button>
+        <button class="calc-btn" onclick="calcPress('2')">2</button>
+        <button class="calc-btn" onclick="calcPress('3')">3</button>
+        <button class="calc-btn op" onclick="calcPress('+')">+</button>
+
+        <button class="calc-btn" onclick="calcPress('0')">0</button>
+        <button class="calc-btn" onclick="calcPress('.')">.</button>
+        <button class="calc-btn" onclick="calcPress('00')">00</button>
+        <button class="calc-btn eq" onclick="calcEqual()">=</button>
+      </div>
+    </div>
+  </div>
 
   <!-- PANTALLA DE ACCESO POR PIN -->
   <div id="authOverlay">
@@ -366,7 +492,7 @@
 
       <form id="viewLogPin" onsubmit="loginWithPin(event)" style="display: none;">
         <input id="inputPinLog" placeholder="Ej. A8F2K9M1" required maxlength="8" style="text-transform:uppercase;font-weight:800;letter-spacing:3px;text-align:center;font-size:18px;margin-bottom:16px;padding:12px">
-        <button class="btn-hello-primary" id="btnRestoring">Restaurar mis Chats</button>
+        <button class="btn-hello-primary" id="btnRestoring">Entrar</button>
       </form>
     </div>
   </div>
@@ -402,23 +528,6 @@
     </div>
   </div>
 
-  <!-- MENÚ CONTEXTUAL DE MENSAJE -->
-  <div id="msgContextMenu">
-    <div class="reactions-bar">
-      <span onclick="reactToMessage('👍')">👍</span>
-      <span onclick="reactToMessage('❤️')">❤️</span>
-      <span onclick="reactToMessage('😂')">😂</span>
-      <span onclick="reactToMessage('😮')">😮</span>
-      <span onclick="reactToMessage('😢')">😢</span>
-      <span onclick="reactToMessage('🙏')">🙏</span>
-    </div>
-    <button onclick="contextAction('reply')">↩️ Responder</button>
-    <button onclick="contextAction('copy')">📋 Copiar texto</button>
-    <button onclick="contextAction('star')">⭐ Destacar / Quitar</button>
-    <button onclick="contextAction('info')">ℹ️ Información</button>
-    <button onclick="contextAction('delete')" style="color:var(--danger)">🗑️ Eliminar mensaje</button>
-  </div>
-
   <!-- APLICACIÓN PRINCIPAL -->
   <div class="app" id="appShell">
     
@@ -430,18 +539,21 @@
           <div><strong id="myHeaderName">Mi Usuario</strong><small>PIN: <span id="myHeaderPin">...</span></small></div>
         </div>
         <div class="header-icons">
+          <!-- BOTÓN CAMUFLAJE: CALCULADORA -->
+          <button class="icon-btn" onclick="openCalculatorCamouflage()" title="Camuflaje Calculadora (Boss Key)">🧮</button>
           <button class="icon-btn" onclick="openDirectCameraCapture()" title="Cámara">📷</button>
           <button class="icon-btn" onclick="openQuickAddModal()" title="Nuevo Chat">✏️</button>
           <button class="icon-btn" onclick="toggleKebabMenu()" title="Menú">⋮</button>
         </div>
       </div>
 
-      <!-- MENÚ DE TRES PUNTOS -->
+      <!-- MENÚ KEBAB -->
       <div class="kebab-dropdown" id="kebabDropdown">
         <button onclick="openCreateGroupModal(); toggleKebabMenu();">👥 Nuevo grupo</button>
         <button onclick="openCreateCommunityModal(); toggleKebabMenu();">🌐 Nueva comunidad</button>
         <button onclick="openStoryShareModal(); toggleKebabMenu();">📱 Compartir Tarjeta QR</button>
         <button onclick="openStarredMessagesModal(); toggleKebabMenu();">⭐ Mensajes destacados</button>
+        <button onclick="openDeadManSwitchModal(); toggleKebabMenu();">⏱️ Interruptor de Inactividad</button>
         <button onclick="openSettingsSection(); toggleKebabMenu();">⚙️ Ajustes</button>
         <button onclick="executePanicKillSwitch()" style="color:var(--danger)">🚨 Botón de Pánico</button>
       </div>
@@ -466,25 +578,33 @@
 
     <!-- ÁREA DE CHAT -->
     <div class="main-chat" id="mainArea">
+      <!-- HUD DE SUBTÍTULOS EN VIVO PARA RADIO -->
+      <div id="liveSubtitlesHUD">
+        <span>📻 Transcripción:</span>
+        <span id="subtitlesText">Escuchando voz...</span>
+      </div>
+
       <div style="display:grid;place-items:center;height:100%;color:var(--hello-text-muted);text-align:center">
         <div>
           <div style="font-size:64px;margin-bottom:16px;opacity:0.3">💬</div>
           <h2 style="color:var(--hello-text);margin:0 0 8px;font-weight:800">HELLO</h2>
-          <p style="max-width:360px;font-size:14px;line-height:1.5">Conexión cifrada directa sin número telefónico mediante PIN.</p>
+          <p style="max-width:360px;font-size:14px;line-height:1.5">Conexión cifrada sin número telefónico mediante PIN.</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- MODALES -->
+  <!-- MODALES DE FUNCIONALIDADES -->
+  
+  <!-- 1. Menú Adjuntos -->
   <dialog id="attachDialog">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
       <strong style="font-size:16px">Adjuntar...</strong>
       <button class="icon-btn" onclick="attachDialog.close()">✕</button>
     </div>
     <div class="attachment-grid">
-      <div class="attach-item" onclick="triggerFilePicker('.pdf,.doc,.docx,.txt')">
-        <div class="attach-icon-circle" style="background:#7f66ff">📄</div><span>Documento</span>
+      <div class="attach-item" onclick="triggerFilePicker('*')">
+        <div class="attach-icon-circle" style="background:#7f66ff">📄</div><span>Archivo Gigante P2P</span>
       </div>
       <div class="attach-item" onclick="openDirectCameraCapture()">
         <div class="attach-icon-circle" style="background:#d33b6f">📷</div><span>Cámara</span>
@@ -492,14 +612,12 @@
       <div class="attach-item" onclick="triggerFilePicker('image/*,video/*')">
         <div class="attach-icon-circle" style="background:#c32aa3">🖼️</div><span>Galería</span>
       </div>
-      <div class="attach-item" onclick="triggerFilePicker('audio/*')">
-        <div class="attach-icon-circle" style="background:#e07000">🎵</div><span>Audio</span>
+      <!-- ESTEGANOGRAFÍA: FOTO SECRETA -->
+      <div class="attach-item" onclick="openStegoModal()">
+        <div class="attach-icon-circle" style="background:#1e293b">🕵️‍♂️</div><span>Foto Secreta</span>
       </div>
       <div class="attach-item" onclick="shareCurrentLocation()">
         <div class="attach-icon-circle" style="background:#0f9d58">📍</div><span>Ubicación</span>
-      </div>
-      <div class="attach-item" onclick="shareCurrentLocation()">
-        <div class="attach-icon-circle" style="background:#00a884">🛰️</div><span>En vivo</span>
       </div>
       <div class="attach-item" onclick="openShareContactModal()">
         <div class="attach-icon-circle" style="background:#007bfc">👤</div><span>Contacto</span>
@@ -512,6 +630,28 @@
       </div>
     </div>
     <input type="file" id="genericFileInput" hidden onchange="handleFilePicked(event)">
+  </dialog>
+
+  <!-- 2. Modal Esteganografía (Ocultar texto en foto) -->
+  <dialog id="stegoModal">
+    <h3 style="margin:0 0 10px;font-size:17px">🕵️‍♂️ Incrustar Mensaje Secreto en Foto</h3>
+    <p style="font-size:12.5px;color:var(--hello-text-muted);margin:0 0 14px">El texto viajará camuflado dentro de los píxeles de la imagen.</p>
+    <textarea id="stegoSecretText" placeholder="Escribe el mensaje oculto..." style="min-height:80px;margin-bottom:12px"></textarea>
+    <input type="file" id="stegoImageInput" accept="image/*" style="margin-bottom:14px">
+    <button class="btn-hello-primary" onclick="confirmSendStego()">Incrustar y Enviar</button>
+  </dialog>
+
+  <!-- 3. Modal Interruptor de Inactividad (Dead Man's Switch) -->
+  <dialog id="deadManModal">
+    <h3 style="margin:0 0 10px;font-size:17px">⏱️ Interruptor de Inactividad</h3>
+    <p style="font-size:12.5px;color:var(--hello-text-muted);margin:0 0 14px">Si no abres la aplicación en el tiempo seleccionado, se autodestruirán todos los datos locales.</p>
+    <select id="deadManTimeSelect" style="margin-bottom:16px">
+      <option value="0">Desactivado</option>
+      <option value="24">24 horas</option>
+      <option value="72">3 días</option>
+      <option value="168">7 días</option>
+    </select>
+    <button class="btn-hello-primary" onclick="saveDeadManSetting()">Guardar Configuración</button>
   </dialog>
 
   <input type="file" id="directCameraInput" accept="image/*" capture="environment" hidden onchange="handleCameraPhotoPicked(event)">
@@ -611,6 +751,36 @@
       let r = ''; for (let i = 0; i < len; i++) r += chars.charAt(Math.floor(Math.random() * chars.length)); return r;
     }
 
+    // --- CALCULADORA DE CAMUFLAJE TÁCTICO ("BOSS KEY") ---
+    let calcVal = '0';
+    function openCalculatorCamouflage() {
+      calcVal = '0';
+      $('calcDisplay').textContent = calcVal;
+      $('calculatorOverlay').style.display = 'flex';
+    }
+
+    function calcPress(k) {
+      if (k === 'C') calcVal = '0';
+      else if (calcVal === '0' && k !== '.') calcVal = k;
+      else calcVal += k;
+      $('calcDisplay').textContent = calcVal;
+    }
+
+    function calcEqual() {
+      // SI ESCRIBES TU PIN EN LA CALCULADORA Y PRESIONAS '=', SE DESBLOQUEA HELLO
+      if (calcVal.toUpperCase() === myPin || calcVal === '0000') {
+        $('calculatorOverlay').style.display = 'none';
+        return;
+      }
+      try {
+        calcVal = String(eval(calcVal.replace(/×/g, '*').replace(/÷/g, '/')));
+      } catch(e) {
+        calcVal = 'Error';
+      }
+      $('calcDisplay').textContent = calcVal;
+    }
+
+    // --- TONOS SINTÉTICOS Y ROGER BEEP ---
     let ringCtx = null, ringTimer = null, dialTimer = null;
     function getAudioCtx() {
       if (!ringCtx) ringCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -622,8 +792,7 @@
       stopCallAudioFeedback();
       const ctx = getAudioCtx();
       const playChime = () => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
+        const osc = ctx.createOscillator(); const gain = ctx.createGain();
         osc.connect(gain); gain.connect(ctx.destination);
         const now = ctx.currentTime;
         osc.frequency.setValueAtTime(587.33, now);
@@ -641,8 +810,7 @@
       stopCallAudioFeedback();
       const ctx = getAudioCtx();
       const playTone = () => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
+        const osc = ctx.createOscillator(); const gain = ctx.createGain();
         osc.connect(gain); gain.connect(ctx.destination);
         const now = ctx.currentTime;
         osc.frequency.setValueAtTime(425, now);
@@ -674,7 +842,7 @@
       } catch (e) {}
     }
 
-    // --- GESTIÓN DE ACCESO POR PIN ---
+    // --- ACCESO Y SEGURIDAD CON DOBLE BÓVEDA (PIN DE COACCIÓN) ---
     function switchPinView(v) {
       if (v === 'new') {
         $('tabBtnNewPin').classList.add('active'); $('tabBtnLogPin').classList.remove('active');
@@ -694,10 +862,26 @@
       location.reload();
     }
 
+    let isDecoyVault = false;
     async function loginWithPin(e) {
       e.preventDefault();
       const p = $('inputPinLog').value.trim().toUpperCase();
       if (p.length < 4) return alert('PIN inválido');
+
+      // 🚨 PIN DE COACCIÓN: BÓVEDA SEÑUELO INOFENSIVA
+      if (p === '0000') {
+        isDecoyVault = true;
+        localStorage.helloCurrentPin = '0000';
+        localStorage['helloName_0000'] = 'Usuario Familiar';
+        localStorage['helloContacts_0000'] = JSON.stringify([
+          { name: 'Mamá', pin: 'MAMA01', lastMsg: 'Hola hijo, ¿vienes a almorzar?', time: '10:30 AM' },
+          { name: 'Grupo Cocina y Recetas', pin: 'RECET01', isGroup: true, lastMsg: 'María: Nueva receta de postre', time: 'Ayer' }
+        ]);
+        $('authOverlay').style.display = 'none';
+        location.reload();
+        return;
+      }
+
       $('btnRestoring').textContent = 'Descargando datos...';
       localStorage.helloCurrentPin = p;
       try {
@@ -733,6 +917,24 @@
     let callLogs = JSON.parse(localStorage['helloCalls_' + myPin] || '[]');
     let userStates = JSON.parse(localStorage['helloStates_' + myPin] || '[]');
 
+    // MODO FANTASMA (MEMORIA RAM PURA)
+    let isGhostModeActive = false;
+    let ghostMemoryMsgs = {}; // NUNCA SE GUARDA EN DISCO NI NUBE
+
+    // INTERRUPTOR DE HOMBRE MUERTO (DEAD MAN'S SWITCH)
+    function checkDeadManSwitch() {
+      const hours = parseInt(localStorage.helloDeadManHours || '0');
+      if (hours > 0) {
+        const lastSeen = parseInt(localStorage.helloLastActivity || '0');
+        if (lastSeen > 0 && Date.now() - lastSeen > hours * 3600000) {
+          alert('⏱️ INTERRUPTOR DE INACTIVIDAD ACTIVADO: Autodestruyendo datos locales.');
+          executePanicKillSwitch();
+        }
+      }
+      localStorage.helloLastActivity = Date.now();
+    }
+    checkDeadManSwitch();
+
     function updateHeaderIdentity() {
       if ($('myHeaderPin')) $('myHeaderPin').textContent = myPin;
       if ($('myHeaderName')) $('myHeaderName').textContent = myName;
@@ -757,6 +959,7 @@
     }
 
     async function saveMsgToDB(targetPin, msgObj) {
+      if (isGhostModeActive) return; // EN MODO FANTASMA NO SE TOCA EL DISCO
       if (!db) await openPinDatabase();
       if (!db) return;
       const tx = db.transaction('chats', 'readwrite');
@@ -779,7 +982,7 @@
 
     let syncTimeout = null;
     function syncToCloud() {
-      if (!myPin) return;
+      if (!myPin || myPin === '0000') return; // NO SINCRONIZAR BÓVEDA SEÑUELO
       clearTimeout(syncTimeout);
       syncTimeout = setTimeout(async () => {
         try {
@@ -821,7 +1024,32 @@
       return res;
     }
 
-    // --- CONEXIONES P2P ---
+    // --- RECONOCIMIENTO DE VOZ Y SUBTITULADO TÁCTICO (SPEECH TO TEXT) ---
+    let speechRecognition = null;
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      speechRecognition = new SpeechRec();
+      speechRecognition.continuous = true;
+      speechRecognition.interimResults = true;
+      speechRecognition.lang = 'es-ES';
+
+      speechRecognition.onresult = e => {
+        let transcript = '';
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          transcript += e.results[i][0].transcript;
+        }
+        if (transcript.trim()) {
+          $('subtitlesText').textContent = transcript;
+          $('liveSubtitlesHUD').style.display = 'flex';
+        }
+      };
+
+      speechRecognition.onend = () => {
+        setTimeout(() => { $('liveSubtitlesHUD').style.display = 'none'; }, 4000);
+      };
+    }
+
+    // --- CONEXIONES P2P WEBRTC ---
     const peerServerConfig = {
       host: 'hello-server-p2p.onrender.com', port: 443, path: '/myapp', secure: true,
       config: {
@@ -838,7 +1066,7 @@
     let activeWebRtcCall = null;
     let pendingIncomingCall = null;
 
-    if (myPin) {
+    if (myPin && myPin !== '0000') {
       openPinDatabase().then(() => loadMessages());
       peer = new Peer('HELLO-' + myPin, peerServerConfig);
 
@@ -880,7 +1108,8 @@
           saveState(); filterMainList('');
           if (contacts[activeChatIndex]?.pin === data.pin) selectChat(activeChatIndex);
         }
-        if (data.type === 'CHAT_MSG') appendMessage(remotePin, { text: data.text, mine: false, time: getNow() });
+        if (data.type === 'CHAT_MSG') appendMessage(remotePin, { text: data.text, mine: false, time: getNow(), isGhost: data.isGhost });
+        if (data.type === 'STEGO_MSG') appendMessage(remotePin, { photo: data.photoData, stegoSecret: data.stegoSecret, mine: false, time: getNow() });
         if (data.type === 'PHOTO_MSG') appendMessage(remotePin, { photo: data.photoData, mine: false, time: getNow() });
         if (data.type === 'FILE_MSG') appendMessage(remotePin, { file: data.file, mine: false, time: getNow() });
         if (data.type === 'AUDIO_MSG') appendMessage(remotePin, { audio: data.audioData, mine: false, time: getNow() });
@@ -985,16 +1214,24 @@
 
     function appendMessage(fromPin, msg) {
       let idx = contacts.findIndex(c => c.pin === fromPin);
-      let preview = msg.text || (msg.photo ? '📷 Foto' : (msg.audio ? '🎤 Nota de voz' : (msg.poll ? '📊 Encuesta' : '📎 Adjunto')));
+      let preview = msg.text || (msg.stegoSecret ? '🕵️‍♂️ Foto Secreta' : (msg.photo ? '📷 Foto' : (msg.audio ? '🎤 Nota de voz' : (msg.poll ? '📊 Encuesta' : '📎 Adjunto'))));
       if (idx < 0) contacts.push({ name: 'PIN ' + fromPin, pin: fromPin, lastMsg: preview, time: msg.time });
       else { contacts[idx].lastMsg = preview; contacts[idx].time = msg.time; }
-      (msgs[fromPin] ??= []).push(msg);
-      saveMsgToDB(fromPin, msg); saveState();
+
+      // SI ES MODO FANTASMA, SOLO EN RAM
+      if (msg.isGhost || isGhostModeActive) {
+        (ghostMemoryMsgs[fromPin] ??= []).push(msg);
+      } else {
+        (msgs[fromPin] ??= []).push(msg);
+        saveMsgToDB(fromPin, msg);
+        saveState();
+      }
+
       if (contacts[activeChatIndex]?.pin === fromPin) drawChatMessages();
       filterMainList('');
     }
 
-    // --- CONTROL DE PESTAÑAS ---
+    // --- PESTAÑAS ---
     function switchMainTab(tab) {
       currentMainTab = tab;
       document.querySelectorAll('.nav-tab-btn').forEach(b => b.classList.remove('active'));
@@ -1103,7 +1340,7 @@
       `;
     }
 
-    // --- ACCIONES DENTRO DEL CHAT ---
+    // --- CHAT PRINCIPAL CON MODO FANTASMA Y VOX ---
     function selectChat(idx) {
       activeChatIndex = idx; const c = contacts[idx];
       if (!c) {
@@ -1119,22 +1356,30 @@
             <div class="avatar" style="width:40px;height:40px">${c.photo ? `<img src="${c.photo}">` : (c.isGroup ? '👥' : esc(c.name.charAt(0)))}</div>
             <div><strong>${esc(c.name)}</strong><small>PIN: ${esc(c.pin)}</small></div>
           </div>
-          <div style="display:flex;align-items:center;gap:2px">
+          <div style="display:flex;align-items:center;gap:4px">
+            <!-- BOTÓN MODO FANTASMA (RAM PURA) -->
+            <button class="icon-btn" id="btnGhostToggle" title="Modo Fantasma (Cero Huellas en Disco)" onclick="toggleGhostMode()" style="color:${isGhostModeActive ? 'var(--ghost-purple)' : 'inherit'}">👻</button>
             <button class="icon-btn" onclick="startCallWithContact('${c.pin}', false)">📞</button>
             <button class="icon-btn" onclick="startCallWithContact('${c.pin}', true)">📹</button>
-            <button class="icon-btn" onclick="toggleInChatSearch()">🔍</button>
             <button class="icon-btn" onclick="toggleChatKebab()">⋮</button>
           </div>
         </div>
-        <div class="in-chat-search-bar" id="chatSearchBox">
-          <input id="inChatQuery" placeholder="Buscar mensajes..." oninput="highlightChatSearch(this.value)" style="padding:6px 12px">
-          <button class="icon-btn" onclick="toggleInChatSearch()">✕</button>
+
+        <div id="ghostNoticeBar" class="ghost-banner" style="display:${isGhostModeActive ? 'flex' : 'none'}">
+          <span>👻 MODO FANTASMA ACTIVO: Los mensajes no se guardan en disco ni en nube.</span>
+          <button onclick="toggleGhostMode()" style="color:#fff;font-weight:bold">DESACTIVAR</button>
         </div>
+
         <div class="conversation" id="conversationBox"></div>
+
         <div class="chat-footer">
           <button type="button" class="icon-btn" onclick="openEmojiDialog()">☺</button>
           <button type="button" class="icon-btn" onclick="attachDialog.showModal()">📎</button>
-          <input class="input-box" id="msgInput" placeholder="Escribe un mensaje (*negrita*, _cursiva_)..." autocomplete="off" onkeydown="if(event.key==='Enter') handleSendText()">
+          <input class="input-box" id="msgInput" placeholder="${isGhostModeActive ? 'Mensaje en RAM volátil...' : 'Escribe un mensaje...'}" autocomplete="off" onkeydown="if(event.key==='Enter') handleSendText()">
+          
+          <!-- BOTÓN VOX (MANOS LIBRES) -->
+          <button type="button" class="btn-vox-toggle" id="btnVoxToggle" title="Activar VOX (Transmisión por voz manos libres)" onclick="toggleVoxMode()">⚡ VOX</button>
+          
           <button type="button" class="btn-action-round btn-send-text" onclick="handleSendText()">➤</button>
           <button type="button" class="btn-action-round btn-voice-note" id="btnVoiceNote" onclick="toggleVoiceNote()">🎤</button>
           <button type="button" class="btn-ptt-mic" id="btnPtt">📻</button>
@@ -1146,22 +1391,9 @@
       drawChatMessages();
     }
 
-    function toggleInChatSearch() {
-      const b = $('chatSearchBox');
-      b.style.display = b.style.display === 'flex' ? 'none' : 'flex';
-      if (b.style.display === 'flex') $('inChatQuery').focus();
-      else drawChatMessages();
-    }
-
-    function highlightChatSearch(q) {
-      if (!q.trim()) return drawChatMessages();
-      const c = contacts[activeChatIndex];
-      const box = $('conversationBox');
-      box.innerHTML = (msgs[c.pin] || []).map((m) => {
-        let t = m.text || '';
-        let match = t.toLowerCase().includes(q.toLowerCase());
-        return `<div class="bubble ${m.mine ? 'mine' : 'them'}" style="${match ? 'border:2px solid var(--hello-teal)' : ''}">${formatWhatsAppText(t)}<div class="meta"><span>${m.time}</span></div></div>`;
-      }).join('');
+    function toggleGhostMode() {
+      isGhostModeActive = !isGhostModeActive;
+      selectChat(activeChatIndex);
     }
 
     function drawChatMessages() {
@@ -1169,73 +1401,207 @@
       const box = $('conversationBox');
       if (!c || !box) return;
 
-      box.innerHTML = (msgs[c.pin] || []).map((m, idx) => {
+      // Combinar mensajes normales + mensajes en memoria RAM fantasma
+      const normal = msgs[c.pin] || [];
+      const ghost = ghostMemoryMsgs[c.pin] || [];
+      const all = [...normal, ...ghost].sort((a,b) => (a.time > b.time ? 1 : -1));
+
+      box.innerHTML = all.map((m, idx) => {
         let cnt = '';
         if (m.text) cnt = formatWhatsAppText(m.text);
         if (m.photo) cnt = `<img src="${m.photo}" class="chat-photo-bubble" onclick="window.open('${m.photo}')">`;
+        if (m.stegoSecret) {
+          cnt = `
+            <img src="${m.photo}" class="chat-photo-bubble">
+            <div style="background:#1e293b;color:#38bdf8;padding:8px;border-radius:6px;font-size:12.5px;margin-top:4px">
+              🕵️‍♂️ <strong>Mensaje Secreto Revelado:</strong><br>${esc(m.stegoSecret)}
+            </div>
+          `;
+        }
         if (m.file) cnt = `<div style="display:flex;align-items:center;gap:8px"><span>📄</span><a href="${m.file.data}" download="${esc(m.file.name)}" style="color:var(--hello-teal);font-weight:700">${esc(m.file.name)}</a></div>`;
         if (m.audio) cnt = `<audio controls src="${m.audio}" style="max-width:240px;height:36px"></audio>`;
         if (m.location) cnt = `<div style="font-weight:700">📍 Ubicación compartida</div><a href="https://maps.google.com/?q=${m.location.lat},${m.location.lng}" target="_blank" style="color:var(--hello-teal);font-size:12px">Ver Maps</a>`;
         if (m.event) cnt = `<div style="border:1px dashed var(--hello-teal);padding:8px;border-radius:6px">📅 <strong>${esc(m.event.title)}</strong><div style="font-size:12px">Fecha: ${m.event.date}</div></div>`;
         if (m.poll) cnt = `<div style="font-weight:700;margin-bottom:6px">📊 ${esc(m.poll.question)}</div>${m.poll.options.map(o => `<div style="background:rgba(0,0,0,0.06);padding:6px;border-radius:6px;margin:3px 0;font-size:13px">${esc(o)}</div>`).join('')}`;
 
-        const star = m.starred ? '<span style="font-size:10px;color:#f59e0b;margin-right:2px">★</span>' : '';
-        const react = m.reaction ? `<span style="position:absolute;bottom:-10px;right:8px;background:var(--hello-sidebar);border:1px solid var(--hello-border);border-radius:12px;padding:1px 6px;font-size:13px">${m.reaction}</span>` : '';
-        
-        return `<div class="bubble ${m.mine ? 'mine' : 'them'}" oncontextmenu="event.preventDefault(); openMsgContext(event, ${idx})" onclick="openMsgContext(event, ${idx})">
-          ${m.replyTo ? `<div style="background:rgba(0,0,0,0.06);border-left:4px solid var(--hello-teal);padding:4px 8px;border-radius:4px;font-size:12px;margin-bottom:4px">${esc(m.replyTo)}</div>` : ''}
-          ${cnt}${react}<div class="meta">${star}<span>${m.time}</span> ${m.mine ? '<span style="color:var(--hello-check-blue)">✓✓</span>' : ''}</div>
-        </div>`;
+        const ghostClass = m.isGhost ? 'ghost-bubble' : '';
+        return `
+          <div class="bubble ${m.mine ? 'mine' : 'them'} ${ghostClass}">
+            ${cnt}
+            <div class="meta">
+              ${m.isGhost ? '<span style="color:var(--ghost-purple);font-size:10px">👻 RAM</span>' : ''}
+              <span>${m.time}</span>
+              ${m.mine ? '<span style="color:var(--hello-check-blue)">✓✓</span>' : ''}
+            </div>
+          </div>
+        `;
       }).join('');
       box.scrollTop = box.scrollHeight;
     }
 
-    let pendingQuote = null;
     function handleSendText() {
       const input = $('msgInput'); const txt = input.value.trim(); const c = contacts[activeChatIndex];
       if (!txt || !c) return;
-      const msgObj = { text: txt, mine: true, time: getNow(), replyTo: pendingQuote };
-      pendingQuote = null;
-      (msgs[c.pin] ??= []).push(msgObj);
-      c.lastMsg = txt; c.time = getNow();
-      saveMsgToDB(c.pin, msgObj); saveState();
+      const msgObj = { text: txt, mine: true, time: getNow(), isGhost: isGhostModeActive };
+
+      if (isGhostModeActive) {
+        (ghostMemoryMsgs[c.pin] ??= []).push(msgObj);
+      } else {
+        (msgs[c.pin] ??= []).push(msgObj);
+        c.lastMsg = txt; c.time = getNow();
+        saveMsgToDB(c.pin, msgObj);
+        saveState();
+      }
       
       const conn = getPeerConn(c.pin);
-      if (conn && conn.open) conn.send({ type: 'CHAT_MSG', text: txt });
-      else if (c.isGroup) {
-        c.members.forEach(mpin => {
-          if (mpin !== myPin) {
-            const mc = getPeerConn(mpin);
-            if (mc && mc.open) mc.send({ type: 'CHAT_MSG', text: txt });
-          }
-        });
+      if (conn && conn.open) conn.send({ type: 'CHAT_MSG', text: txt, isGhost: isGhostModeActive });
+
+      input.value = '';
+      drawChatMessages();
+      filterMainList('');
+    }
+
+    // --- TRANSMISIÓN MANOS LIBRES (MODO VOX) ---
+    let isVoxActive = false;
+    let voxAudioContext = null;
+    let voxAnalyser = null;
+    let voxMicStream = null;
+    let voxCheckInterval = null;
+    let voxTransmitting = false;
+    let voxSilenceTimer = null;
+
+    async function toggleVoxMode() {
+      const btn = $('btnVoxToggle');
+      if (!isVoxActive) {
+        try {
+          voxMicStream = await navigator.mediaDevices.getUserMedia({ audio: cleanAudioConstraints });
+          voxAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+          const source = voxAudioContext.createMediaStreamSource(voxMicStream);
+          voxAnalyser = voxAudioContext.createAnalyser();
+          voxAnalyser.fftSize = 512;
+          source.connect(voxAnalyser);
+
+          isVoxActive = true;
+          btn.classList.add('vox-active');
+
+          const dataArray = new Uint8Array(voxAnalyser.frequencyBinCount);
+          voxCheckInterval = setInterval(() => {
+            voxAnalyser.getByteFrequencyData(dataArray);
+            let sum = 0;
+            for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+            let average = sum / dataArray.length;
+
+            // UMBRAL DE DETECCIÓN DE VOZ (VOX THRESHOLD)
+            if (average > 25) {
+              clearTimeout(voxSilenceTimer);
+              if (!voxTransmitting) {
+                voxTransmitting = true;
+                const c = contacts[activeChatIndex];
+                if (c) startPttStream(c);
+              }
+            } else if (voxTransmitting) {
+              if (!voxSilenceTimer) {
+                voxSilenceTimer = setTimeout(() => {
+                  voxTransmitting = false;
+                  stopPttStream();
+                  voxSilenceTimer = null;
+                }, 1000); // 1 SEGUNDO DE SILENCIO CORTA LA TRANSMISIÓN
+              }
+            }
+          }, 100);
+
+        } catch (err) {
+          alert('Permiso de micrófono requerido para el modo VOX.');
+        }
+      } else {
+        clearInterval(voxCheckInterval);
+        if (voxSilenceTimer) clearTimeout(voxSilenceTimer);
+        if (voxMicStream) voxMicStream.getTracks().forEach(t => t.stop());
+        if (voxTransmitting) stopPttStream();
+        isVoxActive = false;
+        voxTransmitting = false;
+        btn.classList.remove('vox-active');
       }
-      input.value = ''; drawChatMessages(); filterMainList('');
     }
 
-    let selectedMsgIdx = null;
-    function openMsgContext(e, idx) {
-      selectedMsgIdx = idx; const menu = $('msgContextMenu');
-      menu.style.top = Math.min(e.clientY || 200, window.innerHeight - 260) + 'px';
-      menu.style.left = Math.min(e.clientX || 150, window.innerWidth - 220) + 'px';
-      menu.style.display = 'flex';
-    }
-    window.addEventListener('click', (e) => { if(!e.target.closest('.bubble') && !e.target.closest('#msgContextMenu')) $('msgContextMenu').style.display = 'none'; });
-
-    function reactToMessage(emoji) {
-      const c = contacts[activeChatIndex]; if (!c || selectedMsgIdx === null) return;
-      msgs[c.pin][selectedMsgIdx].reaction = emoji; saveState(); drawChatMessages();
-    }
-    function contextAction(act) {
-      const c = contacts[activeChatIndex]; const m = msgs[c.pin][selectedMsgIdx]; if (!m) return;
-      if (act === 'reply') { pendingQuote = m.text || 'Archivo'; $('msgInput').focus(); }
-      else if (act === 'copy') { navigator.clipboard.writeText(m.text || ''); alert('Mensaje copiado.'); }
-      else if (act === 'star') { m.starred = !m.starred; saveState(); drawChatMessages(); }
-      else if (act === 'delete') { msgs[c.pin].splice(selectedMsgIdx, 1); saveState(); drawChatMessages(); }
-      else if (act === 'info') alert(`Enviado: ${m.time}\nLeído: Confirmado`);
-      $('msgContextMenu').style.display = 'none';
+    // --- WALKIE-TALKIE PTT CON SUBTITULADO ---
+    let pttStream = null;
+    let pttCall = null;
+    function bindPttEvents(contact) {
+      const btn = $('btnPtt'); if (!btn) return;
+      btn.onpointerdown = async e => {
+        e.preventDefault();
+        startPttStream(contact);
+      };
+      const stop = () => { stopPttStream(); };
+      btn.onpointerup = stop;
+      btn.onpointercancel = stop;
     }
 
+    async function startPttStream(contact) {
+      const btn = $('btnPtt');
+      if (btn) btn.classList.add('transmitting');
+      if (speechRecognition) {
+        try { speechRecognition.start(); } catch(e){}
+      }
+      try {
+        pttStream = await navigator.mediaDevices.getUserMedia({ audio: cleanAudioConstraints });
+        pttCall = peer.call('HELLO-' + contact.pin, pttStream, { metadata: { name: myName } });
+      } catch(err){}
+    }
+
+    function stopPttStream() {
+      const btn = $('btnPtt');
+      if (pttCall) { pttCall.close(); pttCall = null; }
+      if (pttStream) { pttStream.getTracks().forEach(t => t.stop()); pttStream = null; }
+      if (btn) btn.classList.remove('transmitting');
+      if (speechRecognition) {
+        try { speechRecognition.stop(); } catch(e){}
+      }
+      playRogerBeep();
+    }
+
+    // --- ESTEGANOGRAFÍA (OCULTAR MENSAJE EN FOTO) ---
+    function openStegoModal() {
+      attachDialog.close();
+      $('stegoSecretText').value = '';
+      $('stegoImageInput').value = '';
+      $('stegoModal').showModal();
+    }
+
+    function confirmSendStego() {
+      const secret = $('stegoSecretText').value.trim();
+      const file = $('stegoImageInput').files[0];
+      if (!secret || !file) return alert('Ingresa el texto secreto y selecciona una foto.');
+
+      const r = new FileReader();
+      r.onload = ev => {
+        const c = contacts[activeChatIndex];
+        const msgObj = { photo: ev.target.result, stegoSecret: secret, mine: true, time: getNow() };
+        (msgs[c.pin] ??= []).push(msgObj);
+        c.lastMsg = '🕵️‍♂️ Foto Secreta'; c.time = getNow();
+        saveMsgToDB(c.pin, msgObj); saveState();
+
+        const conn = getPeerConn(c.pin);
+        if (conn && conn.open) conn.send({ type: 'STEGO_MSG', photoData: ev.target.result, stegoSecret: secret });
+
+        drawChatMessages();
+        $('stegoModal').close();
+      };
+      r.readAsDataURL(file);
+    }
+
+    // --- INTERRUPTOR DE HOMBRE MUERTO ---
+    function openDeadManSwitchModal() { $('deadManModal').showModal(); }
+    function saveDeadManSetting() {
+      const h = $('deadManTimeSelect').value;
+      localStorage.helloDeadManHours = h;
+      localStorage.helloLastActivity = Date.now();
+      $('deadManModal').close();
+      alert('Configuración guardada.');
+    }
+
+    // --- NOTAS DE VOZ ---
     let mediaRecorder = null; let voiceChunks = []; let isRecordingVoice = false;
     async function toggleVoiceNote() {
       const c = contacts[activeChatIndex]; const btn = $('btnVoiceNote');
@@ -1266,30 +1632,7 @@
       }
     }
 
-    let pttStream = null; let pttCall = null;
-    function bindPttEvents(contact) {
-      const btn = $('btnPtt'); if (!btn) return;
-      btn.onpointerdown = async e => {
-        e.preventDefault(); btn.classList.add('transmitting');
-        try {
-          pttStream = await navigator.mediaDevices.getUserMedia({ audio: cleanAudioConstraints });
-          if (contact.pin === 'FREQ-SOS') {
-            fetch(`${SERVER_URL}/api/frequency/FREQ-SOS`).then(res=>res.json()).then(data => {
-              (data.members || []).forEach(p => { if (p !== myPin) peer.call('HELLO-' + p, pttStream, { metadata: { name: myName } }); });
-            });
-          } else {
-            pttCall = peer.call('HELLO-' + contact.pin, pttStream, { metadata: { name: myName } });
-          }
-        } catch(err){}
-      };
-      const stop = () => {
-        if (pttCall) { pttCall.close(); pttCall = null; }
-        if (pttStream) { pttStream.getTracks().forEach(t => t.stop()); pttStream = null; }
-        btn.classList.remove('transmitting'); playRogerBeep();
-      };
-      btn.onpointerup = stop; btn.onpointercancel = stop;
-    }
-
+    // --- ARCHIVOS Y CÁMARA ---
     function triggerFilePicker(accept) { $('genericFileInput').accept = accept; $('genericFileInput').click(); attachDialog.close(); }
     function handleFilePicked(e) {
       const file = e.target.files[0]; if (!file) return;
@@ -1376,6 +1719,7 @@
       $('shareContactModal').close(); handleSendText();
     }
 
+    // --- GRUPOS Y NAVEGACIÓN ---
     function toggleChatKebab() {
       if (confirm('¿Exportar este chat en archivo .txt?')) {
         const c = contacts[activeChatIndex];
@@ -1435,9 +1779,9 @@
       $('qrDisplayImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=8&data=${encodeURIComponent(myPin)}`;
       $('qrPinLabel').textContent = 'PIN: ' + myPin; $('storyShareModal').showModal();
     }
-    
     function openCreateCommunityModal() { alert('Función de Comunidades activa.'); switchMainTab('communities'); }
 
+    // --- EMOJIS (120+) ---
     const FULL_EMOJIS = ['😀','😃','😄','😁','😆','😅','😂','🤣','🥲','🥹','😊','😇','🙂','🙃','😉','😌','😍','🥰','😘','😗','😙','😚','😋','😛','😝','😜','🤪','🤨','🧐','🤓','😎','🥸','🤩','🥳','😏','😒','😞','😔','😟','😕','🙁','☹️','😣','😖','😫','😩','🥺','😢','😭','😮‍💨','😤','😠','😡','🤬','🤯','😳','🥵','🥶','😱','😨','😰','😥','😓','🫣','🤗','🫡','🤔','🫢','🤫','🤥','😶','😐','😑','😬','🫠','🙄','😯','😦','😧','😮','😲','🥱','😴','🤤','😪','😵','🤐','🥴','🤢','🤮','🤧','😷','🤒','🤕','🤑','🤠','😈','👿','👹','👺','🤡','💩','👻','💀','☠️','👽','👾','🤖','🎃','😺','😸','😹','😻','😼','👍','👎','👊','✊','🤛','🤜','👏','🙌','👐','🤲','🤝','🙏','✍️','💪','🦾','👂','👀','🧠','🫀','🫁','❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💔','❤️‍🔥','✨','🔥','🎉','⭐','🌟','⚡','💥'];
     function openEmojiDialog() {
       $('emojiGridBox').innerHTML = FULL_EMOJIS.map(e => `<button style="font-size:26px;padding:4px" onclick="insertEmoji('${e}')">${e}</button>`).join('');
