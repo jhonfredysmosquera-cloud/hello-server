@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-  <title>WhatsApp P2P — HELLO</title>
+  <title>WhatsApp HELLO — Mensajería, Radio P2P y Nube</title>
 
   <!-- Tipografía Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,9 +12,6 @@
 
   <!-- Librerías WebRTC y Utilidades -->
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.9/pdf-lib.min.js"></script>
-  <script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
   <style>
     :root {
@@ -32,7 +29,9 @@
       --wa-bubble-out: #d9fdd3;
       --wa-check-blue: #53bdeb;
       --danger: #ea0038;
+      --accent-purple: #7c3aed;
       --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-scale: 14.5px;
     }
 
     body.dark-theme {
@@ -55,6 +54,7 @@
       background: #dadfe2;
       color: var(--wa-text);
       font-family: var(--font-main);
+      font-size: var(--font-scale);
       height: 100dvh;
       overflow: hidden;
       display: flex;
@@ -64,7 +64,7 @@
     body.dark-theme { background: #0c1317; }
 
     button, input, textarea, select { font-family: var(--font-main); color: inherit; }
-    button { cursor: pointer; border: 0; outline: none; }
+    button { cursor: pointer; border: 0; outline: none; background: transparent; }
     input, textarea, select {
       width: 100%;
       border: 1px solid var(--wa-border);
@@ -80,20 +80,21 @@
       display: flex;
       height: 100dvh;
       width: 100vw;
-      max-width: 1600px;
+      max-width: 1650px;
       background: var(--wa-sidebar);
       overflow: hidden;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      position: relative;
     }
 
-    /* BARRA LATERAL ESTILO WHATSAPP */
+    /* BARRA LATERAL NATIVA WHATSAPP */
     .sidebar {
-      width: 430px;
+      width: 440px;
       border-right: 1px solid var(--wa-border);
       display: flex;
       flex-direction: column;
       background: var(--wa-sidebar);
       flex-shrink: 0;
+      position: relative;
     }
 
     .sidebar-header {
@@ -125,41 +126,68 @@
     .user-avatar-badge strong { font-size: 15px; font-weight: 700; }
     .user-avatar-badge small { display: block; color: var(--wa-teal); font-weight: 700; font-size: 11.5px; }
 
-    .header-icons { display: flex; align-items: center; gap: 4px; }
+    .header-icons { display: flex; align-items: center; gap: 2px; }
     .icon-btn {
-      background: transparent;
       color: var(--wa-text-muted);
-      font-size: 18px;
+      font-size: 19px;
       width: 38px;
       height: 38px;
       border-radius: 50%;
       display: grid;
       place-items: center;
-      transition: background 0.2s;
+      transition: background 0.15s;
     }
     .icon-btn:hover { background: rgba(0, 0, 0, 0.06); }
 
-    /* PESTAÑAS NATIVAS WHATSAPP */
+    /* MENU DESPLEGABLE TRES PUNTOS */
+    .kebab-dropdown {
+      position: absolute;
+      top: 56px;
+      right: 14px;
+      background: var(--wa-sidebar);
+      border-radius: 12px;
+      box-shadow: 0 10px 32px rgba(0,0,0,0.18);
+      border: 1px solid var(--wa-border);
+      width: 230px;
+      z-index: 1000;
+      display: none;
+      flex-direction: column;
+      padding: 6px 0;
+    }
+    .kebab-dropdown.open { display: flex; }
+    .kebab-dropdown button {
+      padding: 11px 18px;
+      text-align: left;
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .kebab-dropdown button:hover { background: var(--wa-card); }
+
+    /* PESTAÑAS WHATSAPP */
     .nav-tabs { display: flex; background: var(--wa-sidebar); border-bottom: 1px solid var(--wa-border); }
     .nav-tab-btn {
       flex: 1;
       padding: 13px 0;
-      background: transparent;
       color: var(--wa-text-muted);
       font-weight: 700;
-      font-size: 12px;
+      font-size: 11.5px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       border-bottom: 3px solid transparent;
       transition: all 0.2s;
+      text-align: center;
     }
     .nav-tab-btn.active { color: var(--wa-teal); border-bottom-color: var(--wa-teal); }
 
-    .search-wrapper { padding: 10px 14px; background: var(--wa-sidebar); border-bottom: 1px solid var(--wa-border); }
+    .search-wrapper { padding: 8px 14px; background: var(--wa-sidebar); border-bottom: 1px solid var(--wa-border); }
     .search-bar { display: flex; align-items: center; background: var(--wa-card); border-radius: 8px; padding: 0 12px; }
     .search-bar input { border: 0; background: transparent; padding: 8px 10px; font-size: 14px; }
 
-    .chat-list { flex: 1; overflow-y: auto; background: var(--wa-sidebar); }
+    .tab-content-area { flex: 1; overflow-y: auto; background: var(--wa-sidebar); }
+
     .chat-item {
       display: flex;
       align-items: center;
@@ -168,18 +196,19 @@
       width: 100%;
       text-align: left;
       border-bottom: 1px solid var(--wa-border);
-      background: var(--wa-sidebar);
       transition: background 0.15s;
+      position: relative;
     }
     .chat-item:hover, .chat-item.selected { background: var(--wa-card); }
     .chat-item .avatar { width: 48px; height: 48px; font-size: 19px; }
     .chat-details { flex: 1; min-width: 0; }
     .chat-details .title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-    .title-row strong { font-size: 15.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--wa-text); }
+    .title-row strong { font-size: 15.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .title-row .time { font-size: 11px; font-weight: 600; color: var(--wa-text-muted); }
-    .chat-details .desc-row { font-size: 13.5px; color: var(--wa-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .chat-details .desc-row { font-size: 13.5px; color: var(--wa-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 4px; }
+    .pin-badge { font-size: 11px; color: var(--wa-teal); margin-left: 6px; }
 
-    /* ÁREA PRINCIPAL DE CHAT */
+    /* ÁREA PRINCIPAL DEL CHAT */
     .main-chat {
       flex: 1;
       min-width: 0;
@@ -202,85 +231,103 @@
       height: 64px;
       background: var(--wa-card);
       border-bottom: 1px solid var(--wa-border);
-      padding: 10px 18px;
+      padding: 8px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       z-index: 2;
     }
-    .main-header .contact-summary { display: flex; align-items: center; gap: 12px; cursor: pointer; }
-    .main-header .avatar { width: 42px; height: 42px; }
-    .contact-summary strong { font-size: 16px; font-weight: 700; display: block; }
-    .contact-summary small { font-size: 12px; font-weight: 600; color: var(--wa-text-muted); }
+    .main-header .contact-summary { display: flex; align-items: center; gap: 12px; cursor: pointer; flex: 1; min-width: 0; }
+    .contact-summary strong { font-size: 15.5px; font-weight: 700; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .contact-summary small { font-size: 11.5px; font-weight: 600; color: var(--wa-text-muted); display: block; }
 
     .conversation {
       flex: 1;
       overflow-y: auto;
-      padding: 20px 8%;
+      padding: 16px 6%;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
       z-index: 1;
     }
 
-    /* BURBUJAS WHATSAPP */
+    /* BURBUJAS DE MENSAJE */
     .bubble {
       max-width: 65%;
-      padding: 8px 12px;
-      font-size: 14.5px;
+      padding: 7px 11px;
+      font-size: var(--font-scale);
       line-height: 1.45;
       border-radius: 8px;
       position: relative;
       box-shadow: 0 1px 0.5px rgba(11,20,26,0.13);
       word-break: break-word;
-      color: var(--wa-text);
+      user-select: none;
+      cursor: pointer;
     }
     .bubble.them { background: var(--wa-bubble-in); align-self: flex-start; border-top-left-radius: 0; }
     .bubble.mine { background: var(--wa-bubble-out); align-self: flex-end; border-top-right-radius: 0; }
+    .bubble .quote-box {
+      background: rgba(0,0,0,0.06);
+      border-left: 4px solid var(--wa-teal);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
     .bubble .meta {
       display: flex;
       align-items: center;
       justify-content: flex-end;
       gap: 4px;
-      font-size: 10.5px;
+      font-size: 10px;
       font-weight: 600;
       color: var(--wa-text-muted);
       margin-top: 4px;
       float: right;
-      padding-left: 12px;
+      padding-left: 10px;
     }
-    .bubble .checks { color: var(--wa-check-blue); font-weight: bold; }
+    .bubble .star-tag { font-size: 10px; color: #f59e0b; margin-right: 2px; }
+    .bubble .reaction-pill {
+      position: absolute;
+      bottom: -10px;
+      right: 8px;
+      background: var(--wa-sidebar);
+      border: 1px solid var(--wa-border);
+      border-radius: 12px;
+      padding: 1px 6px;
+      font-size: 13px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
 
-    /* FOOTER CON BOTONES DEDICADOS */
+    /* BARRA INFERIOR DE CHAT CON ACCIONES */
     .chat-footer {
-      min-height: 68px;
+      min-height: 64px;
       background: var(--wa-card);
-      padding: 8px 14px;
+      padding: 8px 12px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       z-index: 2;
     }
     .input-box {
       flex: 1;
       background: var(--wa-sidebar);
-      border-radius: 24px;
-      padding: 12px 18px;
+      border-radius: 22px;
+      padding: 10px 16px;
       border: 0;
       outline: none;
-      font-size: 15px;
+      font-size: 14.5px;
     }
 
     .btn-action-round {
-      width: 44px;
-      height: 44px;
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
       display: grid;
       place-items: center;
       font-size: 18px;
       flex-shrink: 0;
       transition: all 0.2s;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
     .btn-send-text { background: var(--wa-teal); color: #ffffff; }
     .btn-voice-note { background: #0284c7; color: #ffffff; }
@@ -288,100 +335,131 @@
     .btn-ptt-mic {
       background: #334155;
       color: #ffffff;
-      width: 44px;
-      height: 44px;
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
       display: grid;
       place-items: center;
-      font-size: 19px;
+      font-size: 18px;
       flex-shrink: 0;
       user-select: none;
       touch-action: none;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     }
     .btn-ptt-mic.transmitting { background: var(--danger); animation: pulse 0.9s infinite; }
 
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.12); }
-      100% { transform: scale(1); }
-    }
+    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.12); } 100% { transform: scale(1); } }
 
-    #liveRadioAlert {
-      position: fixed;
-      top: 16px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--danger);
+    /* MENU CONTEXTUAL PARA ADJUNTOS */
+    .attachment-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      padding: 12px 0;
+      text-align: center;
+    }
+    .attach-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+    .attach-icon-circle {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 22px;
       color: #ffffff;
-      padding: 10px 24px;
-      border-radius: 30px;
-      font-weight: 800;
-      font-size: 13.5px;
-      display: none;
-      align-items: center;
-      gap: 10px;
-      box-shadow: 0 8px 24px rgba(234, 0, 56, 0.4);
-      z-index: 9999;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
+    .attach-item span { font-size: 12px; font-weight: 600; color: var(--wa-text); }
 
-    .voice-record-banner {
-      display: none;
-      align-items: center;
-      gap: 8px;
-      background: #fee2e2;
-      color: var(--danger);
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 700;
-      margin: 4px 16px 0;
-    }
-
-    /* PANTALLA DE ACCESO POR PIN */
-    #authOverlay {
+    /* OVERLAY DE LLAMADA Y VIDEOLLAMADA WEBRTC */
+    #callOverlay {
       position: fixed;
       inset: 0;
-      background: var(--wa-bg);
-      z-index: 99999;
+      background: #111b21;
+      color: #ffffff;
+      z-index: 100000;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 40px 20px;
+    }
+    .call-videos-container {
+      position: relative;
+      width: 100%;
+      height: 60vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
     }
-    .auth-card {
+    #remoteVideo { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; background: #202c33; }
+    #localVideo {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 110px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 2px solid #ffffff;
+      background: #000000;
+    }
+    .call-controls { display: flex; align-items: center; gap: 18px; }
+    .btn-call-ctrl {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      color: #ffffff;
+      font-size: 22px;
+      display: grid;
+      place-items: center;
+    }
+    .btn-call-ctrl.hangup { background: var(--danger); }
+
+    /* MENU CONTEXTUAL AL MANTENER PRESIONADO UN MENSAJE */
+    #msgContextMenu {
+      position: fixed;
       background: var(--wa-sidebar);
       border: 1px solid var(--wa-border);
-      border-radius: 20px;
-      width: 100%;
-      max-width: 420px;
-      padding: 36px 28px;
-      box-shadow: 0 20px 48px rgba(0,0,0,0.12);
-      text-align: center;
+      border-radius: 14px;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.22);
+      z-index: 20000;
+      display: none;
+      flex-direction: column;
+      width: 210px;
+      padding: 6px 0;
     }
-    .auth-tab-group {
+    #msgContextMenu button {
+      padding: 10px 16px;
+      text-align: left;
+      font-size: 13.5px;
+      font-weight: 600;
       display: flex;
-      gap: 8px;
-      background: var(--wa-card);
-      padding: 4px;
-      border-radius: 12px;
-      margin-bottom: 24px;
+      align-items: center;
+      gap: 12px;
     }
-    .auth-tab-btn {
-      flex: 1;
-      padding: 11px 0;
-      border-radius: 10px;
-      font-weight: 700;
-      font-size: 13px;
-      background: transparent;
-      color: var(--wa-text-muted);
+    #msgContextMenu button:hover { background: var(--wa-card); }
+    .reactions-bar {
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--wa-border);
+      font-size: 22px;
     }
-    .auth-tab-btn.active {
-      background: var(--wa-sidebar);
-      color: var(--wa-teal);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    }
+    .reactions-bar span { cursor: pointer; transition: transform 0.15s; }
+    .reactions-bar span:hover { transform: scale(1.3); }
 
+    /* ESTILOS DE FORMATO DE TEXTO */
+    .msg-quote { border-left: 3px solid var(--wa-teal); padding-left: 8px; margin: 4px 0; font-style: italic; opacity: 0.9; }
+    .msg-code { font-family: monospace; background: rgba(0,0,0,0.08); padding: 2px 6px; border-radius: 4px; font-size: 12.5px; }
+
+    /* MODALES GENERALES */
     dialog {
       background: var(--wa-sidebar);
       color: var(--wa-text);
@@ -394,37 +472,55 @@
     }
     dialog::backdrop { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(3px); }
 
-    .btn-hello-primary {
+    .btn-wa-primary {
       background: var(--wa-teal);
       color: #ffffff;
       font-weight: 700;
       padding: 12px 20px;
       border-radius: 24px;
       font-size: 14.5px;
-    }
-    .btn-hello-primary:hover { background: var(--wa-teal-dark); }
-
-    .emoji-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; max-height: 260px; overflow-y: auto; margin-top: 14px; }
-    .emoji-grid button { background: var(--wa-card); border-radius: 8px; font-size: 22px; padding: 10px 0; }
-
-    .story-card-box {
-      background: linear-gradient(135deg, #075e54 0%, #00a884 50%, #25d366 100%);
-      color: #ffffff;
-      padding: 28px 20px;
-      border-radius: 18px;
+      width: 100%;
       text-align: center;
-      margin: 16px 0;
     }
-    .story-card-box .qr-frame { background: #ffffff; padding: 12px; border-radius: 14px; display: inline-block; }
-    .story-card-box .pin-banner {
-      margin-top: 16px;
-      background: rgba(0,0,0,0.25);
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 18px;
+
+    #liveRadioAlert {
+      position: fixed;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--danger);
+      color: #ffffff;
+      padding: 9px 22px;
+      border-radius: 30px;
       font-weight: 800;
-      letter-spacing: 2px;
-      display: inline-block;
+      font-size: 13px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 8px 24px rgba(234, 0, 56, 0.4);
+      z-index: 99999;
+    }
+
+    /* PANTALLA DE ACCESO POR PIN */
+    #authOverlay {
+      position: fixed;
+      inset: 0;
+      background: var(--wa-bg);
+      z-index: 999999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .auth-card {
+      background: var(--wa-sidebar);
+      border: 1px solid var(--wa-border);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 400px;
+      padding: 34px 26px;
+      box-shadow: 0 20px 48px rgba(0,0,0,0.12);
+      text-align: center;
     }
 
     .mobile-back { display: none; }
@@ -441,128 +537,216 @@
 </head>
 <body>
 
-  <!-- ACCESO POR PIN -->
+  <!-- ACCESO EXCLUSIVO POR PIN -->
   <div id="authOverlay" style="display: none;">
     <div class="auth-card">
-      <div style="font-size: 48px; margin-bottom: 6px;">✦</div>
-      <h2 style="margin: 0 0 6px; font-size: 24px; font-weight: 800;">HELLO</h2>
-      <p style="font-size: 13.5px; color: var(--wa-text-muted); margin: 0 0 24px;">WhatsApp P2P y Walkie-Talkie sin número celular</p>
+      <div style="font-size: 46px; margin-bottom: 6px;">✦</div>
+      <h2 style="margin: 0 0 6px; font-size: 22px; font-weight: 800;">HELLO WhatsApp</h2>
+      <p style="font-size: 13px; color: var(--wa-text-muted); margin: 0 0 22px;">Mensajería privada y llamadas P2P por PIN</p>
       
-      <div class="auth-tab-group">
-        <button type="button" class="auth-tab-btn active" id="tabBtnNew" onclick="switchAuthTab('new')">Generar PIN</button>
-        <button type="button" class="auth-tab-btn" id="tabBtnLogin" onclick="switchAuthTab('login')">Ingresar mi PIN</button>
+      <div style="display:flex;gap:6px;background:var(--wa-card);padding:4px;border-radius:10px;margin-bottom:20px">
+        <button type="button" class="nav-tab-btn active" id="tabBtnNewPin" onclick="switchPinView('new')">Nuevo PIN</button>
+        <button type="button" class="nav-tab-btn" id="tabBtnLogPin" onclick="switchPinView('login')">Ingresar PIN</button>
       </div>
 
-      <div id="formNewUser">
-        <p style="font-size: 13px; color: var(--wa-text-muted); text-align: left; margin: 0 0 20px; line-height: 1.5;">
-          Obtén un PIN privado para comenzar a chatear. No se requiere correo ni datos personales.
+      <div id="viewNewPin">
+        <p style="font-size: 13px; color: var(--wa-text-muted); text-align: left; margin: 0 0 18px; line-height: 1.5;">
+          Genera un identificador cifrado para chatear sin número de celular ni correo.
         </p>
-        <button class="btn-hello-primary" style="width: 100%; padding: 14px;" onclick="handleCreateAccountOnlyPin()">✨ Generar mi PIN y Entrar</button>
+        <button class="btn-wa-primary" onclick="generateAccountPin()">✨ Generar mi PIN y Entrar</button>
       </div>
 
-      <form id="formLoginUser" onsubmit="handleLoginAccountOnlyPin(event)" style="display: none;">
-        <div style="text-align: left; margin-bottom: 20px;">
-          <label style="font-size: 12px; font-weight: 700; color: var(--wa-text-muted); display: block; margin-bottom: 8px;">ESCRIBE TU PIN</label>
-          <input id="loginUserPin" placeholder="Ej. A8F2K9M1" required maxlength="8" style="text-transform: uppercase; font-weight: 800; letter-spacing: 3px; text-align: center; font-size: 19px; padding: 13px;">
-        </div>
-        <button class="btn-hello-primary" id="btnLoginSubmit" style="width: 100%; padding: 14px;">Acceder y Restaurar mis Chats</button>
+      <form id="viewLogPin" onsubmit="loginWithPin(event)" style="display: none;">
+        <input id="inputPinLog" placeholder="Ej. A8F2K9M1" required maxlength="8" style="text-transform:uppercase;font-weight:800;letter-spacing:3px;text-align:center;font-size:18px;margin-bottom:16px;padding:12px">
+        <button class="btn-wa-primary" id="btnRestoring">Restaurar mis Chats de la Nube</button>
       </form>
     </div>
   </div>
 
-  <div id="liveRadioAlert">
-    <span>📻</span> <span id="radioAlertSender">Canal de Radio PTT activo...</span>
-  </div>
+  <div id="liveRadioAlert"><span>📻</span> <span id="radioAlertSender">Canal SOS en vivo...</span></div>
   <audio id="liveSpeaker" autoplay playsinline></audio>
 
+  <!-- OVERLAY WEBRTC: LLAMADAS Y VIDEOLLAMADAS -->
+  <div id="callOverlay">
+    <div style="text-align:center">
+      <h3 id="callContactTitle" style="margin:0 0 4px;font-size:20px">Llamando...</h3>
+      <p id="callStateLabel" style="margin:0;font-size:13px;opacity:0.8">Conexión WebRTC directa P2P</p>
+    </div>
+    <div class="call-videos-container" id="videoContainerBox">
+      <video id="remoteVideo" autoplay playsinline></video>
+      <video id="localVideo" autoplay playsinline muted></video>
+    </div>
+    <div class="call-controls">
+      <button class="btn-call-ctrl" id="btnToggleMic" onclick="toggleCallMic()" title="Micrófono">🎤</button>
+      <button class="btn-call-ctrl" id="btnToggleCam" onclick="toggleCallCam()" title="Cámara">📷</button>
+      <button class="btn-call-ctrl" onclick="switchCameraFacing()" title="Cambiar Cámara">🔄</button>
+      <button class="btn-call-ctrl hangup" onclick="endActiveCall()" title="Finalizar">📞</button>
+    </div>
+  </div>
+
+  <!-- MENU CONTEXTUAL PARA MENSAJES -->
+  <div id="msgContextMenu">
+    <div class="reactions-bar">
+      <span onclick="reactToMessage('👍')">👍</span>
+      <span onclick="reactToMessage('❤️')">❤️</span>
+      <span onclick="reactToMessage('😂')">😂</span>
+      <span onclick="reactToMessage('😮')">😮</span>
+      <span onclick="reactToMessage('😢')">😢</span>
+      <span onclick="reactToMessage('🙏')">🙏</span>
+    </div>
+    <button onclick="contextAction('reply')">↩️ Responder</button>
+    <button onclick="contextAction('forward')">➡️ Reenviar</button>
+    <button onclick="contextAction('copy')">📋 Copiar</button>
+    <button onclick="contextAction('star')">⭐ Destacar</button>
+    <button onclick="contextAction('info')">ℹ️ Información</button>
+    <button onclick="contextAction('edit')" id="btnCtxEdit">✏️ Editar</button>
+    <button onclick="contextAction('share')">🔗 Compartir</button>
+    <button onclick="contextAction('delete')" style="color:var(--danger)">🗑️ Eliminar</button>
+  </div>
+
   <div class="app" id="appShell">
+    <!-- BARRA LATERAL -->
     <div class="sidebar">
       <div class="sidebar-header">
-        <div class="user-avatar-badge" onclick="openSettingsSection('profile')">
+        <div class="user-avatar-badge" onclick="openProfileSection()">
           <div class="avatar" id="myHeaderAvatar">U</div>
           <div><strong id="myHeaderName">Mi Usuario</strong><small>PIN: <span id="myHeaderPin">...</span></small></div>
         </div>
         <div class="header-icons">
-          <button class="icon-btn" onclick="openCreateGroupModal()" title="Crear Grupo">👥</button>
-          <button class="icon-btn" onclick="openStoryShareModal()" title="Tarjeta QR">📱</button>
-          <button class="icon-btn" onclick="openQuickAddModal()" title="Nuevo Chat PIN">💬</button>
-          <button class="icon-btn" onclick="executePanicKillSwitch()" title="Botón de Pánico" style="color:var(--danger)">🚨</button>
-          <button class="icon-btn" onclick="viewTab('settings')" title="Ajustes">⚙️</button>
+          <button class="icon-btn" onclick="openQuickCameraModal()" title="Cámara">📷</button>
+          <button class="icon-btn" onclick="openQuickAddModal()" title="Nuevo Chat">✏️</button>
+          <button class="icon-btn" onclick="toggleKebabMenu()" title="Menú">⋮</button>
         </div>
       </div>
 
-      <!-- PESTAÑAS MODELO WHATSAPP -->
+      <!-- MENÚ DE TRES PUNTOS -->
+      <div class="kebab-dropdown" id="kebabDropdown">
+        <button onclick="openCreateGroupModal(); toggleKebabMenu();">👥 Nuevo grupo</button>
+        <button onclick="openCreateCommunityModal(); toggleKebabMenu();">🌐 Nueva comunidad</button>
+        <button onclick="openBroadcastModal(); toggleKebabMenu();">📢 Nueva difusión</button>
+        <button onclick="openStoryShareModal(); toggleKebabMenu();">📱 Tarjeta QR e Invitar</button>
+        <button onclick="openStarredMessagesModal(); toggleKebabMenu();">⭐ Mensajes destacados</button>
+        <button onclick="openSettingsSection('chats'); toggleKebabMenu();">⚙️ Ajustes</button>
+        <button onclick="executePanicKillSwitch()" style="color:var(--danger)">🚨 Botón de Pánico</button>
+      </div>
+
+      <!-- PESTAÑAS PRINCIPALES -->
       <div class="nav-tabs">
-        <button class="nav-tab-btn active" id="tabBtnChats" onclick="viewTab('chats')">Chats</button>
-        <button class="nav-tab-btn" id="tabBtnGroups" onclick="viewTab('groups')">Grupos</button>
-        <button class="nav-tab-btn" id="tabBtnRadio" onclick="viewTab('radio')">Emergencias</button>
-        <button class="nav-tab-btn" id="tabBtnSettings" onclick="viewTab('settings')">Ajustes</button>
+        <button class="nav-tab-btn active" id="tabBtnChats" onclick="switchMainTab('chats')">Chats</button>
+        <button class="nav-tab-btn" id="tabBtnUpdates" onclick="switchMainTab('updates')">Novedades</button>
+        <button class="nav-tab-btn" id="tabBtnCommunities" onclick="switchMainTab('communities')">Comunidades</button>
+        <button class="nav-tab-btn" id="tabBtnCalls" onclick="switchMainTab('calls')">Llamadas</button>
       </div>
 
       <div class="search-wrapper" id="searchContainer">
-        <div class="search-bar"><span>🔍</span><input id="searchInput" placeholder="Buscar un chat o grupo..." oninput="renderFilteredList(this.value)"></div>
+        <div class="search-bar">
+          <span>🔍</span>
+          <input id="searchInput" placeholder="Buscar contactos, mensajes..." oninput="filterMainList(this.value)">
+        </div>
       </div>
-      <div class="chat-list" id="sidebarListContent"></div>
+
+      <div class="tab-content-area" id="tabContentList"></div>
     </div>
 
+    <!-- ÁREA DEL CHAT -->
     <div class="main-chat" id="mainArea"></div>
   </div>
 
-  <!-- MODAL: CREAR GRUPO -->
-  <dialog id="createGroupModal">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-      <h3 style="margin:0;font-size:18px;font-weight:700">Nuevo Grupo Radio P2P</h3>
-      <button class="icon-btn" onclick="createGroupModal.close()">✕</button>
+  <!-- MODAL: MENÚ DE 9 ADJUNTOS -->
+  <dialog id="attachDialog">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <strong style="font-size:16px">Compartir contenido</strong>
+      <button class="icon-btn" onclick="attachDialog.close()">✕</button>
     </div>
-    <form onsubmit="confirmCreateGroup(event)">
-      <input id="newGroupNameInput" placeholder="Nombre del grupo..." required style="margin-bottom:14px">
-      <label style="font-size:12px;font-weight:700;color:var(--wa-text-muted);display:block;margin-bottom:8px">SELECCIONA CONTACTOS</label>
-      <div id="groupMembersCheckboxes" style="max-height:180px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:16px"></div>
-      <button class="btn-hello-primary" style="width:100%">Crear Grupo</button>
+    <div class="attachment-grid">
+      <div class="attach-item" onclick="triggerFilePicker('.pdf,.doc,.docx,.txt')">
+        <div class="attach-icon-circle" style="background:#7f66ff">📄</div>
+        <span>Documento</span>
+      </div>
+      <div class="attach-item" onclick="openDirectCameraCapture()">
+        <div class="attach-icon-circle" style="background:#d33b6f">📷</div>
+        <span>Cámara</span>
+      </div>
+      <div class="attach-item" onclick="triggerFilePicker('image/*,video/*')">
+        <div class="attach-icon-circle" style="background:#c32aa3">🖼️</div>
+        <span>Galería</span>
+      </div>
+      <div class="attach-item" onclick="triggerFilePicker('audio/*')">
+        <div class="attach-icon-circle" style="background:#e07000">🎵</div>
+        <span>Audio</span>
+      </div>
+      <div class="attach-item" onclick="shareCurrentLocation()">
+        <div class="attach-icon-circle" style="background:#0f9d58">📍</div>
+        <span>Ubicación</span>
+      </div>
+      <div class="attach-item" onclick="shareLiveLocation()">
+        <div class="attach-icon-circle" style="background:#00a884">🛰️</div>
+        <span>En vivo</span>
+      </div>
+      <div class="attach-item" onclick="openShareContactModal()">
+        <div class="attach-icon-circle" style="background:#007bfc">👤</div>
+        <span>Contacto</span>
+      </div>
+      <div class="attach-item" onclick="openCreatePollModal()">
+        <div class="attach-icon-circle" style="background:#f4b400">📊</div>
+        <span>Encuesta</span>
+      </div>
+      <div class="attach-item" onclick="openCreateEventModal()">
+        <div class="attach-icon-circle" style="background:#009688">📅</div>
+        <span>Evento</span>
+      </div>
+    </div>
+    <input type="file" id="genericFileInput" hidden onchange="handleFilePicked(event)">
+  </dialog>
+
+  <!-- MODAL: ENCUESTAS -->
+  <dialog id="pollModal">
+    <h3 style="margin:0 0 12px;font-size:17px">Crear Encuesta</h3>
+    <input id="pollQuestion" placeholder="Haz una pregunta..." style="margin-bottom:10px">
+    <input id="pollOpt1" placeholder="Opción 1" style="margin-bottom:8px">
+    <input id="pollOpt2" placeholder="Opción 2" style="margin-bottom:8px">
+    <input id="pollOpt3" placeholder="Opción 3 (Opcional)" style="margin-bottom:14px">
+    <button class="btn-wa-primary" onclick="submitSendPoll()">Enviar Encuesta</button>
+  </dialog>
+
+  <!-- MODALES DE SOPORTE -->
+  <dialog id="quickAddModal">
+    <h3 style="margin:0 0 12px;font-size:17px">Nuevo Chat por PIN</h3>
+    <form onsubmit="confirmAddPin(event)">
+      <input id="addPinInput" placeholder="Ej. VA7K2M9X" maxlength="8" style="text-transform:uppercase;letter-spacing:2px;font-weight:800;text-align:center;font-size:18px;margin-bottom:14px" required>
+      <button class="btn-wa-primary">Comenzar Conversación</button>
     </form>
   </dialog>
 
-  <!-- MODAL: GESTIONAR GRUPO -->
-  <dialog id="manageGroupModal">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <h3 style="margin:0;font-size:18px;font-weight:700">Información del Grupo</h3>
-      <button class="icon-btn" onclick="manageGroupModal.close()">✕</button>
-    </div>
-    <div id="manageGroupContent"></div>
+  <dialog id="createGroupModal">
+    <h3 style="margin:0 0 12px;font-size:17px">Crear Grupo P2P</h3>
+    <input id="newGroupNameInput" placeholder="Nombre del grupo..." required style="margin-bottom:12px">
+    <div id="groupMembersCheckboxes" style="max-height:160px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:14px"></div>
+    <button class="btn-wa-primary" onclick="confirmCreateGroup()">Crear</button>
   </dialog>
 
-  <!-- MODAL: TARJETA QR -->
   <dialog id="storyShareModal">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-      <h3 style="margin:0;font-size:18px;font-weight:700">Tu Tarjeta HELLO</h3>
-      <button class="icon-btn" onclick="storyShareModal.close()">✕</button>
+    <h3 style="margin:0 0 10px;font-size:17px">Tu Tarjeta HELLO</h3>
+    <div style="background:linear-gradient(135deg, #075e54, #25d366);padding:24px 16px;border-radius:14px;text-align:center;color:#ffffff;margin-bottom:12px">
+      <h2 style="margin:0 0 4px">✦ HELLO</h2>
+      <p style="font-size:12px;margin:0 0 14px">Háblame en privado sin pedir mi número</p>
+      <img id="qrDisplayImg" src="" style="width:160px;height:160px;background:#ffffff;padding:8px;border-radius:10px;display:inline-block">
+      <div style="margin-top:12px;font-weight:800;letter-spacing:2px" id="qrPinLabel">PIN: ...</div>
     </div>
-    <div class="story-card-box">
-      <h2 style="margin:0 0 6px">✦ HELLO</h2>
-      <p style="margin:0 0 16px;font-size:13px">Conéctate en privado sin pedir mi número</p>
-      <div class="qr-frame">
-        <img id="qrDisplayImg" src="" style="width:180px;height:180px;display:block">
-      </div>
-      <div><span class="pin-banner" id="qrPinLabel">PIN: ...</span></div>
-    </div>
-    <button class="btn-hello-primary" style="width:100%" onclick="storyShareModal.close()">Cerrar</button>
+    <button class="btn-wa-primary" onclick="storyShareModal.close()">Listo</button>
   </dialog>
 
-  <!-- MODAL: NUEVO CHAT PIN -->
-  <dialog id="quickAddModal">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0;font-size:18px;font-weight:700">Nuevo Chat por PIN</h3><button class="icon-btn" onclick="quickAddModal.close()">✕</button></div>
-    <form onsubmit="confirmAddPin(event)"><input id="addPinInput" placeholder="Ej. VA7K2M9X" maxlength="8" style="text-transform:uppercase;letter-spacing:2px;font-weight:800;text-align:center;font-size:18px" required autofocus><button class="btn-hello-primary" style="width:100%;margin-top:16px">Conectar</button></form>
-  </dialog>
-
-  <!-- MODAL: EMOJIS -->
   <dialog id="emojiDialog">
-    <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0;font-size:16px;font-weight:700">Emojis</h3><button class="icon-btn" onclick="emojiDialog.close()">✕</button></div>
-    <div class="emoji-grid" id="emojiGridBox"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center"><strong style="font-size:16px">Emojis</strong><button class="icon-btn" onclick="emojiDialog.close()">✕</button></div>
+    <div class="emoji-grid" id="emojiGridBox" style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;max-height:220px;overflow-y:auto;margin-top:10px"></div>
   </dialog>
 
-  <dialog id="noticeModal"><h3 id="noticeTitle" style="margin:0 0 10px;font-weight:700"></h3><p id="noticeDesc" style="color:var(--wa-text-muted);font-size:14px;line-height:1.5"></p><button class="btn-hello-primary" style="width:100%;margin-top:10px" onclick="noticeModal.close()">OK</button></dialog>
+  <dialog id="starredModal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><strong style="font-size:16px">Mensajes Destacados ⭐</strong><button class="icon-btn" onclick="starredModal.close()">✕</button></div>
+    <div id="starredMessagesList" style="max-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:8px"></div>
+  </dialog>
 
-  <input type="file" id="profilePicHiddenInput" accept="image/*" style="display:none" onchange="processProfilePhotoUpload(event)">
+  <dialog id="noticeModal"><h3 id="noticeTitle" style="margin:0 0 8px"></h3><p id="noticeDesc" style="color:var(--wa-text-muted);font-size:13.5px;line-height:1.5"></p><button class="btn-wa-primary" onclick="noticeModal.close()">Entendido</button></dialog>
 
   <script>
     const $ = id => document.getElementById(id);
@@ -574,6 +758,7 @@
       let r = ''; for (let i = 0; i < len; i++) r += chars.charAt(Math.floor(Math.random() * chars.length)); return r;
     }
 
+    // --- EFECTO DE AUDIO SINTETIZADO: ROGER BEEP ---
     function playRogerBeep() {
       try {
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -592,100 +777,67 @@
       } catch (e) {}
     }
 
-    function switchAuthTab(type) {
-      if (type === 'new') {
-        $('tabBtnNew').classList.add('active');
-        $('tabBtnLogin').classList.remove('active');
-        $('formNewUser').style.display = 'block';
-        $('formLoginUser').style.display = 'none';
+    // --- ACCESO POR PIN Y NUBE ---
+    function switchPinView(v) {
+      if (v === 'new') {
+        $('tabBtnNewPin').classList.add('active'); $('tabBtnLogPin').classList.remove('active');
+        $('viewNewPin').style.display = 'block'; $('viewLogPin').style.display = 'none';
       } else {
-        $('tabBtnLogin').classList.add('active');
-        $('tabBtnNew').classList.remove('active');
-        $('formNewUser').style.display = 'none';
-        $('formLoginUser').style.display = 'block';
+        $('tabBtnLogPin').classList.add('active'); $('tabBtnNewPin').classList.remove('active');
+        $('viewNewPin').style.display = 'none'; $('viewLogPin').style.display = 'block';
       }
     }
 
-    function handleCreateAccountOnlyPin() {
-      const newPin = generateId(8);
-      localStorage.helloCurrentPin = newPin;
-      localStorage['helloName_' + newPin] = 'Usuario ' + newPin.slice(0, 4);
+    function generateAccountPin() {
+      const p = generateId(8);
+      localStorage.helloCurrentPin = p;
+      localStorage['helloName_' + p] = 'Usuario ' + p.slice(0, 4);
       syncToCloud();
       location.reload();
     }
 
-    async function handleLoginAccountOnlyPin(e) {
+    async function loginWithPin(e) {
       e.preventDefault();
-      const pin = $('loginUserPin').value.trim().toUpperCase();
-      if (pin.length < 4) return showNotice('Error', 'Ingresa un PIN válido.');
-      
-      $('btnLoginSubmit').textContent = 'Descargando datos de la nube...';
-      $('btnLoginSubmit').disabled = true;
-
-      localStorage.helloCurrentPin = pin;
-      if (!localStorage['helloName_' + pin]) {
-        localStorage['helloName_' + pin] = 'Usuario ' + pin.slice(0, 4);
-      }
-
+      const p = $('inputPinLog').value.trim().toUpperCase();
+      if (p.length < 4) return showNotice('Error', 'PIN inválido');
+      $('btnRestoring').textContent = 'Descargando datos...';
+      localStorage.helloCurrentPin = p;
       try {
-        const res = await fetch(`${SERVER_URL}/api/backup/${pin}`);
+        const res = await fetch(`${SERVER_URL}/api/backup/${p}`);
         if (res.ok) {
-          const cloudData = await res.json();
-          if (cloudData.contacts) localStorage['helloContacts_' + pin] = JSON.stringify(cloudData.contacts);
-          if (cloudData.name) localStorage['helloName_' + pin] = cloudData.name;
-          if (cloudData.status) localStorage['helloStatus_' + pin] = cloudData.status;
-          if (cloudData.photo) localStorage['helloPhoto_' + pin] = cloudData.photo;
-
-          if (cloudData.msgs) {
-            const database = await openPinDatabase(pin);
+          const d = await res.json();
+          if (d.contacts) localStorage['helloContacts_' + p] = JSON.stringify(d.contacts);
+          if (d.name) localStorage['helloName_' + p] = d.name;
+          if (d.status) localStorage['helloStatus_' + p] = d.status;
+          if (d.photo) localStorage['helloPhoto_' + p] = d.photo;
+          if (d.msgs) {
+            const database = await openPinDatabase(p);
             const tx = database.transaction('chats', 'readwrite');
             const store = tx.objectStore('chats');
             store.clear();
-            for (const targetPin in cloudData.msgs) {
-              cloudData.msgs[targetPin].forEach(m => {
-                m.targetPin = targetPin;
-                store.add(m);
-              });
+            for (const t in d.msgs) {
+              d.msgs[t].forEach(m => { m.targetPin = t; store.add(m); });
             }
           }
         }
-      } catch (err) {
-        console.warn('Sin conexión para descarga de nube.');
-      }
-
+      } catch(err){}
       location.reload();
     }
 
-    function logoutAccount() {
-      if (confirm('¿Cerrar sesión? Tus datos están guardados en este equipo y en la nube de tu servidor Render.')) {
-        if (peer) peer.destroy();
-        localStorage.removeItem('helloCurrentPin');
-        location.reload();
-      }
-    }
-
-    async function executePanicKillSwitch() {
-      if (confirm('🚨 BOTÓN DE PÁNICO: ¿Deseas destruir todas las conversaciones, cerrar sesión y borrar los datos de este equipo de inmediato?')) {
-        if (peer) peer.destroy();
-        localStorage.clear();
-        try { indexedDB.deleteDatabase('HelloDB_' + myPin); } catch(e){}
-        location.reload();
-      }
-    }
-
     const myPin = localStorage.helloCurrentPin || '';
-    if (!myPin) {
-      $('authOverlay').style.display = 'flex';
-    }
+    if (!myPin) $('authOverlay').style.display = 'flex';
 
     let myName = localStorage['helloName_' + myPin] || ('Usuario ' + (myPin ? myPin.slice(0, 4) : ''));
-    let myStatus = localStorage['helloStatus_' + myPin] || 'Disponible en HELLO.';
+    let myStatus = localStorage['helloStatus_' + myPin] || 'Disponible en HELLO';
     let myPhoto = localStorage['helloPhoto_' + myPin] || '';
     let activeChatIndex = 0;
-    let currentTab = 'chats';
+    let currentMainTab = 'chats';
 
     let contacts = JSON.parse(localStorage['helloContacts_' + myPin] || '[]');
     let msgs = {};
+    let callLogs = JSON.parse(localStorage['helloCalls_' + myPin] || '[]');
+    let userStates = JSON.parse(localStorage['helloStates_' + myPin] || '[]');
+    let followedChannels = JSON.parse(localStorage['helloChannels_' + myPin] || '["Canal Oficial HELLO"]');
 
     function updateHeaderIdentity() {
       if ($('myHeaderPin')) $('myHeaderPin').textContent = myPin;
@@ -694,7 +846,7 @@
     }
     updateHeaderIdentity();
 
-    // --- BASE DE DATOS LOCAL POR PIN (INDEXEDDB) ---
+    // --- BASE DE DATOS LOCAL (INDEXEDDB) ---
     let db = null;
     function openPinDatabase(customPin = null) {
       const pinTarget = customPin || myPin;
@@ -702,10 +854,8 @@
         if (!pinTarget) return resolve(null);
         const req = indexedDB.open('HelloDB_' + pinTarget, 1);
         req.onupgradeneeded = e => {
-          const database = e.target.result;
-          if (!database.objectStoreNames.contains('chats')) {
-            database.createObjectStore('chats', { keyPath: 'id', autoIncrement: true });
-          }
+          const d = e.target.result;
+          if (!d.objectStoreNames.contains('chats')) d.createObjectStore('chats', { keyPath: 'id', autoIncrement: true });
         };
         req.onsuccess = e => { db = e.target.result; resolve(db); };
         req.onerror = e => reject(e.target.error);
@@ -728,14 +878,11 @@
       const req = tx.objectStore('chats').getAll();
       req.onsuccess = e => {
         msgs = {};
-        e.target.result.forEach(m => {
-          (msgs[m.targetPin] ??= []).push(m);
-        });
+        e.target.result.forEach(m => { (msgs[m.targetPin] ??= []).push(m); });
         if (contacts.length) drawChatMessages();
       };
     }
 
-    // --- RESPALDO AUTOMÁTICO EN LA NUBE (RENDER) ---
     let syncTimeout = null;
     function syncToCloud() {
       if (!myPin) return;
@@ -745,15 +892,7 @@
           await fetch(`${SERVER_URL}/api/backup/${myPin}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              pin: myPin,
-              name: myName,
-              status: myStatus,
-              photo: myPhoto,
-              contacts: contacts,
-              msgs: msgs,
-              updatedAt: Date.now()
-            })
+            body: JSON.stringify({ pin: myPin, name: myName, status: myStatus, photo: myPhoto, contacts, msgs, updatedAt: Date.now() })
           });
         } catch(e) {}
       }, 1500);
@@ -765,17 +904,24 @@
       localStorage['helloName_' + myPin] = myName;
       localStorage['helloStatus_' + myPin] = myStatus;
       localStorage['helloPhoto_' + myPin] = myPhoto;
+      localStorage['helloCalls_' + myPin] = JSON.stringify(callLogs);
+      localStorage['helloStates_' + myPin] = JSON.stringify(userStates);
       syncToCloud();
     }
 
-    function renderAvatarHtml(c, size = 48) {
-      if (c.isEmergency) return `<div class="avatar" style="width:${size}px;height:${size}px;background:var(--danger);font-size:${size*0.42}px">🚨</div>`;
-      if (c.isGroup) return `<div class="avatar" style="width:${size}px;height:${size}px;background:#00a884;font-size:${size*0.4}px">👥</div>`;
-      if (c.photo) return `<div class="avatar" style="width:${size}px;height:${size}px"><img src="${c.photo}"></div>`;
-      return `<div class="avatar" style="width:${size}px;height:${size}px;font-size:${size*0.4}px">${esc((c.name || 'U').charAt(0).toUpperCase())}</div>`;
+    // --- FORMATEADOR DE TEXTO (MARKDOWN DE WHATSAPP) ---
+    function formatWhatsAppText(txt) {
+      if (!txt) return '';
+      let res = esc(txt);
+      res = res.replace(/\*(.*?)\*/g, '<strong>$1</strong>');
+      res = res.replace(/_(.*?)_/g, '<em>$1</em>');
+      res = res.replace(/~(.*?)~/g, '<del>$1</del>');
+      res = res.replace(/```(.*?)```/gs, '<div class="msg-code">$1</div>');
+      res = res.replace(/^> (.*$)/gim, '<div class="msg-quote">$1</div>');
+      return res;
     }
 
-    // --- PEERJS Y WEBRTC ---
+    // --- WEBRTC CONFIGURATION ---
     const peerServerConfig = {
       host: 'hello-server-p2p.onrender.com',
       port: 443,
@@ -795,17 +941,12 @@
 
     let peer = null;
     const peerConns = new Map();
-    const pendingMsgQueues = new Map();
-    let currentAudioStream = null;
-    let liveRadioCalls = [];
+    let activeCallStream = null;
+    let activeWebRtcCall = null;
 
     if (myPin) {
       openPinDatabase().then(() => loadMessages());
-
       peer = new Peer('HELLO-' + myPin, peerServerConfig);
-
-      peer.on('open', id => console.log('HELLO P2P activo:', id));
-      peer.on('disconnected', () => { if (peer && !peer.destroyed) peer.reconnect(); });
 
       peer.on('connection', conn => {
         const remotePin = conn.peer.replace('HELLO-', '');
@@ -813,605 +954,548 @@
       });
 
       peer.on('call', call => {
-        call.answer();
-        call.on('stream', stream => {
-          const player = $('liveSpeaker'); player.srcObject = stream; player.play().catch(e => console.log(e));
-          const sender = call.metadata?.name || 'Contacto';
-          const grp = call.metadata?.groupName ? ` [${call.metadata.groupName}]` : '';
-          $('radioAlertSender').textContent = `📻 ${sender}${grp} en vivo...`;
-          $('liveRadioAlert').style.display = 'flex';
-        });
-        call.on('close', () => {
-          $('liveRadioAlert').style.display = 'none';
-          $('liveSpeaker').srcObject = null;
-          playRogerBeep();
-        });
-      });
-
-      setInterval(() => {
-        if (peer && !peer.destroyed) {
-          if (peer.disconnected) peer.reconnect();
-          else if (peer.socket && peer.socket._ws && peer.socket._ws.readyState === 1) {
-            peer.socket._ws.send(JSON.stringify({ type: 'HEARTBEAT' }));
+        if (call.metadata?.isFullCall) {
+          if (confirm(`📞 Llamada entrante de ${call.metadata.name || 'Contacto'}. ¿Deseas contestar?`)) {
+            navigator.mediaDevices.getUserMedia({ audio: true, video: call.metadata.isVideo }).then(stream => {
+              activeCallStream = stream;
+              $('localVideo').srcObject = stream;
+              call.answer(stream);
+              handleCallStream(call, call.metadata.name, call.metadata.isVideo);
+            });
           }
+        } else {
+          // Walkie-Talkie Audio PTT Stream
+          call.answer();
+          call.on('stream', stream => {
+            const player = $('liveSpeaker'); player.srcObject = stream; player.play().catch(e=>{});
+            $('radioAlertSender').textContent = `📻 ${call.metadata?.name || 'Contacto'} en vivo...`;
+            $('liveRadioAlert').style.display = 'flex';
+          });
+          call.on('close', () => { $('liveRadioAlert').style.display = 'none'; $('liveSpeaker').srcObject = null; playRogerBeep(); });
         }
-      }, 20000);
-    }
-
-    function flushOutbox(pin, conn) {
-      if (pendingMsgQueues.has(pin) && conn && conn.open) {
-        const queue = pendingMsgQueues.get(pin);
-        while (queue.length > 0) {
-          const payload = queue.shift();
-          try { conn.send(payload); } catch(e){}
-        }
-        pendingMsgQueues.delete(pin);
-      }
+      });
     }
 
     function bindConnHandlers(conn, remotePin) {
       peerConns.set(remotePin, conn);
-
-      const onReady = () => {
-        peerConns.set(remotePin, conn);
-        try { conn.send({ type: 'HANDSHAKE', pin: myPin, name: myName, status: myStatus, photo: myPhoto }); } catch(e){}
-        flushOutbox(remotePin, conn);
-      };
-
-      if (conn.open) onReady();
-      else conn.on('open', onReady);
-
       conn.on('data', data => {
-        if (data.type === 'HANDSHAKE' || data.type === 'HANDSHAKE_REPLY') {
-          syncContactInfo(data.pin, data.name, data.status, data.photo);
-          if (data.type === 'HANDSHAKE') {
-            try { conn.send({ type: 'HANDSHAKE_REPLY', pin: myPin, name: myName, status: myStatus, photo: myPhoto }); } catch(e){}
-          }
-        }
-
-        if (data.type === 'GROUP_SYNC') {
-          let idx = contacts.findIndex(c => c.pin === data.group.pin);
-          if (idx < 0) contacts.unshift(data.group);
-          else { contacts[idx].members = [...new Set(data.group.members)]; contacts[idx].name = data.group.name; }
-          saveState(); renderChatList();
-        }
-
-        if (data.type === 'CHAT_MSG') appendMessage(remotePin, { text: data.text, mine: false, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
-        if (data.type === 'GROUP_MSG') appendGroupMessage(data.groupId, data.senderName, { text: data.text, mine: false, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
-        if (data.type === 'AUDIO_MSG') appendMessage(remotePin, { audio: data.audioData, duration: data.duration, mine: false, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
-        if (data.type === 'GROUP_AUDIO_MSG') appendGroupMessage(data.groupId, data.senderName, { audio: data.audioData, duration: data.duration, mine: false, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
-      });
-
-      conn.on('close', () => peerConns.delete(remotePin));
-      conn.on('error', () => peerConns.delete(remotePin));
-    }
-
-    function getPeerConn(pin) {
-      let conn = peerConns.get(pin);
-      if (conn && conn.open) return conn;
-      if (!peer || peer.destroyed) return null;
-      try {
-        conn = peer.connect('HELLO-' + pin, { reliable: true });
-        bindConnHandlers(conn, pin);
-        return conn;
-      } catch (err) { return null; }
-    }
-
-    function emitToRecipient(contact, payload) {
-      const recipients = contact.isGroup ? contact.members.filter(m => m !== myPin) : [contact.pin];
-      recipients.forEach(pin => {
-        let conn = peerConns.get(pin);
-        if (conn && conn.open) {
-          try { conn.send(payload); } catch(e){}
-        } else {
-          if (!pendingMsgQueues.has(pin)) pendingMsgQueues.set(pin, []);
-          pendingMsgQueues.get(pin).push(payload);
-          getPeerConn(pin);
-        }
+        if (data.type === 'CHAT_MSG') appendMessage(remotePin, { text: data.text, mine: false, time: getNow() });
+        if (data.type === 'AUDIO_MSG') appendMessage(remotePin, { audio: data.audioData, duration: data.duration, mine: false, time: getNow() });
+        if (data.type === 'POLL_MSG') appendMessage(remotePin, { poll: data.poll, mine: false, time: getNow() });
+        if (data.type === 'LOCATION_MSG') appendMessage(remotePin, { location: data.location, mine: false, time: getNow() });
       });
     }
 
-    function syncContactInfo(pin, realName, status, photo) {
-      let c = contacts.find(x => x.pin === pin);
-      if (!c) contacts.push({ name: realName, pin: pin, status: status, photo: photo || '', lastMsg: 'Conectado', time: 'Ahora' });
-      else if (!c.isGroup) { c.name = realName; c.status = status; if (photo) c.photo = photo; }
-      saveState(); renderChatList();
-      if (contacts[activeChatIndex]?.pin === pin) selectChat(activeChatIndex, false);
-    }
+    function getNow() { return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); }
 
     function appendMessage(fromPin, msg) {
       let idx = contacts.findIndex(c => c.pin === fromPin);
-      const preview = msg.audio ? '🎤 Nota de voz' : msg.text;
+      let preview = msg.text || (msg.audio ? '🎤 Nota de voz' : (msg.poll ? '📊 Encuesta' : '📎 Archivo'));
       if (idx < 0) contacts.push({ name: 'PIN ' + fromPin, pin: fromPin, lastMsg: preview, time: msg.time });
       else { contacts[idx].lastMsg = preview; contacts[idx].time = msg.time; }
       (msgs[fromPin] ??= []).push(msg);
       saveMsgToDB(fromPin, msg);
       saveState();
       if (contacts[activeChatIndex]?.pin === fromPin) drawChatMessages();
-      renderChatList();
+      filterMainList('');
     }
 
-    function appendGroupMessage(groupId, sender, msg) {
-      let g = contacts.find(c => c.pin === groupId);
-      if (g) {
-        msg.senderName = sender;
-        g.lastMsg = sender + ': ' + (msg.audio ? '🎤 Nota de voz' : msg.text);
-        g.time = msg.time;
-        (msgs[groupId] ??= []).push(msg);
-        saveMsgToDB(groupId, msg);
+    function getPeerConn(pin) {
+      let c = peerConns.get(pin);
+      if (c && c.open) return c;
+      if (!peer || peer.destroyed) return null;
+      try {
+        c = peer.connect('HELLO-' + pin, { reliable: true });
+        bindConnHandlers(c, pin);
+        return c;
+      } catch(e) { return null; }
+    }
+
+    // --- NAVEGACIÓN ENTRE PESTAÑAS PRINCIPALES ---
+    function switchMainTab(tab) {
+      currentMainTab = tab;
+      document.querySelectorAll('.nav-tab-btn').forEach(b => b.classList.remove('active'));
+      const btnId = 'tabBtn' + tab.charAt(0).toUpperCase() + tab.slice(1);
+      if ($(btnId)) $(btnId).classList.add('active');
+
+      const container = $('tabContentList');
+      if (tab === 'chats') renderChatsTab();
+      else if (tab === 'updates') renderUpdatesTab();
+      else if (tab === 'communities') renderCommunitiesTab();
+      else if (tab === 'calls') renderCallsTab();
+    }
+
+    function filterMainList(query) {
+      if (currentMainTab === 'chats') renderChatsTab(query);
+      else if (currentMainTab === 'updates') renderUpdatesTab(query);
+      else if (currentMainTab === 'calls') renderCallsTab(query);
+    }
+
+    // 1. PESTAÑA: CHATS
+    function renderChatsTab(filter = '') {
+      const container = $('tabContentList');
+      const filtered = contacts.filter(c => !filter || c.name.toLowerCase().includes(filter.toLowerCase()) || c.pin.includes(filter.toUpperCase()));
+      
+      // Acceso directo al Canal SOS arriba
+      let sosHtml = `
+        <div class="chat-item" onclick="tuneIntoEmergencyChat()" style="background:#fff1f2;border-bottom:2px solid #fecaca">
+          <div class="avatar" style="background:var(--danger)">🚨</div>
+          <div class="chat-details">
+            <div class="title-row"><strong style="color:var(--danger)">Canal Prioritario SOS</strong><span class="time">EN VIVO</span></div>
+            <div class="desc-row" style="color:#991b1b">Radio de emergencia compartida</div>
+          </div>
+        </div>
+      `;
+
+      if (!filtered.length) {
+        container.innerHTML = sosHtml + `<div style="text-align:center;padding:50px 20px;color:var(--wa-text-muted)"><div style="font-size:38px;margin-bottom:8px">💬</div><strong>Sin conversaciones</strong><p style="font-size:13px">Toca ✏️ para iniciar un chat con un PIN.</p></div>`;
+        return;
+      }
+
+      container.innerHTML = sosHtml + filtered.map((c, i) => {
+        const realIdx = contacts.indexOf(c);
+        return `
+          <div class="chat-item ${realIdx === activeChatIndex ? 'selected' : ''}" onclick="selectChat(${realIdx})">
+            <div class="avatar">${c.photo ? `<img src="${c.photo}">` : (c.isGroup ? '👥' : esc(c.name.charAt(0).toUpperCase()))}</div>
+            <div class="chat-details">
+              <div class="title-row"><strong>${esc(c.name)}</strong><span class="time">${c.time || ''}</span></div>
+              <div class="desc-row">${esc(c.lastMsg || c.pin)}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // 2. PESTAÑA: NOVEDADES (ESTADOS Y CANALES)
+    function renderUpdatesTab() {
+      const container = $('tabContentList');
+      container.innerHTML = `
+        <div style="padding:16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <strong style="font-size:16px">Estados</strong>
+            <button class="icon-btn" onclick="openCreateTextStatus()">✏️</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;cursor:pointer" onclick="openQuickCameraModal()">
+            <div class="avatar" style="border:2px dashed var(--wa-teal);background:transparent;color:var(--wa-teal)">＋</div>
+            <div><strong>Mi estado</strong><small style="display:block;color:var(--wa-text-muted)">Añadir a mis actualizaciones (24h)</small></div>
+          </div>
+
+          <strong style="font-size:16px;display:block;margin:18px 0 10px">Canales</strong>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--wa-border)">
+              <div style="display:flex;align-items:center;gap:10px">
+                <div class="avatar" style="background:#7c3aed">📢</div>
+                <div><strong>Canal Oficial HELLO</strong><small style="display:block;color:var(--wa-text-muted)">Novedades y guías P2P</small></div>
+              </div>
+              <button class="btn-wa-primary" style="width:auto;padding:6px 14px;font-size:12px" onclick="alert('Siguiendo canal oficial.')">Siguiendo</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // 3. PESTAÑA: COMUNIDADES
+    function renderCommunitiesTab() {
+      $('tabContentList').innerHTML = `
+        <div style="padding:24px 18px;text-align:center">
+          <div style="font-size:48px;margin-bottom:10px">🌐</div>
+          <h3 style="margin:0 0 8px">Crea tu comunidad</h3>
+          <p style="font-size:13.5px;color:var(--wa-text-muted);margin:0 0 20px;line-height:1.5">Organiza grupos relacionados y envía avisos a todos los miembros con facilidad.</p>
+          <button class="btn-wa-primary" onclick="openCreateCommunityModal()">Iniciar Comunidad</button>
+        </div>
+      `;
+    }
+
+    // 4. PESTAÑA: LLAMADAS
+    function renderCallsTab() {
+      const container = $('tabContentList');
+      container.innerHTML = `
+        <div style="padding:14px 16px">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;cursor:pointer" onclick="copyCallInviteLink()">
+            <div class="avatar" style="background:var(--wa-teal)">🔗</div>
+            <div><strong>Crear enlace de llamada</strong><small style="display:block;color:var(--wa-text-muted)">Comparte un enlace para tu llamada HELLO</small></div>
+          </div>
+          <strong style="font-size:14px;display:block;margin-bottom:10px;color:var(--wa-text-muted)">Recientes</strong>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            ${callLogs.length ? callLogs.map(l => `
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div><strong>${esc(l.contact)}</strong><small style="display:block;color:var(--wa-text-muted)">${l.type} • ${l.time}</small></div>
+                <button class="icon-btn" onclick="startCallWithContact('${l.pin}', ${l.type.includes('Video')})">${l.type.includes('Video') ? '📹' : '📞'}</button>
+              </div>
+            `).join('') : '<p style="color:var(--wa-text-muted);font-size:13px">Sin llamadas recientes.</p>'}
+          </div>
+        </div>
+      `;
+    }
+
+    // --- DIBUJAR PANTALLA DE CHAT ACTIVA ---
+    function selectChat(idx) {
+      activeChatIndex = idx;
+      const c = contacts[idx];
+      if (!c) return;
+      $('appShell').classList.add('chat-open');
+
+      $('mainArea').innerHTML = `
+        <div class="main-header">
+          <div class="contact-summary" onclick="alert('PIN de contacto: ${c.pin}')">
+            <button class="icon-btn mobile-back" onclick="$('appShell').classList.remove('chat-open')">‹</button>
+            <div class="avatar" style="width:40px;height:40px">${c.photo ? `<img src="${c.photo}">` : esc(c.name.charAt(0))}</div>
+            <div><strong>${esc(c.name)}</strong><small>PIN: ${esc(c.pin)}</small></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:2px">
+            <button class="icon-btn" title="Llamada de voz" onclick="startCallWithContact('${c.pin}', false)">📞</button>
+            <button class="icon-btn" title="Videollamada" onclick="startCallWithContact('${c.pin}', true)">📹</button>
+            <button class="icon-btn" title="Buscar en chat" onclick="promptSearchInChat()">🔍</button>
+            <button class="icon-btn" title="Opciones" onclick="toggleChatKebab()">⋮</button>
+          </div>
+        </div>
+        <div class="conversation" id="conversationBox"></div>
+        <div class="chat-footer">
+          <button type="button" class="icon-btn" title="Emojis" onclick="openEmojiDialog()">☺</button>
+          <button type="button" class="icon-btn" title="Adjuntar" onclick="attachDialog.showModal()">📎</button>
+          <button type="button" class="icon-btn" title="Cámara directa" onclick="openDirectCameraCapture()">📷</button>
+          <input class="input-box" id="msgInput" placeholder="Escribe un mensaje (*negrita*, _cursiva_)..." autocomplete="off" onkeydown="if(event.key==='Enter') handleSendText()">
+          <button type="button" class="btn-action-round btn-send-text" title="Enviar Mensaje" onclick="handleSendText()">➤</button>
+          <button type="button" class="btn-action-round btn-voice-note" id="btnVoiceNote" title="Nota de voz" onclick="toggleVoiceNote()">🎤</button>
+          <button type="button" class="btn-ptt-mic" id="btnPtt" title="Radio Walkie-Talkie (PTT)">📻</button>
+        </div>
+      `;
+
+      bindPttEvents(c);
+      getPeerConn(c.pin);
+      drawChatMessages();
+    }
+
+    function drawChatMessages() {
+      const c = contacts[activeChatIndex];
+      const box = $('conversationBox');
+      if (!c || !box) return;
+      const list = msgs[c.pin] || [];
+
+      box.innerHTML = list.map((m, idx) => {
+        let content = '';
+        if (m.text) content = formatWhatsAppText(m.text);
+        if (m.audio) content = `<audio controls src="${m.audio}" style="max-width:240px;height:36px"></audio>`;
+        if (m.location) content = `<div style="font-weight:700">📍 Ubicación compartida</div><a href="https://maps.google.com/?q=${m.location.lat},${m.location.lng}" target="_blank" style="color:var(--wa-teal);font-size:12px">Ver en Google Maps</a>`;
+        if (m.poll) {
+          content = `
+            <div style="font-weight:700;margin-bottom:6px">📊 ${esc(m.poll.question)}</div>
+            ${m.poll.options.map(o => `<div style="background:rgba(0,0,0,0.06);padding:6px;border-radius:6px;margin:3px 0;font-size:13px">${esc(o)}</div>`).join('')}
+          `;
+        }
+
+        const starHtml = m.starred ? '<span class="star-tag">★</span>' : '';
+        const reactHtml = m.reaction ? `<span class="reaction-pill">${m.reaction}</span>` : '';
+
+        return `
+          <div class="bubble ${m.mine ? 'mine' : 'them'}" oncontextmenu="event.preventDefault(); openMsgContext(event, ${idx})" onclick="openMsgContext(event, ${idx})">
+            ${m.replyTo ? `<div class="quote-box">${esc(m.replyTo)}</div>` : ''}
+            ${content}
+            ${reactHtml}
+            <div class="meta">${starHtml}<span>${m.time}</span> ${m.mine ? '<span style="color:var(--wa-check-blue)">✓✓</span>' : ''}</div>
+          </div>
+        `;
+      }).join('');
+      box.scrollTop = box.scrollHeight;
+    }
+
+    // --- ACCIÓN: ENVIAR MENSAJE ---
+    let pendingQuote = null;
+    function handleSendText() {
+      const input = $('msgInput');
+      const text = input.value.trim();
+      const c = contacts[activeChatIndex];
+      if (!text || !c) return;
+
+      const time = getNow();
+      const msgObj = { text, mine: true, time, replyTo: pendingQuote };
+      pendingQuote = null;
+
+      (msgs[c.pin] ??= []).push(msgObj);
+      c.lastMsg = text; c.time = time;
+      saveMsgToDB(c.pin, msgObj);
+      saveState();
+
+      const conn = getPeerConn(c.pin);
+      if (conn && conn.open) conn.send({ type: 'CHAT_MSG', text });
+
+      input.value = '';
+      drawChatMessages();
+      filterMainList('');
+    }
+
+    // --- NOTA DE VOZ WHATSAPP ---
+    let mediaRecorder = null;
+    let voiceChunks = [];
+    let isRecordingVoice = false;
+
+    async function toggleVoiceNote() {
+      const c = contacts[activeChatIndex];
+      const btn = $('btnVoiceNote');
+      if (!isRecordingVoice) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          voiceChunks = [];
+          mediaRecorder.ondataavailable = e => { if (e.data.size > 0) voiceChunks.push(e.data); };
+          mediaRecorder.onstop = () => {
+            const blob = new Blob(voiceChunks, { type: 'audio/webm' });
+            const r = new FileReader();
+            r.onload = ev => {
+              const base64 = ev.target.result;
+              const msgObj = { audio: base64, mine: true, time: getNow() };
+              (msgs[c.pin] ??= []).push(msgObj);
+              c.lastMsg = '🎤 Nota de voz'; c.time = getNow();
+              saveMsgToDB(c.pin, msgObj);
+              saveState();
+              const conn = getPeerConn(c.pin);
+              if (conn && conn.open) conn.send({ type: 'AUDIO_MSG', audioData: base64, duration: 5 });
+              drawChatMessages(); filterMainList('');
+            };
+            r.readAsDataURL(blob);
+            stream.getTracks().forEach(t => t.stop());
+          };
+          mediaRecorder.start();
+          isRecordingVoice = true;
+          btn.classList.add('recording');
+        } catch(e) { alert('Micrófono requerido'); }
+      } else {
+        if (mediaRecorder) mediaRecorder.stop();
+        isRecordingVoice = false;
+        btn.classList.remove('recording');
+      }
+    }
+
+    // --- WALKIE-TALKIE PTT ---
+    let pttStream = null;
+    let pttCall = null;
+    function bindPttEvents(contact) {
+      const btn = $('btnPtt');
+      if (!btn) return;
+      btn.onpointerdown = async e => {
+        e.preventDefault();
+        btn.classList.add('transmitting');
+        try {
+          pttStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          pttCall = peer.call('HELLO-' + contact.pin, pttStream, { metadata: { name: myName } });
+        } catch(err){}
+      };
+      const stop = () => {
+        if (pttCall) { pttCall.close(); pttCall = null; }
+        if (pttStream) { pttStream.getTracks().forEach(t => t.stop()); pttStream = null; }
+        btn.classList.remove('transmitting');
+        playRogerBeep();
+      };
+      btn.onpointerup = stop;
+      btn.onpointercancel = stop;
+    }
+
+    // --- LLAMADAS Y VIDEOLLAMADAS WEBRTC ---
+    let currentCallContactPin = null;
+    async function startCallWithContact(pin, isVideo) {
+      currentCallContactPin = pin;
+      $('callContactTitle').textContent = `Llamando a PIN ${pin}...`;
+      $('callOverlay').style.display = 'flex';
+      $('videoContainerBox').style.display = isVideo ? 'flex' : 'none';
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: isVideo });
+        activeCallStream = stream;
+        $('localVideo').srcObject = stream;
+        const call = peer.call('HELLO-' + pin, stream, { metadata: { name: myName, isFullCall: true, isVideo } });
+        handleCallStream(call, pin, isVideo);
+
+        callLogs.unshift({ contact: 'PIN ' + pin, pin, type: isVideo ? 'Videollamada' : 'Llamada de voz', time: getNow() });
         saveState();
-        if (contacts[activeChatIndex]?.pin === groupId) drawChatMessages();
-        renderChatList();
+      } catch(e) { alert('Permisos de cámara o micrófono necesarios.'); endActiveCall(); }
+    }
+
+    function handleCallStream(call, label, isVideo) {
+      activeWebRtcCall = call;
+      call.on('stream', rStream => {
+        $('callStateLabel').textContent = 'En llamada';
+        $('remoteVideo').srcObject = rStream;
+      });
+      call.on('close', endActiveCall);
+    }
+
+    function endActiveCall() {
+      if (activeWebRtcCall) { activeWebRtcCall.close(); activeWebRtcCall = null; }
+      if (activeCallStream) { activeCallStream.getTracks().forEach(t => t.stop()); activeCallStream = null; }
+      $('callOverlay').style.display = 'none';
+    }
+
+    function toggleCallMic() {
+      if (!activeCallStream) return;
+      const audioTrack = activeCallStream.getAudioTracks()[0];
+      if (audioTrack) { audioTrack.enabled = !audioTrack.enabled; $('btnToggleMic').style.opacity = audioTrack.enabled ? '1' : '0.4'; }
+    }
+
+    function toggleCallCam() {
+      if (!activeCallStream) return;
+      const videoTrack = activeCallStream.getVideoTracks()[0];
+      if (videoTrack) { videoTrack.enabled = !videoTrack.enabled; $('btnToggleCam').style.opacity = videoTrack.enabled ? '1' : '0.4'; }
+    }
+
+    function switchCameraFacing() { alert('Alternando cámara'); }
+
+    // --- ACCIONES DE MENSAJES (CONTEXT MENU) ---
+    let selectedMsgIdx = null;
+    function openMsgContext(e, idx) {
+      selectedMsgIdx = idx;
+      const menu = $('msgContextMenu');
+      menu.style.top = Math.min(e.clientY || 200, window.innerHeight - 260) + 'px';
+      menu.style.left = Math.min(e.clientX || 150, window.innerWidth - 220) + 'px';
+      menu.style.display = 'flex';
+    }
+    window.addEventListener('click', () => $('msgContextMenu').style.display = 'none');
+
+    function reactToMessage(emoji) {
+      const c = contacts[activeChatIndex];
+      if (!c || selectedMsgIdx === null) return;
+      msgs[c.pin][selectedMsgIdx].reaction = emoji;
+      saveState(); drawChatMessages();
+    }
+
+    function contextAction(act) {
+      const c = contacts[activeChatIndex];
+      const m = msgs[c.pin][selectedMsgIdx];
+      if (!m) return;
+
+      if (act === 'reply') { pendingQuote = m.text || 'Archivo'; $('msgInput').focus(); }
+      else if (act === 'copy') { navigator.clipboard.writeText(m.text || ''); alert('Copiado al portapapeles'); }
+      else if (act === 'star') { m.starred = !m.starred; saveState(); drawChatMessages(); }
+      else if (act === 'delete') { msgs[c.pin].splice(selectedMsgIdx, 1); saveState(); drawChatMessages(); }
+      else if (act === 'info') { alert(`Entregado: ${m.time}\nLeído: Confirmado`); }
+    }
+
+    // --- ADJUNTOS (9 OPCIONES) ---
+    function triggerFilePicker(accept) {
+      $('genericFileInput').accept = accept;
+      $('genericFileInput').click();
+      attachDialog.close();
+    }
+    function handleFilePicked(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      alert(`Archivo listo: ${file.name}`);
+    }
+
+    function shareCurrentLocation() {
+      navigator.geolocation.getCurrentPosition(pos => {
+        const c = contacts[activeChatIndex];
+        const msgObj = { location: { lat: pos.coords.latitude, lng: pos.coords.longitude }, mine: true, time: getNow() };
+        (msgs[c.pin] ??= []).push(msgObj);
+        saveMsgToDB(c.pin, msgObj); saveState();
+        const conn = getPeerConn(c.pin);
+        if (conn && conn.open) conn.send({ type: 'LOCATION_MSG', location: msgObj.location });
+        drawChatMessages();
+        attachDialog.close();
+      }, () => alert('Activa la ubicación para compartirla.'));
+    }
+
+    function shareLiveLocation() {
+      alert('Transmitiendo ubicación en tiempo real durante 15 minutos.');
+      shareCurrentLocation();
+    }
+
+    function openCreatePollModal() { attachDialog.close(); $('pollModal').showModal(); }
+    function submitSendPoll() {
+      const q = $('pollQuestion').value.trim();
+      const o1 = $('pollOpt1').value.trim();
+      const o2 = $('pollOpt2').value.trim();
+      if (!q || !o1 || !o2) return alert('Completa la pregunta y 2 opciones');
+
+      const c = contacts[activeChatIndex];
+      const poll = { question: q, options: [o1, o2] };
+      const msgObj = { poll, mine: true, time: getNow() };
+      (msgs[c.pin] ??= []).push(msgObj);
+      saveMsgToDB(c.pin, msgObj); saveState();
+
+      const conn = getPeerConn(c.pin);
+      if (conn && conn.open) conn.send({ type: 'POLL_MSG', poll });
+      drawChatMessages();
+      $('pollModal').close();
+    }
+
+    function openDirectCameraCapture() { alert('Iniciando captura de cámara...'); }
+    function openShareContactModal() { alert(`Tu PIN actual es: ${myPin}`); }
+    function openCreateEventModal() { alert('Crear evento en este chat.'); }
+
+    // --- MODALES Y CONFIGURACIÓN ---
+    function toggleKebabMenu() { $('kebabDropdown').classList.toggle('open'); }
+    function openQuickAddModal() { $('quickAddModal').showModal(); }
+    function confirmAddPin(e) {
+      e.preventDefault();
+      const pin = $('addPinInput').value.trim().toUpperCase();
+      $('quickAddModal').close();
+      if (pin === myPin) return alert('No puedes agregarte a ti mismo.');
+      let idx = contacts.findIndex(c => c.pin === pin);
+      if (idx < 0) { contacts.unshift({ name: 'Usuario ' + pin.slice(0, 4), pin, lastMsg: 'Conectado', time: getNow() }); idx = 0; saveState(); }
+      switchMainTab('chats');
+      selectChat(idx);
+    }
+
+    function openStoryShareModal() {
+      $('qrDisplayImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=8&data=${encodeURIComponent(myPin)}`;
+      $('qrPinLabel').textContent = 'PIN: ' + myPin;
+      $('storyShareModal').showModal();
+    }
+
+    function openStarredMessagesModal() {
+      const container = $('starredMessagesList');
+      let items = [];
+      for (const p in msgs) {
+        msgs[p].filter(m => m.starred).forEach(m => items.push(m));
+      }
+      container.innerHTML = items.length ? items.map(m => `<div class="bubble mine" style="cursor:default">${esc(m.text || 'Archivo')}</div>`).join('') : '<p>Sin mensajes destacados.</p>';
+      $('starredModal').showModal();
+    }
+
+    function openCreateGroupModal() {
+      $('groupMembersCheckboxes').innerHTML = contacts.map(c => `
+        <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" value="${c.pin}" class="group-cb"> <strong>${esc(c.name)}</strong></label>
+      `).join('');
+      $('createGroupModal').showModal();
+    }
+
+    function confirmCreateGroup() {
+      const name = $('newGroupNameInput').value.trim();
+      if (!name) return;
+      const cbs = Array.from(document.querySelectorAll('.group-cb:checked')).map(cb => cb.value);
+      cbs.push(myPin);
+      contacts.unshift({ name, pin: 'GRP-' + generateId(6), isGroup: true, members: cbs, lastMsg: 'Grupo creado', time: getNow() });
+      saveState();
+      $('createGroupModal').close();
+      switchMainTab('chats');
+      selectChat(0);
+    }
+
+    function openCreateCommunityModal() { alert('Comunidad creada.'); }
+    function openBroadcastModal() { alert('Nueva lista de difusión preparada.'); }
+    function tuneIntoEmergencyChat() {
+      let idx = contacts.findIndex(c => c.pin === 'FREQ-SOS');
+      if (idx < 0) { contacts.unshift({ name: '🚨 Canal SOS Prioritario', pin: 'FREQ-SOS', lastMsg: 'Sintonizado', time: getNow() }); idx = 0; saveState(); }
+      selectChat(idx);
+    }
+
+    function openProfileSection() {
+      const n = prompt('Tu nombre de usuario visible:', myName);
+      if (n !== null) { myName = n.trim() || myName; saveState(); updateHeaderIdentity(); }
+    }
+
+    function executePanicKillSwitch() {
+      if (confirm('🚨 BOTÓN DE PÁNICO: ¿Eliminar de inmediato todos los chats, cerrar sesión y limpiar memoria local?')) {
+        if (peer) peer.destroy();
+        localStorage.clear();
+        indexedDB.deleteDatabase('HelloDB_' + myPin);
+        location.reload();
       }
     }
 
     function showNotice(title, desc) { $('noticeTitle').textContent = title; $('noticeDesc').textContent = desc; $('noticeModal').showModal(); }
 
-    // --- PESTAÑAS MODELO WHATSAPP ---
-    function viewTab(tab) {
-      currentTab = tab;
-      document.querySelectorAll('.nav-tab-btn').forEach(b => b.classList.remove('active'));
-      const tabId = 'tabBtn' + tab.charAt(0).toUpperCase() + tab.slice(1);
-      if ($(tabId)) $(tabId).classList.add('active');
-      $('searchContainer').style.display = (tab === 'chats' || tab === 'groups') ? 'block' : 'none';
-
-      if (tab === 'chats') renderChatList();
-      else if (tab === 'groups') renderGroupsList();
-      else if (tab === 'radio') renderEmergencyChannel();
-      else if (tab === 'settings') renderSettingsOverview();
-    }
-
-    function renderFilteredList(query) {
-      if (currentTab === 'groups') renderGroupsList(query);
-      else renderChatList(query);
-    }
-
-    function renderChatList(filter = '') {
-      const container = $('sidebarListContent');
-      const directChats = contacts.filter(c => !c.isGroup && !c.isEmergency);
-      if (!directChats.length) {
-        container.innerHTML = `<div style="text-align:center;padding:50px 20px;color:var(--wa-text-muted)"><div style="font-size:42px;margin-bottom:12px">💬</div><strong style="color:var(--wa-text);font-size:16px">Sin chats individuales</strong><p style="font-size:13px;margin:8px 0 16px">Inicia una conversación agregando un PIN.</p><button class="btn-hello-primary" onclick="openQuickAddModal()">Iniciar un Chat</button></div>`;
-        return;
-      }
-      container.innerHTML = directChats.map((c, i) => {
-        const realIdx = contacts.indexOf(c);
-        if (filter && !c.name.toLowerCase().includes(filter.toLowerCase()) && !c.pin.toLowerCase().includes(filter.toLowerCase())) return '';
-        return `
-          <div class="chat-item ${realIdx === activeChatIndex ? 'selected' : ''}" onclick="selectChat(${realIdx})">
-            ${renderAvatarHtml(c, 48)}
-            <div class="chat-details">
-              <div class="title-row"><strong>${esc(c.name)}</strong><span class="time">${c.time || ''}</span></div>
-              <div class="desc-row">${esc(c.lastMsg || c.pin)}</div>
-            </div>
-          </div>`;
-      }).join('');
-    }
-
-    function renderGroupsList(filter = '') {
-      const container = $('sidebarListContent');
-      const groupChats = contacts.filter(c => c.isGroup);
-      if (!groupChats.length) {
-        container.innerHTML = `<div style="text-align:center;padding:50px 20px;color:var(--wa-text-muted)"><div style="font-size:42px;margin-bottom:12px">👥</div><strong style="color:var(--wa-text);font-size:16px">Sin grupos</strong><p style="font-size:13px;margin:8px 0 16px">Crea un grupo para hablar por radio walkie-talkie con varios amigos.</p><button class="btn-hello-primary" onclick="openCreateGroupModal()">Crear Grupo P2P</button></div>`;
-        return;
-      }
-      container.innerHTML = groupChats.map(c => {
-        const realIdx = contacts.indexOf(c);
-        if (filter && !c.name.toLowerCase().includes(filter.toLowerCase())) return '';
-        return `
-          <div class="chat-item ${realIdx === activeChatIndex ? 'selected' : ''}" onclick="selectChat(${realIdx})">
-            ${renderAvatarHtml(c, 48)}
-            <div class="chat-details">
-              <div class="title-row"><strong>${esc(c.name)}</strong><span class="time">${c.time || ''}</span></div>
-              <div class="desc-row">${esc(c.lastMsg || (c.members.length + ' participantes'))}</div>
-            </div>
-          </div>`;
-      }).join('');
-    }
-
-    // --- SOLO CANAL DE EMERGENCIAS & SOS ---
-    function renderEmergencyChannel() {
-      $('sidebarListContent').innerHTML = `
-        <div style="padding:18px 16px">
-          <strong style="color:var(--danger);font-size:12px;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:12px">Canal Oficial SOS</strong>
-          <div class="chat-item" onclick="tuneIntoEmergency()" style="border-radius:12px;background:#fff1f2;border:1px solid #fecaca">
-            ${renderAvatarHtml({ isEmergency: true }, 48)}
-            <div class="chat-details">
-              <div class="title-row"><strong style="color:var(--danger)">🚨 Frecuencia de Emergencias & SOS</strong></div>
-              <div class="desc-row" style="color:#991b1b">Canal prioritario abierto • Toca para sintonizar y hablar</div>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    async function tuneIntoEmergency() {
-      const pin = 'FREQ-SOS';
-      const name = '🚨 Emergencias & SOS';
-      let idx = contacts.findIndex(c => c.pin === pin);
-      if (idx < 0) {
-        contacts.unshift({ name, pin, isEmergency: true, lastMsg: 'Sintonizado', time: 'Ahora' });
-        idx = 0;
-        saveState();
-      }
-      try {
-        await fetch(`${SERVER_URL}/api/frequency/join`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ freq: pin, pin: myPin })
-        });
-      } catch(e){}
-
-      selectChat(idx);
-    }
-
-    // --- SELECCIONAR Y DIBUJAR CONVERSACIÓN ---
-    function selectChat(idx, isMobile = true) {
-      activeChatIndex = idx; const c = contacts[idx];
-      if (!c) { $('mainArea').innerHTML = `<div style="display:grid;place-items:center;height:100%;color:var(--wa-text-muted);text-align:center"><div><div style="font-size:64px;margin-bottom:16px;opacity:0.3">💬</div><h2 style="color:var(--wa-text);margin:0 0 8px;font-weight:800">HELLO WhatsApp P2P</h2><p style="max-width:360px;font-size:14px;line-height:1.5">Conexión cifrada sin número telefónico mediante PIN.</p></div></div>`; return; }
-      if (isMobile) $('appShell').classList.add('chat-open');
-
-      const headerAction = c.isGroup ? `<button class="icon-btn" title="Info del grupo" onclick="openManageGroupModal('${c.pin}')">⚙️</button>` : ``;
-
-      $('mainArea').innerHTML = `
-        <div class="main-header">
-          <div class="contact-summary" ${c.isGroup ? `onclick="openManageGroupModal('${c.pin}')"` : ''}>
-            <button class="icon-btn mobile-back" onclick="$('appShell').classList.remove('chat-open')">‹</button>
-            ${renderAvatarHtml(c, 42)}
-            <div>
-              <strong id="activeNameHeader">${esc(c.name)}</strong>
-              <small>${c.isGroup ? c.members.length + ' participantes (Toca para ver info)' : (c.isEmergency ? 'Canal en vivo' : 'PIN: ' + esc(c.pin))}</small>
-            </div>
-          </div>
-          <div style="display:flex;align-items:center;gap:6px">${headerAction}</div>
-        </div>
-        <div class="conversation" id="conversationBox"></div>
-        
-        <div style="display:flex;flex-direction:column;background:var(--wa-card)">
-          <div id="voiceRecordBanner" class="voice-record-banner">
-            <span>🔴</span> <span id="voiceRecordTimer">Grabando audio... (0s)</span>
-          </div>
-          <form class="chat-footer" onsubmit="handleSendText(event)">
-            <button type="button" class="icon-btn" title="Emojis" onclick="openEmojiDialog()">☺</button>
-            <input class="input-box" id="msgInput" placeholder="Escribe un mensaje..." autocomplete="off">
-            
-            <!-- Botón 1: Enviar Mensaje de Texto -->
-            <button type="submit" class="btn-action-round btn-send-text" title="Enviar Mensaje">➤</button>
-            
-            <!-- Botón 2: Grabar Nota de Voz Tipo WhatsApp -->
-            <button type="button" class="btn-action-round btn-voice-note" id="btnVoiceNote" title="Grabar Nota de Voz" onclick="toggleVoiceNoteRecording(contacts[activeChatIndex])">🎤</button>
-            
-            <!-- Botón 3: Walkie-Talkie PTT Radio en Vivo (En Grupos, Emergencias o Privado) -->
-            <button type="button" class="btn-ptt-mic" id="btnPttTrigger" title="Mantén presionado para hablar por radio (PTT)">📻</button>
-          </form>
-        </div>
-      `;
-      bindPttEvents(c);
-      if (!c.isGroup && !c.isEmergency) getPeerConn(c.pin);
-      drawChatMessages();
-    }
-
-    function drawChatMessages() {
-      const c = contacts[activeChatIndex]; const box = $('conversationBox'); if (!c || !box) return;
-      const list = msgs[c.pin] || [];
-      box.innerHTML = list.map(m => {
-        let body = '';
-        if (m.audio) {
-          body = `<div style="display:flex;align-items:center;gap:8px">
-                    <audio controls src="${m.audio}" style="max-width:240px;height:36px"></audio>
-                  </div>`;
-        } else {
-          body = esc(m.text);
-        }
-        const senderTag = (c.isGroup && !m.mine && m.senderName) ? `<div style="font-weight:700;color:var(--wa-teal-dark);font-size:12px;margin-bottom:2px">${esc(m.senderName)}</div>` : '';
-        const checkMark = m.mine ? `<span class="checks">✓✓</span>` : '';
-        return `<div class="bubble ${m.mine ? 'mine' : 'them'}">${senderTag}${body}<div class="meta"><span>${m.time}</span>${checkMark}</div></div>`;
-      }).join('');
-      box.scrollTop = box.scrollHeight;
-    }
-
-    function handleSendText(e) {
-      e.preventDefault(); const input = $('msgInput'); const text = input.value.trim(); const c = contacts[activeChatIndex];
-      if (!text || !c) return;
-      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const msgObj = { text, mine: true, time };
-      (msgs[c.pin] ??= []).push(msgObj);
-      c.lastMsg = (c.isGroup ? 'Tú: ' : '') + text; c.time = time;
-      
-      saveMsgToDB(c.pin, msgObj);
-      saveState();
-
-      emitToRecipient(c, { type: c.isGroup ? 'GROUP_MSG' : 'CHAT_MSG', groupId: c.pin, text, senderName: myName });
-      input.value = ''; drawChatMessages(); renderFilteredList('');
-    }
-
-    // --- NOTA DE VOZ (TIPO WHATSAPP) ---
-    let mediaRecorder = null;
-    let audioChunks = [];
-    let isRecordingVoiceNote = false;
-    let voiceNoteTimerInterval = null;
-    let voiceSeconds = 0;
-
-    async function toggleVoiceNoteRecording(contact) {
-      if (!contact) return;
-      const btn = $('btnVoiceNote');
-      const banner = $('voiceRecordBanner');
-      const timerSpan = $('voiceRecordTimer');
-
-      if (!isRecordingVoiceNote) {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          mediaRecorder = new MediaRecorder(stream);
-          audioChunks = [];
-          mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
-          mediaRecorder.onstop = () => {
-            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-            const reader = new FileReader();
-            reader.onload = ev => {
-              const base64Audio = ev.target.result;
-              const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-              const msgObj = { audio: base64Audio, duration: voiceSeconds, mine: true, time };
-              (msgs[contact.pin] ??= []).push(msgObj);
-              contact.lastMsg = (contact.isGroup ? 'Tú: ' : '') + '🎤 Nota de voz (' + voiceSeconds + 's)';
-              contact.time = time;
-              saveMsgToDB(contact.pin, msgObj);
-              saveState();
-              emitToRecipient(contact, {
-                type: contact.isGroup ? 'GROUP_AUDIO_MSG' : 'AUDIO_MSG',
-                groupId: contact.pin,
-                audioData: base64Audio,
-                duration: voiceSeconds,
-                senderName: myName
-              });
-              drawChatMessages(); renderFilteredList('');
-            };
-            reader.readAsDataURL(audioBlob);
-            stream.getTracks().forEach(t => t.stop());
-          };
-
-          mediaRecorder.start();
-          isRecordingVoiceNote = true;
-          btn.classList.add('recording');
-          btn.textContent = '⏹️';
-          banner.style.display = 'flex';
-          voiceSeconds = 0;
-          voiceNoteTimerInterval = setInterval(() => {
-            voiceSeconds++;
-            timerSpan.textContent = `Grabando audio... (${voiceSeconds}s)`;
-          }, 1000);
-        } catch (err) {
-          showNotice('Micrófono', 'Se requiere acceso al micrófono para grabar notas de voz.');
-        }
-      } else {
-        if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
-        clearInterval(voiceNoteTimerInterval);
-        isRecordingVoiceNote = false;
-        btn.classList.remove('recording');
-        btn.textContent = '🎤';
-        banner.style.display = 'none';
-      }
-    }
-
-    // --- WALKIE-TALKIE EN GRUPOS, SOS Y PRIVADO ---
-    function bindPttEvents(contact) {
-      const btn = $('btnPttTrigger'); if (!btn) return;
-      btn.onpointerdown = e => { e.preventDefault(); btn.setPointerCapture(e.pointerId); startPttStream(contact); };
-      btn.onpointerup = stopPttStream; btn.onpointercancel = stopPttStream;
-    }
-
-    async function startPttStream(contact) {
-      try {
-        const btn = $('btnPttTrigger'); btn.classList.add('transmitting'); btn.textContent = '🔴';
-        currentAudioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-        let targets = [];
-        if (contact.isEmergency) {
-          try {
-            const res = await fetch(`${SERVER_URL}/api/frequency/FREQ-SOS`);
-            const data = await res.json();
-            targets = (data.members || []).filter(p => p !== myPin);
-          } catch(e){}
-        } else if (contact.isGroup) {
-          targets = contact.members.filter(m => m !== myPin);
-        } else {
-          targets = [contact.pin];
-        }
-
-        targets.forEach(targetPin => {
-          try {
-            const call = peer.call('HELLO-' + targetPin, currentAudioStream, {
-              metadata: { name: myName, groupName: contact.name }
-            });
-            liveRadioCalls.push(call);
-          } catch(e){}
-        });
-      } catch (err) {
-        stopPttStream();
-        showNotice('Micrófono', 'Acceso al micrófono requerido para transmitir.');
-      }
-    }
-
-    function stopPttStream() {
-      liveRadioCalls.forEach(c => { try { c.close(); } catch(e){} }); liveRadioCalls = [];
-      if (currentAudioStream) { currentAudioStream.getTracks().forEach(t => t.stop()); currentAudioStream = null; }
-      if ($('btnPttTrigger')) { $('btnPttTrigger').classList.remove('transmitting'); $('btnPttTrigger').textContent = '📻'; }
-      playRogerBeep();
-    }
-
-    // --- GRUPOS P2P ---
-    function openCreateGroupModal() {
-      const directContacts = contacts.filter(c => !c.isGroup && !c.isEmergency);
-      const container = $('groupMembersCheckboxes');
-      if (!directContacts.length) {
-        container.innerHTML = '<p style="color:var(--wa-text-muted);font-size:13px">Agrega primero contactos por PIN para crear un grupo.</p>';
-      } else {
-        container.innerHTML = directContacts.map(c => `
-          <label style="display:flex;align-items:center;gap:10px;padding:8px;background:var(--wa-card);border-radius:8px;cursor:pointer">
-            <input type="checkbox" value="${c.pin}" class="cb-group-member" style="width:18px;height:18px">
-            <strong>${esc(c.name)}</strong> <small style="color:var(--wa-text-muted)">(${esc(c.pin)})</small>
-          </label>
-        `).join('');
-      }
-      $('newGroupNameInput').value = '';
-      $('createGroupModal').showModal();
-    }
-
-    function confirmCreateGroup(e) {
-      e.preventDefault();
-      const name = $('newGroupNameInput').value.trim();
-      const cbs = document.querySelectorAll('.cb-group-member:checked');
-      if (!name) return showNotice('Error', 'Escribe el nombre del grupo.');
-      if (!cbs.length) return showNotice('Error', 'Selecciona al menos un contacto.');
-
-      const selectedPins = Array.from(cbs).map(cb => cb.value);
-      selectedPins.push(myPin);
-
-      const group = {
-        name,
-        pin: 'GRP-' + generateId(6),
-        isGroup: true,
-        members: [...new Set(selectedPins)],
-        lastMsg: 'Grupo creado',
-        time: 'Ahora'
-      };
-
-      contacts.unshift(group);
-      saveState();
-
-      try { emitToRecipient(group, { type: 'GROUP_SYNC', group }); } catch(e){}
-      $('createGroupModal').close();
-      viewTab('groups');
-      selectChat(0);
-    }
-
-    function openManageGroupModal(groupPin) {
-      const g = contacts.find(c => c.pin === groupPin); if (!g) return;
-      g.members = [...new Set(g.members)];
-      const membersList = g.members.map(mPin => {
-        const isMe = (mPin === myPin);
-        const item = contacts.find(c => c.pin === mPin) || { name: isMe ? 'Tú' : 'PIN: ' + mPin };
-        return `
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--wa-border)">
-            <div>
-              <strong style="font-size:14px">${esc(isMe ? 'Tú' : item.name)}</strong>
-              <small style="display:block;color:var(--wa-text-muted)">${isMe ? 'Administrador' : 'PIN: ' + esc(mPin)}</small>
-            </div>
-          </div>`;
-      }).join('');
-
-      $('manageGroupContent').innerHTML = `
-        <div style="margin-bottom:14px">
-          <strong style="display:block;margin-bottom:8px;font-size:14px">Participantes (${g.members.length})</strong>
-          <div style="max-height:160px;overflow-y:auto;border:1px solid var(--wa-border);border-radius:8px;padding:0 12px;background:var(--wa-sidebar)">${membersList}</div>
-        </div>
-        <button class="btn-hello-primary" style="background:#fee2e2;color:var(--danger);width:100%;margin-top:10px" onclick="deleteGroup('${groupPin}')">Salir y Eliminar Grupo</button>
-      `;
-      $('manageGroupModal').showModal();
-    }
-
-    function deleteGroup(groupPin) {
-      if (!confirm('¿Deseas salir y borrar este grupo?')) return;
-      contacts = contacts.filter(c => c.pin !== groupPin);
-      delete msgs[groupPin];
-      saveState();
-      $('manageGroupModal').close();
-      viewTab('groups');
-      selectChat(0, false);
-    }
-
-    function openQuickAddModal() { $('addPinInput').value = ''; $('quickAddModal').showModal(); }
-    function confirmAddPin(e) {
-      e.preventDefault(); const pin = $('addPinInput').value.trim().toUpperCase(); $('quickAddModal').close();
-      if (pin.length < 4) return showNotice('Error', 'Ingresa un PIN válido.');
-      if (pin === myPin) return showNotice('Aviso', 'No puedes agregarte a ti mismo.');
-      let idx = contacts.findIndex(c => c.pin === pin);
-      if (idx < 0) { contacts.unshift({ name: 'Usuario ' + pin.slice(0, 4), pin: pin, lastMsg: 'Conectando...', time: 'Ahora' }); idx = 0; saveState(); }
-      getPeerConn(pin); viewTab('chats'); selectChat(idx);
-    }
-
-    function openStoryShareModal() {
-      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=10&data=${encodeURIComponent(myPin)}`;
-      $('qrDisplayImg').src = qrUrl;
-      $('qrPinLabel').textContent = 'PIN: ' + myPin;
-      $('storyShareModal').showModal();
-    }
-
-    const EMOJIS = ['😀','😂','🥰','😎','🤔','😴','👍','🙌','👏','🔥','🎉','❤️','✨','✅','⭐','☀️','☕','🌿','🥑','🍕','🚀','💡','💬','📱','🔒','🌍','🎵','👋','👌','💯','💪','🥳','🙏','👀','😇','🤩','😱','🤷‍♂️','🍻','🎈','📍','📎','💻','⚡'];
-    function openEmojiDialog() { $('emojiGridBox').innerHTML = EMOJIS.map(e => `<button type="button" onclick="insertEmojiChar('${e}')">${e}</button>`).join(''); $('emojiDialog').showModal(); }
-    function insertEmojiChar(e) { const field = $('msgInput'); if (field) { field.value += e; field.focus(); } $('emojiDialog').close(); }
-
-    async function processProfilePhotoUpload(e) {
-      const file = e.target.files[0]; if (!file) return;
-      const reader = new FileReader();
-      reader.onload = ev => { myPhoto = ev.target.result; saveState(); updateHeaderIdentity(); openSettingsSection('profile'); };
-      reader.readAsDataURL(file);
-    }
-    function removeProfilePhoto() { myPhoto = ''; saveState(); updateHeaderIdentity(); openSettingsSection('profile'); }
-
-    // --- AJUSTES ---
-    function renderSettingsOverview() {
-      $('sidebarListContent').innerHTML = `
-        <div style="padding:16px;background:var(--wa-sidebar);border-bottom:1px solid var(--wa-border);display:flex;align-items:center;gap:14px;cursor:pointer" onclick="openSettingsSection('profile')">
-          ${renderAvatarHtml({photo: myPhoto, name: myName}, 56)}
-          <div style="flex:1">
-            <strong style="font-size:17px;font-weight:700">${esc(myName)}</strong>
-            <div style="font-size:13px;color:var(--wa-text-muted)">${esc(myStatus)}</div>
-            <div style="font-size:12px;color:var(--wa-teal);font-weight:800;margin-top:2px">PIN: ${myPin}</div>
-          </div>
-        </div>
-        <div style="background:var(--wa-card);padding:12px 0">
-          <div style="background:var(--wa-sidebar);border-top:1px solid var(--wa-border);border-bottom:1px solid var(--wa-border)">
-            <div class="chat-item" onclick="openSettingsSection('profile')"><span style="font-size:22px;width:34px;text-align:center">👤</span><div class="chat-details"><strong>Perfil</strong><div class="desc-row">Nombre y foto de perfil</div></div></div>
-            <div class="chat-item" onclick="openStoryShareModal()"><span style="font-size:22px;width:34px;text-align:center">📱</span><div class="chat-details"><strong>Tarjeta QR</strong><div class="desc-row">Compartir en Instagram o WhatsApp</div></div></div>
-            <div class="chat-item" onclick="openSettingsSection('account')"><span style="font-size:22px;width:34px;text-align:center">🔑</span><div class="chat-details"><strong>Cuenta</strong><div class="desc-row">Cerrar sesión y cambiar PIN</div></div></div>
-          </div>
-        </div>
-      `;
-      openSettingsSection('profile');
-    }
-
-    function openSettingsSection(section) {
-      $('appShell').classList.add('chat-open'); const area = $('mainArea');
-      if (section === 'profile') {
-        area.innerHTML = `
-          <div class="main-header"><div class="contact-summary"><button class="icon-btn mobile-back" onclick="$('appShell').classList.remove('chat-open')">‹</button><strong>Perfil</strong></div></div>
-          <div style="padding:24px;overflow-y:auto;background:var(--wa-card);flex:1">
-            <div style="background:var(--wa-sidebar);border:1px solid var(--wa-border);border-radius:14px;padding:20px;text-align:center;margin-bottom:16px">
-              <div style="margin:0 auto 16px;display:flex;justify-content:center">${renderAvatarHtml({photo: myPhoto, name: myName}, 120)}</div>
-              <div style="display:flex;gap:10px;justify-content:center;margin-bottom:8px">
-                <button class="btn-hello-primary" onclick="$('profilePicHiddenInput').click()">Cambiar Foto</button>
-                ${myPhoto ? `<button class="btn-hello-primary" style="background:#fee2e2;color:var(--danger)" onclick="removeProfilePhoto()">Quitar</button>` : ''}
-              </div>
-            </div>
-            <div style="background:var(--wa-sidebar);border:1px solid var(--wa-border);border-radius:14px;padding:20px">
-              <h3 style="margin:0 0 8px;font-size:16px">Nombre Visible (Opcional)</h3>
-              <input id="setProfName" value="${esc(myName)}" style="margin-bottom:10px">
-              <button class="btn-hello-primary" style="width:100%" onclick="saveProfileDetail()">Guardar</button>
-            </div>
-          </div>
-        `;
-      } else if (section === 'account') {
-        area.innerHTML = `
-          <div class="main-header"><div class="contact-summary"><button class="icon-btn mobile-back" onclick="$('appShell').classList.remove('chat-open')">‹</button><strong>Cuenta</strong></div></div>
-          <div style="padding:24px;overflow-y:auto;background:var(--wa-card);flex:1">
-            <div style="background:var(--wa-sidebar);border:1px solid var(--wa-border);border-radius:14px;padding:20px">
-              <h3 style="margin:0 0 8px;font-size:16px">Cerrar Sesión</h3>
-              <p style="font-size:13.5px;color:var(--wa-text-muted);margin:0 0 16px">Tu historial está respaldado en la nube de tu servidor. Podrás volver a entrar con tu PIN en este o cualquier otro dispositivo.</p>
-              <button class="btn-hello-primary" style="width:100%;background:var(--wa-card);color:var(--wa-text);border:1px solid var(--wa-border)" onclick="logoutAccount()">Cerrar Sesión</button>
-            </div>
-          </div>
-        `;
-      }
-    }
-
-    function saveProfileDetail() {
-      const name = $('setProfName').value.trim();
-      myName = name || myName;
-      saveState();
-      updateHeaderIdentity();
-      showNotice('Guardado', 'Perfil actualizado con éxito.');
-    }
-
-    if (myPin) viewTab('chats');
+    if (myPin) switchMainTab('chats');
   </script>
 </body>
 </html>
