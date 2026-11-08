@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-  <title>WhatsApp HELLO — Mensajería, Radio P2P y Nube</title>
+  <title>WhatsApp P2P — HELLO</title>
 
   <!-- Tipografía Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Librerías WebRTC y Utilidades -->
+  <!-- Librería WebRTC PeerJS -->
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 
   <style>
@@ -29,7 +29,6 @@
       --wa-bubble-out: #d9fdd3;
       --wa-check-blue: #53bdeb;
       --danger: #ea0038;
-      --accent-purple: #7c3aed;
       --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       --font-scale: 14.5px;
     }
@@ -86,7 +85,6 @@
       position: relative;
     }
 
-    /* BARRA LATERAL NATIVA WHATSAPP */
     .sidebar {
       width: 440px;
       border-right: 1px solid var(--wa-border);
@@ -139,7 +137,6 @@
     }
     .icon-btn:hover { background: rgba(0, 0, 0, 0.06); }
 
-    /* MENU DESPLEGABLE TRES PUNTOS */
     .kebab-dropdown {
       position: absolute;
       top: 56px;
@@ -166,7 +163,6 @@
     }
     .kebab-dropdown button:hover { background: var(--wa-card); }
 
-    /* PESTAÑAS WHATSAPP */
     .nav-tabs { display: flex; background: var(--wa-sidebar); border-bottom: 1px solid var(--wa-border); }
     .nav-tab-btn {
       flex: 1;
@@ -197,7 +193,6 @@
       text-align: left;
       border-bottom: 1px solid var(--wa-border);
       transition: background 0.15s;
-      position: relative;
     }
     .chat-item:hover, .chat-item.selected { background: var(--wa-card); }
     .chat-item .avatar { width: 48px; height: 48px; font-size: 19px; }
@@ -205,10 +200,8 @@
     .chat-details .title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
     .title-row strong { font-size: 15.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .title-row .time { font-size: 11px; font-weight: 600; color: var(--wa-text-muted); }
-    .chat-details .desc-row { font-size: 13.5px; color: var(--wa-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 4px; }
-    .pin-badge { font-size: 11px; color: var(--wa-teal); margin-left: 6px; }
+    .chat-details .desc-row { font-size: 13.5px; color: var(--wa-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    /* ÁREA PRINCIPAL DEL CHAT */
     .main-chat {
       flex: 1;
       min-width: 0;
@@ -241,6 +234,16 @@
     .contact-summary strong { font-size: 15.5px; font-weight: 700; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .contact-summary small { font-size: 11.5px; font-weight: 600; color: var(--wa-text-muted); display: block; }
 
+    .in-chat-search-bar {
+      display: none;
+      padding: 8px 16px;
+      background: var(--wa-sidebar);
+      border-bottom: 1px solid var(--wa-border);
+      align-items: center;
+      gap: 10px;
+      z-index: 3;
+    }
+
     .conversation {
       flex: 1;
       overflow-y: auto;
@@ -251,10 +254,9 @@
       z-index: 1;
     }
 
-    /* BURBUJAS DE MENSAJE */
     .bubble {
       max-width: 65%;
-      padding: 7px 11px;
+      padding: 8px 12px;
       font-size: var(--font-scale);
       line-height: 1.45;
       border-radius: 8px;
@@ -298,8 +300,14 @@
       font-size: 13px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
+    .bubble img.chat-photo-bubble {
+      max-width: 100%;
+      border-radius: 6px;
+      display: block;
+      margin-bottom: 4px;
+      cursor: pointer;
+    }
 
-    /* BARRA INFERIOR DE CHAT CON ACCIONES */
     .chat-footer {
       min-height: 64px;
       background: var(--wa-card);
@@ -349,7 +357,6 @@
 
     @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.12); } 100% { transform: scale(1); } }
 
-    /* MENU CONTEXTUAL PARA ADJUNTOS */
     .attachment-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -374,9 +381,26 @@
       color: #ffffff;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
-    .attach-item span { font-size: 12px; font-weight: 600; color: var(--wa-text); }
+    .attach-item span { font-size: 12px; font-weight: 600; }
 
-    /* OVERLAY DE LLAMADA Y VIDEOLLAMADA WEBRTC */
+    /* PANTALLA LLAMADA ENTRANTE */
+    #incomingCallDialog {
+      text-align: center;
+      padding: 28px 20px;
+      border-radius: 18px;
+      width: 320px;
+    }
+    .btn-call-action {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      font-size: 24px;
+      display: grid;
+      place-items: center;
+      color: #ffffff;
+    }
+
+    /* OVERLAY LLAMADA ACTIVA WEBRTC */
     #callOverlay {
       position: fixed;
       inset: 0;
@@ -387,7 +411,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
-      padding: 40px 20px;
+      padding: 34px 20px;
     }
     .call-videos-container {
       position: relative;
@@ -422,7 +446,6 @@
     }
     .btn-call-ctrl.hangup { background: var(--danger); }
 
-    /* MENU CONTEXTUAL AL MANTENER PRESIONADO UN MENSAJE */
     #msgContextMenu {
       position: fixed;
       background: var(--wa-sidebar);
@@ -455,11 +478,9 @@
     .reactions-bar span { cursor: pointer; transition: transform 0.15s; }
     .reactions-bar span:hover { transform: scale(1.3); }
 
-    /* ESTILOS DE FORMATO DE TEXTO */
     .msg-quote { border-left: 3px solid var(--wa-teal); padding-left: 8px; margin: 4px 0; font-style: italic; opacity: 0.9; }
     .msg-code { font-family: monospace; background: rgba(0,0,0,0.08); padding: 2px 6px; border-radius: 4px; font-size: 12.5px; }
 
-    /* MODALES GENERALES */
     dialog {
       background: var(--wa-sidebar);
       color: var(--wa-text);
@@ -501,7 +522,6 @@
       z-index: 99999;
     }
 
-    /* PANTALLA DE ACCESO POR PIN */
     #authOverlay {
       position: fixed;
       inset: 0;
@@ -537,12 +557,12 @@
 </head>
 <body>
 
-  <!-- ACCESO EXCLUSIVO POR PIN -->
+  <!-- ACCESO POR PIN -->
   <div id="authOverlay" style="display: none;">
     <div class="auth-card">
       <div style="font-size: 46px; margin-bottom: 6px;">✦</div>
       <h2 style="margin: 0 0 6px; font-size: 22px; font-weight: 800;">HELLO WhatsApp</h2>
-      <p style="font-size: 13px; color: var(--wa-text-muted); margin: 0 0 22px;">Mensajería privada y llamadas P2P por PIN</p>
+      <p style="font-size: 13px; color: var(--wa-text-muted); margin: 0 0 22px;">Mensajería privada y llamadas P2P sin eco por PIN</p>
       
       <div style="display:flex;gap:6px;background:var(--wa-card);padding:4px;border-radius:10px;margin-bottom:20px">
         <button type="button" class="nav-tab-btn active" id="tabBtnNewPin" onclick="switchPinView('new')">Nuevo PIN</button>
@@ -566,6 +586,17 @@
   <div id="liveRadioAlert"><span>📻</span> <span id="radioAlertSender">Canal SOS en vivo...</span></div>
   <audio id="liveSpeaker" autoplay playsinline></audio>
 
+  <!-- MODAL LLAMADA ENTRANTE CON TIMBRADO -->
+  <dialog id="incomingCallDialog">
+    <div class="avatar" id="incAvatar" style="width:72px;height:72px;margin:0 auto 12px;font-size:26px">U</div>
+    <h3 id="incName" style="margin:0 0 4px">Contacto</h3>
+    <p id="incType" style="margin:0 0 24px;font-size:13px;color:var(--wa-text-muted)">Llamada entrante...</p>
+    <div style="display:flex;justify-content:center;gap:36px">
+      <button class="btn-call-action" style="background:var(--danger)" onclick="rejectIncomingCall()">✕</button>
+      <button class="btn-call-action" style="background:var(--wa-green)" onclick="acceptIncomingCall()">📞</button>
+    </div>
+  </dialog>
+
   <!-- OVERLAY WEBRTC: LLAMADAS Y VIDEOLLAMADAS -->
   <div id="callOverlay">
     <div style="text-align:center">
@@ -579,7 +610,6 @@
     <div class="call-controls">
       <button class="btn-call-ctrl" id="btnToggleMic" onclick="toggleCallMic()" title="Micrófono">🎤</button>
       <button class="btn-call-ctrl" id="btnToggleCam" onclick="toggleCallCam()" title="Cámara">📷</button>
-      <button class="btn-call-ctrl" onclick="switchCameraFacing()" title="Cambiar Cámara">🔄</button>
       <button class="btn-call-ctrl hangup" onclick="endActiveCall()" title="Finalizar">📞</button>
     </div>
   </div>
@@ -595,17 +625,13 @@
       <span onclick="reactToMessage('🙏')">🙏</span>
     </div>
     <button onclick="contextAction('reply')">↩️ Responder</button>
-    <button onclick="contextAction('forward')">➡️ Reenviar</button>
     <button onclick="contextAction('copy')">📋 Copiar</button>
     <button onclick="contextAction('star')">⭐ Destacar</button>
     <button onclick="contextAction('info')">ℹ️ Información</button>
-    <button onclick="contextAction('edit')" id="btnCtxEdit">✏️ Editar</button>
-    <button onclick="contextAction('share')">🔗 Compartir</button>
     <button onclick="contextAction('delete')" style="color:var(--danger)">🗑️ Eliminar</button>
   </div>
 
   <div class="app" id="appShell">
-    <!-- BARRA LATERAL -->
     <div class="sidebar">
       <div class="sidebar-header">
         <div class="user-avatar-badge" onclick="openProfileSection()">
@@ -613,24 +639,21 @@
           <div><strong id="myHeaderName">Mi Usuario</strong><small>PIN: <span id="myHeaderPin">...</span></small></div>
         </div>
         <div class="header-icons">
-          <button class="icon-btn" onclick="openQuickCameraModal()" title="Cámara">📷</button>
+          <button class="icon-btn" onclick="openDirectCameraCapture()" title="Tomar Foto">📷</button>
           <button class="icon-btn" onclick="openQuickAddModal()" title="Nuevo Chat">✏️</button>
           <button class="icon-btn" onclick="toggleKebabMenu()" title="Menú">⋮</button>
         </div>
       </div>
 
-      <!-- MENÚ DE TRES PUNTOS -->
       <div class="kebab-dropdown" id="kebabDropdown">
         <button onclick="openCreateGroupModal(); toggleKebabMenu();">👥 Nuevo grupo</button>
         <button onclick="openCreateCommunityModal(); toggleKebabMenu();">🌐 Nueva comunidad</button>
-        <button onclick="openBroadcastModal(); toggleKebabMenu();">📢 Nueva difusión</button>
         <button onclick="openStoryShareModal(); toggleKebabMenu();">📱 Tarjeta QR e Invitar</button>
         <button onclick="openStarredMessagesModal(); toggleKebabMenu();">⭐ Mensajes destacados</button>
-        <button onclick="openSettingsSection('chats'); toggleKebabMenu();">⚙️ Ajustes</button>
+        <button onclick="openProfileSection(); toggleKebabMenu();">👤 Mi Perfil y Foto</button>
         <button onclick="executePanicKillSwitch()" style="color:var(--danger)">🚨 Botón de Pánico</button>
       </div>
 
-      <!-- PESTAÑAS PRINCIPALES -->
       <div class="nav-tabs">
         <button class="nav-tab-btn active" id="tabBtnChats" onclick="switchMainTab('chats')">Chats</button>
         <button class="nav-tab-btn" id="tabBtnUpdates" onclick="switchMainTab('updates')">Novedades</button>
@@ -648,7 +671,6 @@
       <div class="tab-content-area" id="tabContentList"></div>
     </div>
 
-    <!-- ÁREA DEL CHAT -->
     <div class="main-chat" id="mainArea"></div>
   </div>
 
@@ -699,14 +721,38 @@
     <input type="file" id="genericFileInput" hidden onchange="handleFilePicked(event)">
   </dialog>
 
+  <!-- INPUTS DE CÁMARA DIRECTA Y PERFIL -->
+  <input type="file" id="directCameraInput" accept="image/*" capture="environment" hidden onchange="handleCameraPhotoPicked(event)">
+  <input type="file" id="profilePicInput" accept="image/*" hidden onchange="processProfilePhotoUpload(event)">
+
   <!-- MODAL: ENCUESTAS -->
   <dialog id="pollModal">
     <h3 style="margin:0 0 12px;font-size:17px">Crear Encuesta</h3>
     <input id="pollQuestion" placeholder="Haz una pregunta..." style="margin-bottom:10px">
     <input id="pollOpt1" placeholder="Opción 1" style="margin-bottom:8px">
     <input id="pollOpt2" placeholder="Opción 2" style="margin-bottom:8px">
-    <input id="pollOpt3" placeholder="Opción 3 (Opcional)" style="margin-bottom:14px">
     <button class="btn-wa-primary" onclick="submitSendPoll()">Enviar Encuesta</button>
+  </dialog>
+
+  <!-- MODAL: ESTADO DE TEXTO -->
+  <dialog id="textStatusModal">
+    <h3 style="margin:0 0 12px;font-size:17px">Nuevo Estado</h3>
+    <textarea id="textStatusContent" placeholder="Escribe tu estado..." style="min-height:90px;margin-bottom:12px"></textarea>
+    <button class="btn-wa-primary" onclick="confirmPublishTextStatus()">Publicar Actualización</button>
+  </dialog>
+
+  <!-- MODAL: COMPARTIR CONTACTO -->
+  <dialog id="shareContactModal">
+    <h3 style="margin:0 0 12px;font-size:17px">Compartir Contacto</h3>
+    <div id="contactShareList" style="max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:8px"></div>
+  </dialog>
+
+  <!-- MODAL: EVENTO -->
+  <dialog id="eventModal">
+    <h3 style="margin:0 0 12px;font-size:17px">Crear Evento</h3>
+    <input id="eventTitle" placeholder="Título del evento..." style="margin-bottom:10px">
+    <input id="eventDate" type="date" style="margin-bottom:14px">
+    <button class="btn-wa-primary" onclick="submitSendEvent()">Compartir Evento</button>
   </dialog>
 
   <!-- MODALES DE SOPORTE -->
@@ -736,9 +782,10 @@
     <button class="btn-wa-primary" onclick="storyShareModal.close()">Listo</button>
   </dialog>
 
+  <!-- MODAL DE EMOJIS AMPLIADO (120+ EMOJIS) -->
   <dialog id="emojiDialog">
     <div style="display:flex;justify-content:space-between;align-items:center"><strong style="font-size:16px">Emojis</strong><button class="icon-btn" onclick="emojiDialog.close()">✕</button></div>
-    <div class="emoji-grid" id="emojiGridBox" style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;max-height:220px;overflow-y:auto;margin-top:10px"></div>
+    <div class="emoji-grid" id="emojiGridBox" style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;max-height:280px;overflow-y:auto;margin-top:10px"></div>
   </dialog>
 
   <dialog id="starredModal">
@@ -746,38 +793,100 @@
     <div id="starredMessagesList" style="max-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:8px"></div>
   </dialog>
 
-  <dialog id="noticeModal"><h3 id="noticeTitle" style="margin:0 0 8px"></h3><p id="noticeDesc" style="color:var(--wa-text-muted);font-size:13.5px;line-height:1.5"></p><button class="btn-wa-primary" onclick="noticeModal.close()">Entendido</button></dialog>
-
   <script>
     const $ = id => document.getElementById(id);
     const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const SERVER_URL = 'https://hello-server-p2p.onrender.com';
+
+    // --- RESTRICCIONES DE AUDIO SIN ECO NI RUIDO ---
+    const cleanAudioConstraints = {
+      echoCancellation: true,
+      noiseSuppression: true,
+      autoGainControl: true
+    };
 
     function generateId(len) {
       const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
       let r = ''; for (let i = 0; i < len; i++) r += chars.charAt(Math.floor(Math.random() * chars.length)); return r;
     }
 
-    // --- EFECTO DE AUDIO SINTETIZADO: ROGER BEEP ---
+    // --- GENERADOR DE TONOS SINTÉTICOS (WEB AUDIO API) ---
+    let ringtoneAudioCtx = null;
+    let ringtoneTimer = null;
+    let dialtoneTimer = null;
+
+    function getAudioCtx() {
+      if (!ringtoneAudioCtx) ringtoneAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (ringtoneAudioCtx.state === 'suspended') ringtoneAudioCtx.resume();
+      return ringtoneAudioCtx;
+    }
+
+    // Tono de timbrado de llamada entrante
+    function startIncomingRingtone() {
+      stopCallAudioFeedback();
+      const ctx = getAudioCtx();
+      const playChime = () => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        const now = ctx.currentTime;
+        osc.frequency.setValueAtTime(587.33, now);       // D5
+        osc.frequency.setValueAtTime(880.00, now + 0.15); // A5
+        osc.frequency.setValueAtTime(1174.66, now + 0.3); // D6
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.85);
+        osc.start(now);
+        osc.stop(now + 0.85);
+      };
+      playChime();
+      ringtoneTimer = setInterval(playChime, 1800);
+    }
+
+    // Tono de llamada saliente (Tuuu... Tuuu...)
+    function startOutgoingDialTone() {
+      stopCallAudioFeedback();
+      const ctx = getAudioCtx();
+      const playTone = () => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        const now = ctx.currentTime;
+        osc.frequency.setValueAtTime(425, now);
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.setValueAtTime(0.12, now + 1.2);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 1.25);
+        osc.start(now);
+        osc.stop(now + 1.25);
+      };
+      playTone();
+      dialtoneTimer = setInterval(playTone, 3200);
+    }
+
+    function stopCallAudioFeedback() {
+      if (ringtoneTimer) { clearInterval(ringtoneTimer); ringtoneTimer = null; }
+      if (dialtoneTimer) { clearInterval(dialtoneTimer); dialtoneTimer = null; }
+    }
+
     function playRogerBeep() {
       try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
+        const ctx = getAudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
         osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.type = 'sine';
-        const now = audioCtx.currentTime;
+        gain.connect(ctx.destination);
+        const now = ctx.currentTime;
         osc.frequency.setValueAtTime(1200, now);
         osc.frequency.setValueAtTime(1600, now + 0.07);
-        gain.gain.setValueAtTime(0.12, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
         osc.start(now);
-        osc.stop(now + 0.16);
+        osc.stop(now + 0.15);
       } catch (e) {}
     }
 
-    // --- ACCESO POR PIN Y NUBE ---
+    // --- ACCESO POR PIN ---
     function switchPinView(v) {
       if (v === 'new') {
         $('tabBtnNewPin').classList.add('active'); $('tabBtnLogPin').classList.remove('active');
@@ -799,7 +908,7 @@
     async function loginWithPin(e) {
       e.preventDefault();
       const p = $('inputPinLog').value.trim().toUpperCase();
-      if (p.length < 4) return showNotice('Error', 'PIN inválido');
+      if (p.length < 4) return alert('PIN inválido');
       $('btnRestoring').textContent = 'Descargando datos...';
       localStorage.helloCurrentPin = p;
       try {
@@ -810,15 +919,6 @@
           if (d.name) localStorage['helloName_' + p] = d.name;
           if (d.status) localStorage['helloStatus_' + p] = d.status;
           if (d.photo) localStorage['helloPhoto_' + p] = d.photo;
-          if (d.msgs) {
-            const database = await openPinDatabase(p);
-            const tx = database.transaction('chats', 'readwrite');
-            const store = tx.objectStore('chats');
-            store.clear();
-            for (const t in d.msgs) {
-              d.msgs[t].forEach(m => { m.targetPin = t; store.add(m); });
-            }
-          }
         }
       } catch(err){}
       location.reload();
@@ -837,7 +937,6 @@
     let msgs = {};
     let callLogs = JSON.parse(localStorage['helloCalls_' + myPin] || '[]');
     let userStates = JSON.parse(localStorage['helloStates_' + myPin] || '[]');
-    let followedChannels = JSON.parse(localStorage['helloChannels_' + myPin] || '["Canal Oficial HELLO"]');
 
     function updateHeaderIdentity() {
       if ($('myHeaderPin')) $('myHeaderPin').textContent = myPin;
@@ -909,7 +1008,23 @@
       syncToCloud();
     }
 
-    // --- FORMATEADOR DE TEXTO (MARKDOWN DE WHATSAPP) ---
+    // --- DIFUSIÓN EN VIVO DE CAMBIOS DE PERFIL A OTROS USUARIOS ---
+    function broadcastProfileUpdate() {
+      peerConns.forEach((conn) => {
+        if (conn && conn.open) {
+          try {
+            conn.send({
+              type: 'PROFILE_UPDATE',
+              pin: myPin,
+              name: myName,
+              status: myStatus,
+              photo: myPhoto
+            });
+          } catch(e){}
+        }
+      });
+    }
+
     function formatWhatsAppText(txt) {
       if (!txt) return '';
       let res = esc(txt);
@@ -921,7 +1036,7 @@
       return res;
     }
 
-    // --- WEBRTC CONFIGURATION ---
+    // --- WEBRTC Y SEÑALIZACIÓN ---
     const peerServerConfig = {
       host: 'hello-server-p2p.onrender.com',
       port: 443,
@@ -943,6 +1058,7 @@
     const peerConns = new Map();
     let activeCallStream = null;
     let activeWebRtcCall = null;
+    let pendingIncomingCall = null;
 
     if (myPin) {
       openPinDatabase().then(() => loadMessages());
@@ -955,34 +1071,106 @@
 
       peer.on('call', call => {
         if (call.metadata?.isFullCall) {
-          if (confirm(`📞 Llamada entrante de ${call.metadata.name || 'Contacto'}. ¿Deseas contestar?`)) {
-            navigator.mediaDevices.getUserMedia({ audio: true, video: call.metadata.isVideo }).then(stream => {
-              activeCallStream = stream;
-              $('localVideo').srcObject = stream;
-              call.answer(stream);
-              handleCallStream(call, call.metadata.name, call.metadata.isVideo);
-            });
-          }
+          // LLAMADA ENTRANTE CON TIMBRADO ACTIVO
+          pendingIncomingCall = call;
+          $('incName').textContent = call.metadata.name || ('PIN: ' + call.peer.replace('HELLO-',''));
+          $('incType').textContent = call.metadata.isVideo ? '📹 Videollamada entrante...' : '📞 Llamada de voz entrante...';
+          $('incomingCallDialog').showModal();
+          startIncomingRingtone();
         } else {
-          // Walkie-Talkie Audio PTT Stream
+          // WALKIE-TALKIE PTT EN DIRECTO
           call.answer();
           call.on('stream', stream => {
-            const player = $('liveSpeaker'); player.srcObject = stream; player.play().catch(e=>{});
+            const player = $('liveSpeaker');
+            player.srcObject = stream;
+            player.play().catch(e=>{});
             $('radioAlertSender').textContent = `📻 ${call.metadata?.name || 'Contacto'} en vivo...`;
             $('liveRadioAlert').style.display = 'flex';
           });
-          call.on('close', () => { $('liveRadioAlert').style.display = 'none'; $('liveSpeaker').srcObject = null; playRogerBeep(); });
+          call.on('close', () => {
+            $('liveRadioAlert').style.display = 'none';
+            $('liveSpeaker').srcObject = null;
+            playRogerBeep();
+          });
         }
       });
     }
 
+    function acceptIncomingCall() {
+      stopCallAudioFeedback();
+      $('incomingCallDialog').close();
+      if (!pendingIncomingCall) return;
+
+      const isVideo = pendingIncomingCall.metadata.isVideo;
+      navigator.mediaDevices.getUserMedia({
+        audio: cleanAudioConstraints,
+        video: isVideo
+      }).then(stream => {
+        activeCallStream = stream;
+        $('localVideo').srcObject = stream;
+        $('localVideo').muted = true; // IMPORTANTE: SILENCIAR LOCAL PARA EVITAR ECO
+        pendingIncomingCall.answer(stream);
+        handleCallStream(pendingIncomingCall, pendingIncomingCall.metadata.name, isVideo);
+      }).catch(err => {
+        alert('Error al acceder al micrófono/cámara: ' + err.message);
+      });
+    }
+
+    function rejectIncomingCall() {
+      stopCallAudioFeedback();
+      $('incomingCallDialog').close();
+      if (pendingIncomingCall) {
+        pendingIncomingCall.close();
+        pendingIncomingCall = null;
+      }
+    }
+
     function bindConnHandlers(conn, remotePin) {
       peerConns.set(remotePin, conn);
+
+      const sendHandshake = () => {
+        try {
+          conn.send({
+            type: 'PROFILE_UPDATE',
+            pin: myPin,
+            name: myName,
+            status: myStatus,
+            photo: myPhoto
+          });
+        } catch(e){}
+      };
+
+      if (conn.open) sendHandshake();
+      else conn.on('open', sendHandshake);
+
       conn.on('data', data => {
+        // ACTUALIZACIÓN DE PERFIL Y FOTO EN VIVO
+        if (data.type === 'PROFILE_UPDATE') {
+          let c = contacts.find(x => x.pin === data.pin);
+          if (c) {
+            c.name = data.name || c.name;
+            c.status = data.status || c.status;
+            c.photo = data.photo || '';
+          } else {
+            contacts.push({ name: data.name, pin: data.pin, status: data.status, photo: data.photo || '', lastMsg: 'Conectado', time: getNow() });
+          }
+          saveState();
+          filterMainList('');
+          if (contacts[activeChatIndex]?.pin === data.pin) selectChat(activeChatIndex);
+        }
+
         if (data.type === 'CHAT_MSG') appendMessage(remotePin, { text: data.text, mine: false, time: getNow() });
+        if (data.type === 'PHOTO_MSG') appendMessage(remotePin, { photo: data.photoData, caption: data.caption, mine: false, time: getNow() });
+        if (data.type === 'FILE_MSG') appendMessage(remotePin, { file: data.file, mine: false, time: getNow() });
         if (data.type === 'AUDIO_MSG') appendMessage(remotePin, { audio: data.audioData, duration: data.duration, mine: false, time: getNow() });
         if (data.type === 'POLL_MSG') appendMessage(remotePin, { poll: data.poll, mine: false, time: getNow() });
         if (data.type === 'LOCATION_MSG') appendMessage(remotePin, { location: data.location, mine: false, time: getNow() });
+        if (data.type === 'EVENT_MSG') appendMessage(remotePin, { event: data.event, mine: false, time: getNow() });
+        if (data.type === 'STATE_NEW') {
+          userStates.unshift({ name: data.name, pin: data.pin, text: data.text, time: getNow() });
+          saveState();
+          if (currentMainTab === 'updates') renderUpdatesTab();
+        }
       });
     }
 
@@ -990,7 +1178,7 @@
 
     function appendMessage(fromPin, msg) {
       let idx = contacts.findIndex(c => c.pin === fromPin);
-      let preview = msg.text || (msg.audio ? '🎤 Nota de voz' : (msg.poll ? '📊 Encuesta' : '📎 Archivo'));
+      let preview = msg.text || (msg.photo ? '📷 Foto' : (msg.audio ? '🎤 Nota de voz' : (msg.poll ? '📊 Encuesta' : '📎 Archivo')));
       if (idx < 0) contacts.push({ name: 'PIN ' + fromPin, pin: fromPin, lastMsg: preview, time: msg.time });
       else { contacts[idx].lastMsg = preview; contacts[idx].time = msg.time; }
       (msgs[fromPin] ??= []).push(msg);
@@ -1011,14 +1199,13 @@
       } catch(e) { return null; }
     }
 
-    // --- NAVEGACIÓN ENTRE PESTAÑAS PRINCIPALES ---
+    // --- PESTAÑAS PRINCIPALES ---
     function switchMainTab(tab) {
       currentMainTab = tab;
       document.querySelectorAll('.nav-tab-btn').forEach(b => b.classList.remove('active'));
       const btnId = 'tabBtn' + tab.charAt(0).toUpperCase() + tab.slice(1);
       if ($(btnId)) $(btnId).classList.add('active');
 
-      const container = $('tabContentList');
       if (tab === 'chats') renderChatsTab();
       else if (tab === 'updates') renderUpdatesTab();
       else if (tab === 'communities') renderCommunitiesTab();
@@ -1031,12 +1218,11 @@
       else if (currentMainTab === 'calls') renderCallsTab(query);
     }
 
-    // 1. PESTAÑA: CHATS
+    // 1. PESTAÑA CHATS
     function renderChatsTab(filter = '') {
       const container = $('tabContentList');
       const filtered = contacts.filter(c => !filter || c.name.toLowerCase().includes(filter.toLowerCase()) || c.pin.includes(filter.toUpperCase()));
       
-      // Acceso directo al Canal SOS arriba
       let sosHtml = `
         <div class="chat-item" onclick="tuneIntoEmergencyChat()" style="background:#fff1f2;border-bottom:2px solid #fecaca">
           <div class="avatar" style="background:var(--danger)">🚨</div>
@@ -1066,7 +1252,7 @@
       }).join('');
     }
 
-    // 2. PESTAÑA: NOVEDADES (ESTADOS Y CANALES)
+    // 2. PESTAÑA NOVEDADES
     function renderUpdatesTab() {
       const container = $('tabContentList');
       container.innerHTML = `
@@ -1075,26 +1261,36 @@
             <strong style="font-size:16px">Estados</strong>
             <button class="icon-btn" onclick="openCreateTextStatus()">✏️</button>
           </div>
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;cursor:pointer" onclick="openQuickCameraModal()">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;cursor:pointer" onclick="openCreateTextStatus()">
             <div class="avatar" style="border:2px dashed var(--wa-teal);background:transparent;color:var(--wa-teal)">＋</div>
-            <div><strong>Mi estado</strong><small style="display:block;color:var(--wa-text-muted)">Añadir a mis actualizaciones (24h)</small></div>
+            <div><strong>Mi estado</strong><small style="display:block;color:var(--wa-text-muted)">Publicar una actualización (24h)</small></div>
+          </div>
+
+          <div style="margin-bottom:24px">
+            ${userStates.length ? userStates.map(s => `
+              <div class="chat-item" style="padding:8px 0">
+                <div class="avatar" style="background:var(--wa-teal)">${esc(s.name.charAt(0))}</div>
+                <div class="chat-details">
+                  <div class="title-row"><strong>${esc(s.name)}</strong><span class="time">${s.time}</span></div>
+                  <div class="desc-row">${esc(s.text)}</div>
+                </div>
+              </div>
+            `).join('') : '<p style="color:var(--wa-text-muted);font-size:13px">Sin estados recientes.</p>'}
           </div>
 
           <strong style="font-size:16px;display:block;margin:18px 0 10px">Canales</strong>
-          <div style="display:flex;flex-direction:column;gap:10px">
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--wa-border)">
-              <div style="display:flex;align-items:center;gap:10px">
-                <div class="avatar" style="background:#7c3aed">📢</div>
-                <div><strong>Canal Oficial HELLO</strong><small style="display:block;color:var(--wa-text-muted)">Novedades y guías P2P</small></div>
-              </div>
-              <button class="btn-wa-primary" style="width:auto;padding:6px 14px;font-size:12px" onclick="alert('Siguiendo canal oficial.')">Siguiendo</button>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--wa-border)">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="avatar" style="background:#7c3aed">📢</div>
+              <div><strong>Canal Oficial HELLO</strong><small style="display:block;color:var(--wa-text-muted)">Novedades y guías P2P</small></div>
             </div>
+            <button class="btn-wa-primary" style="width:auto;padding:6px 14px;font-size:12px" onclick="alert('Siguiendo canal oficial.')">Siguiendo</button>
           </div>
         </div>
       `;
     }
 
-    // 3. PESTAÑA: COMUNIDADES
+    // 3. PESTAÑA COMUNIDADES
     function renderCommunitiesTab() {
       $('tabContentList').innerHTML = `
         <div style="padding:24px 18px;text-align:center">
@@ -1106,29 +1302,29 @@
       `;
     }
 
-    // 4. PESTAÑA: LLAMADAS
+    // 4. PESTAÑA LLAMADAS
     function renderCallsTab() {
       const container = $('tabContentList');
       container.innerHTML = `
         <div style="padding:14px 16px">
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;cursor:pointer" onclick="copyCallInviteLink()">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;cursor:pointer" onclick="openQuickAddModal()">
             <div class="avatar" style="background:var(--wa-teal)">🔗</div>
-            <div><strong>Crear enlace de llamada</strong><small style="display:block;color:var(--wa-text-muted)">Comparte un enlace para tu llamada HELLO</small></div>
+            <div><strong>Iniciar nueva llamada</strong><small style="display:block;color:var(--wa-text-muted)">Conéctate a un PIN con audio limpio</small></div>
           </div>
-          <strong style="font-size:14px;display:block;margin-bottom:10px;color:var(--wa-text-muted)">Recientes</strong>
+          <strong style="font-size:14px;display:block;margin-bottom:10px;color:var(--wa-text-muted)">Historial Reciente</strong>
           <div style="display:flex;flex-direction:column;gap:12px">
             ${callLogs.length ? callLogs.map(l => `
               <div style="display:flex;justify-content:space-between;align-items:center">
                 <div><strong>${esc(l.contact)}</strong><small style="display:block;color:var(--wa-text-muted)">${l.type} • ${l.time}</small></div>
                 <button class="icon-btn" onclick="startCallWithContact('${l.pin}', ${l.type.includes('Video')})">${l.type.includes('Video') ? '📹' : '📞'}</button>
               </div>
-            `).join('') : '<p style="color:var(--wa-text-muted);font-size:13px">Sin llamadas recientes.</p>'}
+            `).join('') : '<p style="color:var(--wa-text-muted);font-size:13px">Sin llamadas registradas.</p>'}
           </div>
         </div>
       `;
     }
 
-    // --- DIBUJAR PANTALLA DE CHAT ACTIVA ---
+    // --- PANTALLA PRINCIPAL DE CHAT ---
     function selectChat(idx) {
       activeChatIndex = idx;
       const c = contacts[idx];
@@ -1137,7 +1333,7 @@
 
       $('mainArea').innerHTML = `
         <div class="main-header">
-          <div class="contact-summary" onclick="alert('PIN de contacto: ${c.pin}')">
+          <div class="contact-summary" onclick="openProfileSection()">
             <button class="icon-btn mobile-back" onclick="$('appShell').classList.remove('chat-open')">‹</button>
             <div class="avatar" style="width:40px;height:40px">${c.photo ? `<img src="${c.photo}">` : esc(c.name.charAt(0))}</div>
             <div><strong>${esc(c.name)}</strong><small>PIN: ${esc(c.pin)}</small></div>
@@ -1145,15 +1341,19 @@
           <div style="display:flex;align-items:center;gap:2px">
             <button class="icon-btn" title="Llamada de voz" onclick="startCallWithContact('${c.pin}', false)">📞</button>
             <button class="icon-btn" title="Videollamada" onclick="startCallWithContact('${c.pin}', true)">📹</button>
-            <button class="icon-btn" title="Buscar en chat" onclick="promptSearchInChat()">🔍</button>
+            <button class="icon-btn" title="Buscar en el chat" onclick="toggleInChatSearch()">🔍</button>
             <button class="icon-btn" title="Opciones" onclick="toggleChatKebab()">⋮</button>
           </div>
+        </div>
+        <div class="in-chat-search-bar" id="chatSearchBox">
+          <input id="inChatQuery" placeholder="Buscar mensajes en esta conversación..." oninput="highlightChatSearch(this.value)" style="padding:6px 12px;font-size:13px">
+          <button class="icon-btn" onclick="toggleInChatSearch()">✕</button>
         </div>
         <div class="conversation" id="conversationBox"></div>
         <div class="chat-footer">
           <button type="button" class="icon-btn" title="Emojis" onclick="openEmojiDialog()">☺</button>
           <button type="button" class="icon-btn" title="Adjuntar" onclick="attachDialog.showModal()">📎</button>
-          <button type="button" class="icon-btn" title="Cámara directa" onclick="openDirectCameraCapture()">📷</button>
+          <button type="button" class="icon-btn" title="Tomar Foto" onclick="openDirectCameraCapture()">📷</button>
           <input class="input-box" id="msgInput" placeholder="Escribe un mensaje (*negrita*, _cursiva_)..." autocomplete="off" onkeydown="if(event.key==='Enter') handleSendText()">
           <button type="button" class="btn-action-round btn-send-text" title="Enviar Mensaje" onclick="handleSendText()">➤</button>
           <button type="button" class="btn-action-round btn-voice-note" id="btnVoiceNote" title="Nota de voz" onclick="toggleVoiceNote()">🎤</button>
@@ -1166,6 +1366,30 @@
       drawChatMessages();
     }
 
+    function toggleInChatSearch() {
+      const b = $('chatSearchBox');
+      b.style.display = b.style.display === 'flex' ? 'none' : 'flex';
+      if (b.style.display === 'flex') $('inChatQuery').focus();
+      else drawChatMessages();
+    }
+
+    function highlightChatSearch(q) {
+      if (!q.trim()) return drawChatMessages();
+      const c = contacts[activeChatIndex];
+      const list = msgs[c.pin] || [];
+      const box = $('conversationBox');
+      box.innerHTML = list.map((m, idx) => {
+        let text = m.text || '';
+        let isMatch = text.toLowerCase().includes(q.toLowerCase());
+        return `
+          <div class="bubble ${m.mine ? 'mine' : 'them'}" style="${isMatch ? 'border:2px solid var(--wa-teal)' : ''}">
+            ${formatWhatsAppText(text)}
+            <div class="meta"><span>${m.time}</span></div>
+          </div>
+        `;
+      }).join('');
+    }
+
     function drawChatMessages() {
       const c = contacts[activeChatIndex];
       const box = $('conversationBox');
@@ -1175,8 +1399,11 @@
       box.innerHTML = list.map((m, idx) => {
         let content = '';
         if (m.text) content = formatWhatsAppText(m.text);
+        if (m.photo) content = `<img src="${m.photo}" class="chat-photo-bubble" onclick="window.open('${m.photo}')">${m.caption ? `<div>${esc(m.caption)}</div>` : ''}`;
+        if (m.file) content = `<div style="display:flex;align-items:center;gap:8px"><span>📄</span><a href="${m.file.data}" download="${esc(m.file.name)}" style="color:var(--wa-teal);font-weight:700">${esc(m.file.name)}</a></div>`;
         if (m.audio) content = `<audio controls src="${m.audio}" style="max-width:240px;height:36px"></audio>`;
-        if (m.location) content = `<div style="font-weight:700">📍 Ubicación compartida</div><a href="https://maps.google.com/?q=${m.location.lat},${m.location.lng}" target="_blank" style="color:var(--wa-teal);font-size:12px">Ver en Google Maps</a>`;
+        if (m.location) content = `<div style="font-weight:700">📍 Ubicación</div><a href="https://maps.google.com/?q=${m.location.lat},${m.location.lng}" target="_blank" style="color:var(--wa-teal);font-size:12px">Abrir en Google Maps</a>`;
+        if (m.event) content = `<div style="border:1px dashed var(--wa-teal);padding:8px;border-radius:6px">📅 <strong>${esc(m.event.title)}</strong><div style="font-size:12px">Fecha: ${m.event.date}</div></div>`;
         if (m.poll) {
           content = `
             <div style="font-weight:700;margin-bottom:6px">📊 ${esc(m.poll.question)}</div>
@@ -1199,7 +1426,7 @@
       box.scrollTop = box.scrollHeight;
     }
 
-    // --- ACCIÓN: ENVIAR MENSAJE ---
+    // --- ENVIAR MENSAJE ---
     let pendingQuote = null;
     function handleSendText() {
       const input = $('msgInput');
@@ -1224,7 +1451,33 @@
       filterMainList('');
     }
 
-    // --- NOTA DE VOZ WHATSAPP ---
+    // --- CÁMARA DIRECTA ---
+    function openDirectCameraCapture() {
+      if ($('attachDialog').open) $('attachDialog').close();
+      $('directCameraInput').click();
+    }
+
+    function handleCameraPhotoPicked(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const r = new FileReader();
+      r.onload = ev => {
+        const c = contacts[activeChatIndex];
+        if (!c) return;
+        const msgObj = { photo: ev.target.result, mine: true, time: getNow() };
+        (msgs[c.pin] ??= []).push(msgObj);
+        c.lastMsg = '📷 Foto'; c.time = getNow();
+        saveMsgToDB(c.pin, msgObj);
+        saveState();
+        const conn = getPeerConn(c.pin);
+        if (conn && conn.open) conn.send({ type: 'PHOTO_MSG', photoData: ev.target.result });
+        drawChatMessages();
+        filterMainList('');
+      };
+      r.readAsDataURL(file);
+    }
+
+    // --- NOTA DE VOZ (SIN ECO) ---
     let mediaRecorder = null;
     let voiceChunks = [];
     let isRecordingVoice = false;
@@ -1234,7 +1487,7 @@
       const btn = $('btnVoiceNote');
       if (!isRecordingVoice) {
         try {
-          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: cleanAudioConstraints });
           mediaRecorder = new MediaRecorder(stream);
           voiceChunks = [];
           mediaRecorder.ondataavailable = e => { if (e.data.size > 0) voiceChunks.push(e.data); };
@@ -1258,7 +1511,7 @@
           mediaRecorder.start();
           isRecordingVoice = true;
           btn.classList.add('recording');
-        } catch(e) { alert('Micrófono requerido'); }
+        } catch(e) { alert('Permiso de micrófono requerido.'); }
       } else {
         if (mediaRecorder) mediaRecorder.stop();
         isRecordingVoice = false;
@@ -1266,7 +1519,7 @@
       }
     }
 
-    // --- WALKIE-TALKIE PTT ---
+    // --- WALKIE-TALKIE PTT (AUDIO LIMPIO SIN ECO) ---
     let pttStream = null;
     let pttCall = null;
     function bindPttEvents(contact) {
@@ -1276,7 +1529,7 @@
         e.preventDefault();
         btn.classList.add('transmitting');
         try {
-          pttStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          pttStream = await navigator.mediaDevices.getUserMedia({ audio: cleanAudioConstraints });
           pttCall = peer.call('HELLO-' + contact.pin, pttStream, { metadata: { name: myName } });
         } catch(err){}
       };
@@ -1290,36 +1543,45 @@
       btn.onpointercancel = stop;
     }
 
-    // --- LLAMADAS Y VIDEOLLAMADAS WEBRTC ---
-    let currentCallContactPin = null;
+    // --- LLAMADAS Y VIDEOLLAMADAS CON TONOS Y SIN ECO ---
     async function startCallWithContact(pin, isVideo) {
-      currentCallContactPin = pin;
       $('callContactTitle').textContent = `Llamando a PIN ${pin}...`;
       $('callOverlay').style.display = 'flex';
       $('videoContainerBox').style.display = isVideo ? 'flex' : 'none';
+      startOutgoingDialTone();
 
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: isVideo });
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: cleanAudioConstraints,
+          video: isVideo
+        });
         activeCallStream = stream;
         $('localVideo').srcObject = stream;
+        $('localVideo').muted = true; // SILENCIAR AUDIO LOCAL PARA EVITAR ECO
+
         const call = peer.call('HELLO-' + pin, stream, { metadata: { name: myName, isFullCall: true, isVideo } });
         handleCallStream(call, pin, isVideo);
 
         callLogs.unshift({ contact: 'PIN ' + pin, pin, type: isVideo ? 'Videollamada' : 'Llamada de voz', time: getNow() });
         saveState();
-      } catch(e) { alert('Permisos de cámara o micrófono necesarios.'); endActiveCall(); }
+      } catch(e) {
+        alert('Cámara o micrófono no disponibles.');
+        endActiveCall();
+      }
     }
 
     function handleCallStream(call, label, isVideo) {
       activeWebRtcCall = call;
       call.on('stream', rStream => {
-        $('callStateLabel').textContent = 'En llamada';
+        stopCallAudioFeedback();
+        $('callStateLabel').textContent = 'Conectado';
         $('remoteVideo').srcObject = rStream;
       });
       call.on('close', endActiveCall);
     }
 
     function endActiveCall() {
+      stopCallAudioFeedback();
       if (activeWebRtcCall) { activeWebRtcCall.close(); activeWebRtcCall = null; }
       if (activeCallStream) { activeCallStream.getTracks().forEach(t => t.stop()); activeCallStream = null; }
       $('callOverlay').style.display = 'none';
@@ -1327,19 +1589,17 @@
 
     function toggleCallMic() {
       if (!activeCallStream) return;
-      const audioTrack = activeCallStream.getAudioTracks()[0];
-      if (audioTrack) { audioTrack.enabled = !audioTrack.enabled; $('btnToggleMic').style.opacity = audioTrack.enabled ? '1' : '0.4'; }
+      const t = activeCallStream.getAudioTracks()[0];
+      if (t) { t.enabled = !t.enabled; $('btnToggleMic').style.opacity = t.enabled ? '1' : '0.4'; }
     }
 
     function toggleCallCam() {
       if (!activeCallStream) return;
-      const videoTrack = activeCallStream.getVideoTracks()[0];
-      if (videoTrack) { videoTrack.enabled = !videoTrack.enabled; $('btnToggleCam').style.opacity = videoTrack.enabled ? '1' : '0.4'; }
+      const t = activeCallStream.getVideoTracks()[0];
+      if (t) { t.enabled = !t.enabled; $('btnToggleCam').style.opacity = t.enabled ? '1' : '0.4'; }
     }
 
-    function switchCameraFacing() { alert('Alternando cámara'); }
-
-    // --- ACCIONES DE MENSAJES (CONTEXT MENU) ---
+    // --- MENÚ CONTEXTUAL MENSAJES ---
     let selectedMsgIdx = null;
     function openMsgContext(e, idx) {
       selectedMsgIdx = idx;
@@ -1361,24 +1621,36 @@
       const c = contacts[activeChatIndex];
       const m = msgs[c.pin][selectedMsgIdx];
       if (!m) return;
-
       if (act === 'reply') { pendingQuote = m.text || 'Archivo'; $('msgInput').focus(); }
-      else if (act === 'copy') { navigator.clipboard.writeText(m.text || ''); alert('Copiado al portapapeles'); }
+      else if (act === 'copy') { navigator.clipboard.writeText(m.text || ''); alert('Mensaje copiado.'); }
       else if (act === 'star') { m.starred = !m.starred; saveState(); drawChatMessages(); }
       else if (act === 'delete') { msgs[c.pin].splice(selectedMsgIdx, 1); saveState(); drawChatMessages(); }
       else if (act === 'info') { alert(`Entregado: ${m.time}\nLeído: Confirmado`); }
     }
 
-    // --- ADJUNTOS (9 OPCIONES) ---
+    // --- ADJUNTOS ACTIVOS ---
     function triggerFilePicker(accept) {
       $('genericFileInput').accept = accept;
       $('genericFileInput').click();
       attachDialog.close();
     }
+
     function handleFilePicked(e) {
       const file = e.target.files[0];
       if (!file) return;
-      alert(`Archivo listo: ${file.name}`);
+      const r = new FileReader();
+      r.onload = ev => {
+        const c = contacts[activeChatIndex];
+        const msgObj = { file: { name: file.name, data: ev.target.result }, mine: true, time: getNow() };
+        (msgs[c.pin] ??= []).push(msgObj);
+        c.lastMsg = '📎 ' + file.name; c.time = getNow();
+        saveMsgToDB(c.pin, msgObj);
+        saveState();
+        const conn = getPeerConn(c.pin);
+        if (conn && conn.open) conn.send({ type: 'FILE_MSG', file: msgObj.file });
+        drawChatMessages(); filterMainList('');
+      };
+      r.readAsDataURL(file);
     }
 
     function shareCurrentLocation() {
@@ -1391,11 +1663,11 @@
         if (conn && conn.open) conn.send({ type: 'LOCATION_MSG', location: msgObj.location });
         drawChatMessages();
         attachDialog.close();
-      }, () => alert('Activa la ubicación para compartirla.'));
+      }, () => alert('Activa los permisos de ubicación en tu navegador.'));
     }
 
     function shareLiveLocation() {
-      alert('Transmitiendo ubicación en tiempo real durante 15 minutos.');
+      alert('Transmitiendo ubicación en vivo.');
       shareCurrentLocation();
     }
 
@@ -1418,11 +1690,77 @@
       $('pollModal').close();
     }
 
-    function openDirectCameraCapture() { alert('Iniciando captura de cámara...'); }
-    function openShareContactModal() { alert(`Tu PIN actual es: ${myPin}`); }
-    function openCreateEventModal() { alert('Crear evento en este chat.'); }
+    function openShareContactModal() {
+      attachDialog.close();
+      $('contactShareList').innerHTML = contacts.map(c => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid var(--wa-border)">
+          <span>${esc(c.name)} (${esc(c.pin)})</span>
+          <button class="btn-wa-primary" style="width:auto;padding:4px 10px;font-size:12px" onclick="sendSharedContact('${c.name}', '${c.pin}')">Enviar</button>
+        </div>
+      `).join('');
+      $('shareContactModal').showModal();
+    }
 
-    // --- MODALES Y CONFIGURACIÓN ---
+    function sendSharedContact(name, pin) {
+      $('msgInput').value = `👤 Contacto: ${name} (PIN: ${pin})`;
+      $('shareContactModal').close();
+      handleSendText();
+    }
+
+    function openCreateEventModal() { attachDialog.close(); $('eventModal').showModal(); }
+    function submitSendEvent() {
+      const title = $('eventTitle').value.trim();
+      const date = $('eventDate').value;
+      if (!title || !date) return alert('Indica título y fecha.');
+      const c = contacts[activeChatIndex];
+      const eventObj = { title, date };
+      const msgObj = { event: eventObj, mine: true, time: getNow() };
+      (msgs[c.pin] ??= []).push(msgObj);
+      saveMsgToDB(c.pin, msgObj); saveState();
+      const conn = getPeerConn(c.pin);
+      if (conn && conn.open) conn.send({ type: 'EVENT_MSG', event: eventObj });
+      drawChatMessages();
+      $('eventModal').close();
+    }
+
+    // --- ESTADO DE TEXTO (24H) ---
+    function openCreateTextStatus() { $('textStatusModal').showModal(); }
+    function confirmPublishTextStatus() {
+      const text = $('textStatusContent').value.trim();
+      if (!text) return;
+      userStates.unshift({ name: 'Tú', pin: myPin, text, time: getNow() });
+      saveState();
+      // Notificar a pares
+      peerConns.forEach(conn => { if (conn && conn.open) conn.send({ type: 'STATE_NEW', name: myName, pin: myPin, text }); });
+      $('textStatusModal').close();
+      renderUpdatesTab();
+    }
+
+    // --- MENÚ DE EMOJIS AMPLIADO (120+ EMOJIS) ---
+    const FULL_EMOJIS = [
+      '😀','😃','😄','😁','😆','😅','😂','🤣','🥲','🥹','😊','😇','🙂','🙃','😉','😌','😍','🥰','😘','😗','😙','😚','😋','😛','😝','😜','🤪','🤨','🧐','🤓','😎','🥸','🤩','🥳','😏','😒','😞','😔','😟','😕','🙁','☹️','😣','😖','😫','😩','🥺','😢','😭','😮‍💨','😤','😠','😡','🤬','🤯','😳','🥵','🥶','😱','😨','😰','😥','😓','🫣','🤗','🫡','🤔','🫢','🤫','🤥','😶','😐','😑','😬','🫠','🙄','😯','😦','😧','😮','😲','🥱','😴','🤤','😪','😵','🤐','🥴','🤢','🤮','🤧','😷','🤒','🤕','🤑','🤠','😈','👿','👹','👺','🤡','💩','👻','💀','☠️','👽','👾','🤖','🎃','😺','😸','😹','😻','😼','👍','👎','👊','✊','🤛','🤜','👏','🙌','👐','🤲','🤝','🙏','✍️','💪','🦾','👂','👀','🧠','🫀','🫁','❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💔','❤️‍🔥','✨','🔥','🎉','⭐','🌟','⚡','💥'
+    ];
+
+    function openEmojiDialog() {
+      $('emojiGridBox').innerHTML = FULL_EMOJIS.map(e => `<button style="font-size:22px;padding:6px" onclick="insertEmoji('${e}')">${e}</button>`).join('');
+      $('emojiDialog').showModal();
+    }
+    function insertEmoji(e) { $('msgInput').value += e; $('emojiDialog').close(); $('msgInput').focus(); }
+
+    // --- OPCIONES ADICIONALES ---
+    function toggleChatKebab() {
+      if (confirm('¿Exportar conversación actual en un archivo de texto?')) {
+        const c = contacts[activeChatIndex];
+        const list = msgs[c.pin] || [];
+        const content = list.map(m => `[${m.time}] ${m.mine ? 'Yo' : c.name}: ${m.text || 'Archivo'}`).join('\n');
+        const blob = new Blob([content], { type: 'text/plain' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `Chat_HELLO_${c.name}.txt`;
+        a.click();
+      }
+    }
+
     function toggleKebabMenu() { $('kebabDropdown').classList.toggle('open'); }
     function openQuickAddModal() { $('quickAddModal').showModal(); }
     function confirmAddPin(e) {
@@ -1472,28 +1810,50 @@
     }
 
     function openCreateCommunityModal() { alert('Comunidad creada.'); }
-    function openBroadcastModal() { alert('Nueva lista de difusión preparada.'); }
+
     function tuneIntoEmergencyChat() {
       let idx = contacts.findIndex(c => c.pin === 'FREQ-SOS');
       if (idx < 0) { contacts.unshift({ name: '🚨 Canal SOS Prioritario', pin: 'FREQ-SOS', lastMsg: 'Sintonizado', time: getNow() }); idx = 0; saveState(); }
       selectChat(idx);
     }
 
+    // --- PERFIL Y FOTO CON DIFUSIÓN INMEDIATA A CONTACTOS ---
     function openProfileSection() {
       const n = prompt('Tu nombre de usuario visible:', myName);
-      if (n !== null) { myName = n.trim() || myName; saveState(); updateHeaderIdentity(); }
+      if (n !== null) {
+        myName = n.trim() || myName;
+        if (confirm('¿Deseas cambiar tu foto de perfil?')) {
+          $('profilePicInput').click();
+        } else {
+          saveState();
+          updateHeaderIdentity();
+          broadcastProfileUpdate();
+        }
+      }
+    }
+
+    function processProfilePhotoUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const r = new FileReader();
+      r.onload = ev => {
+        myPhoto = ev.target.result;
+        saveState();
+        updateHeaderIdentity();
+        broadcastProfileUpdate();
+        alert('Foto actualizada y sincronizada con tus contactos.');
+      };
+      r.readAsDataURL(file);
     }
 
     function executePanicKillSwitch() {
-      if (confirm('🚨 BOTÓN DE PÁNICO: ¿Eliminar de inmediato todos los chats, cerrar sesión y limpiar memoria local?')) {
+      if (confirm('🚨 BOTÓN DE PÁNICO: ¿Eliminar de inmediato todos los chats, cerrar sesión y limpiar la memoria?')) {
         if (peer) peer.destroy();
         localStorage.clear();
         indexedDB.deleteDatabase('HelloDB_' + myPin);
         location.reload();
       }
     }
-
-    function showNotice(title, desc) { $('noticeTitle').textContent = title; $('noticeDesc').textContent = desc; $('noticeModal').showModal(); }
 
     if (myPin) switchMainTab('chats');
   </script>
