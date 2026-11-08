@@ -3,14 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-  <title>HELLO — Mensajería Privada y Radio P2P</title>
+  <title>HELLO — Mensajería y Radio P2P</title>
 
-  <!-- Tipografía Profesional Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Bibliotecas WebRTC y Utilidades -->
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.9/pdf-lib.min.js"></script>
   <script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
@@ -30,10 +28,7 @@
       --hello-text-muted: #667781;
       --hello-bubble-in: #ffffff;
       --hello-bubble-out: #d9fdd3;
-      --hello-check-blue: #53bdeb;
       --danger: #ea0038;
-      --accent-purple: #7c3aed;
-      --shadow: 0 1px 3px rgba(11, 20, 26, 0.08);
       --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
@@ -49,7 +44,6 @@
       --hello-text-muted: #8696a0;
       --hello-bubble-in: #202c33;
       --hello-bubble-out: #005c4b;
-      --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -63,7 +57,6 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      letter-spacing: -0.01em;
     }
     body.dark-theme { background: #0c1317; }
 
@@ -73,10 +66,9 @@
       width: 100%;
       border: 1px solid var(--hello-border);
       background: var(--hello-card);
-      border-radius: 10px;
+      border-radius: 8px;
       padding: 10px 14px;
       outline: none;
-      color: var(--hello-text);
       font-size: 14px;
     }
     input:focus, textarea:focus, select:focus { border-color: var(--hello-teal); }
@@ -110,12 +102,7 @@
       border-bottom: 1px solid var(--hello-border);
     }
 
-    .user-avatar-badge {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-    }
+    .user-avatar-badge { display: flex; align-items: center; gap: 12px; cursor: pointer; }
     .avatar {
       width: 42px;
       height: 42px;
@@ -128,14 +115,13 @@
       font-size: 16px;
       overflow: hidden;
       flex-shrink: 0;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
     .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-    .user-avatar-badge strong { font-size: 15px; font-weight: 700; color: var(--hello-text); }
-    .user-avatar-badge small { display: block; color: var(--hello-teal); font-weight: 700; font-size: 11.5px; letter-spacing: 0.5px; }
+    .user-avatar-badge strong { font-size: 15px; font-weight: 700; }
+    .user-avatar-badge small { display: block; color: var(--hello-teal); font-weight: 700; font-size: 11.5px; }
 
-    .header-icons { display: flex; align-items: center; gap: 6px; }
+    .header-icons { display: flex; align-items: center; gap: 4px; }
     .icon-btn {
       background: transparent;
       color: var(--hello-text-muted);
@@ -145,10 +131,9 @@
       border-radius: 50%;
       display: grid;
       place-items: center;
-      transition: background 0.2s, transform 0.1s;
+      transition: background 0.2s;
     }
     .icon-btn:hover { background: rgba(0, 0, 0, 0.06); }
-    .icon-btn:active { transform: scale(0.95); }
 
     .nav-tabs { display: flex; background: var(--hello-sidebar); border-bottom: 1px solid var(--hello-border); }
     .nav-tab-btn {
@@ -157,7 +142,7 @@
       background: transparent;
       color: var(--hello-text-muted);
       font-weight: 700;
-      font-size: 12.5px;
+      font-size: 12px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       border-bottom: 3px solid transparent;
@@ -166,8 +151,8 @@
     .nav-tab-btn.active { color: var(--hello-teal); border-bottom-color: var(--hello-teal); }
 
     .search-wrapper { padding: 10px 14px; background: var(--hello-sidebar); border-bottom: 1px solid var(--hello-border); }
-    .search-bar { display: flex; align-items: center; background: var(--hello-card); border-radius: 10px; padding: 0 12px; }
-    .search-bar input { border: 0; background: transparent; padding: 9px 10px; font-size: 14px; }
+    .search-bar { display: flex; align-items: center; background: var(--hello-card); border-radius: 8px; padding: 0 12px; }
+    .search-bar input { border: 0; background: transparent; padding: 8px 10px; font-size: 14px; }
 
     .chat-list { flex: 1; overflow-y: auto; background: var(--hello-sidebar); }
     .chat-item {
@@ -217,9 +202,9 @@
       justify-content: space-between;
       z-index: 2;
     }
-    .main-header .contact-summary { display: flex; align-items: center; gap: 12px; }
+    .main-header .contact-summary { display: flex; align-items: center; gap: 12px; cursor: pointer; }
     .main-header .avatar { width: 42px; height: 42px; }
-    .contact-summary strong { font-size: 16px; font-weight: 700; display: block; color: var(--hello-text); }
+    .contact-summary strong { font-size: 16px; font-weight: 700; display: block; }
     .contact-summary small { font-size: 12px; font-weight: 600; color: var(--hello-text-muted); }
 
     .conversation {
@@ -237,7 +222,7 @@
       padding: 9px 13px;
       font-size: 14.5px;
       line-height: 1.45;
-      border-radius: 12px;
+      border-radius: 10px;
       position: relative;
       box-shadow: 0 1px 1px rgba(0,0,0,0.06);
       word-break: break-word;
@@ -257,9 +242,7 @@
       float: right;
       padding-left: 12px;
     }
-    .bubble img.chat-img { max-width: 100%; border-radius: 8px; display: block; margin-bottom: 6px; cursor: pointer; }
 
-    /* FOOTER MODERNO CON LOS 3 BOTONES DE ACCIÓN */
     .chat-footer {
       min-height: 68px;
       background: var(--hello-card);
@@ -277,8 +260,6 @@
       border: 0;
       outline: none;
       font-size: 15px;
-      color: var(--hello-text);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
 
     .btn-action-round {
@@ -289,29 +270,12 @@
       place-items: center;
       font-size: 18px;
       flex-shrink: 0;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+      transition: all 0.2s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
-    .btn-action-round:active { transform: scale(0.92); }
-
-    /* 1. Botón Enviar Texto */
-    .btn-send-text {
-      background: var(--hello-teal);
-      color: #ffffff;
-    }
-    .btn-send-text:hover { background: var(--hello-teal-dark); }
-
-    /* 2. Botón Grabar Nota de Voz (Tipo WhatsApp) */
-    .btn-voice-note {
-      background: #0284c7;
-      color: #ffffff;
-    }
-    .btn-voice-note.recording {
-      background: var(--danger);
-      animation: pulse 1s infinite;
-    }
-
-    /* 3. Botón Walkie-Talkie PTT */
+    .btn-send-text { background: var(--hello-teal); color: #ffffff; }
+    .btn-voice-note { background: #0284c7; color: #ffffff; }
+    .btn-voice-note.recording { background: var(--danger); animation: pulse 1s infinite; }
     .btn-ptt-mic {
       background: #334155;
       color: #ffffff;
@@ -322,16 +286,11 @@
       place-items: center;
       font-size: 19px;
       flex-shrink: 0;
-      transition: all 0.2s;
       user-select: none;
       touch-action: none;
       box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     }
-    .btn-ptt-mic.transmitting {
-      background: var(--danger);
-      animation: pulse 0.9s infinite;
-      transform: scale(1.08);
-    }
+    .btn-ptt-mic.transmitting { background: var(--danger); animation: pulse 0.9s infinite; }
 
     @keyframes pulse {
       0% { transform: scale(1); }
@@ -367,9 +326,9 @@
       border-radius: 20px;
       font-size: 13px;
       font-weight: 700;
+      margin: 4px 16px 0;
     }
 
-    /* PANTALLA DE ACCESO POR PIN */
     #authOverlay {
       position: fixed;
       inset: 0;
@@ -406,7 +365,6 @@
       font-size: 13px;
       background: transparent;
       color: var(--hello-text-muted);
-      transition: all 0.2s;
     }
     .auth-tab-btn.active {
       background: var(--hello-sidebar);
@@ -433,17 +391,12 @@
       padding: 12px 20px;
       border-radius: 24px;
       font-size: 14.5px;
-      transition: background 0.2s;
     }
     .btn-hello-primary:hover { background: var(--hello-teal-dark); }
 
     .emoji-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; max-height: 260px; overflow-y: auto; margin-top: 14px; }
-    .emoji-grid button { background: var(--hello-card); border-radius: 10px; font-size: 22px; padding: 10px 0; }
+    .emoji-grid button { background: var(--hello-card); border-radius: 8px; font-size: 22px; padding: 10px 0; }
 
-    .attach-grid { display: grid; gap: 10px; margin-top: 14px; }
-    .attach-grid button { display: flex; align-items: center; gap: 12px; padding: 14px; background: var(--hello-card); border-radius: 10px; font-weight: 600; font-size: 14px; }
-
-    /* TARJETA VIRAL PARA HISTORIAS */
     .story-card-box {
       background: linear-gradient(135deg, #075e54 0%, #00a884 50%, #25d366 100%);
       color: #ffffff;
@@ -451,15 +404,11 @@
       border-radius: 18px;
       text-align: center;
       margin: 16px 0;
-      box-shadow: 0 10px 30px rgba(0,168,132,0.3);
     }
-    .story-card-box h2 { margin: 0 0 6px; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
-    .story-card-box p { margin: 0 0 16px; font-size: 13.5px; opacity: 0.95; font-weight: 500; }
-    .story-card-box .qr-frame { background: #ffffff; padding: 12px; border-radius: 14px; display: inline-block; box-shadow: 0 6px 18px rgba(0,0,0,0.15); }
+    .story-card-box .qr-frame { background: #ffffff; padding: 12px; border-radius: 14px; display: inline-block; }
     .story-card-box .pin-banner {
       margin-top: 16px;
       background: rgba(0,0,0,0.25);
-      backdrop-filter: blur(6px);
       padding: 8px 16px;
       border-radius: 20px;
       font-size: 18px;
@@ -482,12 +431,12 @@
 </head>
 <body>
 
-  <!-- PANTALLA DE ACCESO POR PIN -->
+  <!-- ACCESO POR PIN -->
   <div id="authOverlay" style="display: none;">
     <div class="auth-card">
       <div style="font-size: 48px; margin-bottom: 6px;">✦</div>
-      <h2 style="margin: 0 0 6px; font-size: 24px; font-weight: 800; color: var(--hello-text)">HELLO</h2>
-      <p style="font-size: 13.5px; color: var(--hello-text-muted); margin: 0 0 24px; font-weight: 500;">Mensajería privada y Radio P2P sin número celular</p>
+      <h2 style="margin: 0 0 6px; font-size: 24px; font-weight: 800;">HELLO</h2>
+      <p style="font-size: 13.5px; color: var(--hello-text-muted); margin: 0 0 24px;">Mensajería privada y Radio P2P sin número celular</p>
       
       <div class="auth-tab-group">
         <button type="button" class="auth-tab-btn active" id="tabBtnNew" onclick="switchAuthTab('new')">Generar PIN</button>
@@ -496,9 +445,9 @@
 
       <div id="formNewUser">
         <p style="font-size: 13px; color: var(--hello-text-muted); text-align: left; margin: 0 0 20px; line-height: 1.5;">
-          Crea un PIN criptográfico exclusivo. No requerimos tu correo ni tu número telefónico.
+          Obtén un PIN privado para comenzar a chatear. No se requiere correo ni datos personales.
         </p>
-        <button class="btn-hello-primary" style="width: 100%; padding: 14px; font-size: 15px;" onclick="handleCreateAccountOnlyPin()">✨ Generar mi PIN y Entrar</button>
+        <button class="btn-hello-primary" style="width: 100%; padding: 14px;" onclick="handleCreateAccountOnlyPin()">✨ Generar mi PIN y Entrar</button>
       </div>
 
       <form id="formLoginUser" onsubmit="handleLoginAccountOnlyPin(event)" style="display: none;">
@@ -506,7 +455,7 @@
           <label style="font-size: 12px; font-weight: 700; color: var(--hello-text-muted); display: block; margin-bottom: 8px;">ESCRIBE TU PIN</label>
           <input id="loginUserPin" placeholder="Ej. A8F2K9M1" required maxlength="8" style="text-transform: uppercase; font-weight: 800; letter-spacing: 3px; text-align: center; font-size: 19px; padding: 13px;">
         </div>
-        <button class="btn-hello-primary" style="width: 100%; padding: 14px; font-size: 15px;">Acceder a mis Chats</button>
+        <button class="btn-hello-primary" id="btnLoginSubmit" style="width: 100%; padding: 14px;">Acceder y Restaurar mis Chats</button>
       </form>
     </div>
   </div>
@@ -524,21 +473,24 @@
           <div><strong id="myHeaderName">Mi Usuario</strong><small>PIN: <span id="myHeaderPin">...</span></small></div>
         </div>
         <div class="header-icons">
-          <button class="icon-btn" onclick="openStoryShareModal()" title="Tarjeta QR para Historias">📱</button>
-          <button class="icon-btn" onclick="openQuickAddModal()" title="Nuevo Chat por PIN">💬</button>
-          <button class="icon-btn" onclick="executePanicKillSwitch()" title="Botón de Pánico (Borrar y Salir)" style="color:var(--danger)">🚨</button>
+          <button class="icon-btn" onclick="openCreateGroupModal()" title="Crear Grupo P2P">👥</button>
+          <button class="icon-btn" onclick="openStoryShareModal()" title="Tarjeta QR">📱</button>
+          <button class="icon-btn" onclick="openQuickAddModal()" title="Nuevo Chat PIN">💬</button>
+          <button class="icon-btn" onclick="executePanicKillSwitch()" title="Botón de Pánico" style="color:var(--danger)">🚨</button>
           <button class="icon-btn" onclick="viewTab('settings')" title="Ajustes">⚙️</button>
         </div>
       </div>
 
+      <!-- PESTAÑAS MODELO WHATSAPP -->
       <div class="nav-tabs">
         <button class="nav-tab-btn active" id="tabBtnChats" onclick="viewTab('chats')">Chats</button>
-        <button class="nav-tab-btn" id="tabBtnRadio" onclick="viewTab('radio')">Frecuencias PTT</button>
+        <button class="nav-tab-btn" id="tabBtnGroups" onclick="viewTab('groups')">Grupos</button>
+        <button class="nav-tab-btn" id="tabBtnRadio" onclick="viewTab('radio')">Frecuencias</button>
         <button class="nav-tab-btn" id="tabBtnSettings" onclick="viewTab('settings')">Ajustes</button>
       </div>
 
       <div class="search-wrapper" id="searchContainer">
-        <div class="search-bar"><span>🔍</span><input id="searchInput" placeholder="Buscar por nombre o PIN..." oninput="renderChatList(this.value)"></div>
+        <div class="search-bar"><span>🔍</span><input id="searchInput" placeholder="Buscar un chat o grupo..." oninput="renderFilteredList(this.value)"></div>
       </div>
       <div class="chat-list" id="sidebarListContent"></div>
     </div>
@@ -546,42 +498,56 @@
     <div class="main-chat" id="mainArea"></div>
   </div>
 
-  <!-- MODALES -->
+  <!-- MODAL: CREAR GRUPO -->
+  <dialog id="createGroupModal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h3 style="margin:0;font-size:18px;font-weight:700">Nuevo Grupo Radio P2P</h3>
+      <button class="icon-btn" onclick="createGroupModal.close()">✕</button>
+    </div>
+    <form onsubmit="confirmCreateGroup(event)">
+      <input id="newGroupNameInput" placeholder="Nombre del grupo..." required style="margin-bottom:14px">
+      <label style="font-size:12px;font-weight:700;color:var(--hello-text-muted);display:block;margin-bottom:8px">SELECCIONA CONTACTOS</label>
+      <div id="groupMembersCheckboxes" style="max-height:180px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:16px"></div>
+      <button class="btn-hello-primary" style="width:100%">Crear Grupo</button>
+    </form>
+  </dialog>
+
+  <!-- MODAL: GESTIONAR GRUPO -->
+  <dialog id="manageGroupModal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h3 style="margin:0;font-size:18px;font-weight:700">Información del Grupo</h3>
+      <button class="icon-btn" onclick="manageGroupModal.close()">✕</button>
+    </div>
+    <div id="manageGroupContent"></div>
+  </dialog>
+
+  <!-- MODAL: TARJETA QR -->
   <dialog id="storyShareModal">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
       <h3 style="margin:0;font-size:18px;font-weight:700">Tu Tarjeta HELLO</h3>
       <button class="icon-btn" onclick="storyShareModal.close()">✕</button>
     </div>
     <div class="story-card-box">
-      <h2>✦ HELLO</h2>
-      <p>Háblame en privado sin pedir mi número</p>
+      <h2 style="margin:0 0 6px">✦ HELLO</h2>
+      <p style="margin:0 0 16px;font-size:13px">Conéctate en privado sin pedir mi número</p>
       <div class="qr-frame">
         <img id="qrDisplayImg" src="" style="width:180px;height:180px;display:block">
       </div>
       <div><span class="pin-banner" id="qrPinLabel">PIN: ...</span></div>
     </div>
-    <button class="btn-hello-primary" style="width:100%" onclick="storyShareModal.close()">Listo para Capturar Pantalla</button>
+    <button class="btn-hello-primary" style="width:100%" onclick="storyShareModal.close()">Cerrar</button>
   </dialog>
 
+  <!-- MODAL: NUEVO CHAT PIN -->
   <dialog id="quickAddModal">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0;font-size:18px;font-weight:700">Nuevo Chat por PIN</h3><button class="icon-btn" onclick="quickAddModal.close()">✕</button></div>
     <form onsubmit="confirmAddPin(event)"><input id="addPinInput" placeholder="Ej. VA7K2M9X" maxlength="8" style="text-transform:uppercase;letter-spacing:2px;font-weight:800;text-align:center;font-size:18px" required autofocus><button class="btn-hello-primary" style="width:100%;margin-top:16px">Conectar</button></form>
   </dialog>
 
+  <!-- MODAL: EMOJIS -->
   <dialog id="emojiDialog">
     <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0;font-size:16px;font-weight:700">Emojis</h3><button class="icon-btn" onclick="emojiDialog.close()">✕</button></div>
     <div class="emoji-grid" id="emojiGridBox"></div>
-  </dialog>
-
-  <dialog id="attachmentDialog">
-    <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0;font-size:16px;font-weight:700">Compartir Archivo</h3><button class="icon-btn" onclick="attachmentDialog.close()">✕</button></div>
-    <div class="attach-grid">
-      <button type="button" onclick="selectAttachment('image/*')">📷 Fotos e Imágenes</button>
-      <button type="button" onclick="selectAttachment('.pdf,.doc,.docx,.xls,.xlsx,.txt,.csv')">📄 Documentos</button>
-    </div>
-    <input type="file" id="fileHiddenInput" hidden>
-    <div id="filePreviewNotice" style="margin:12px 0;font-size:13px"></div>
-    <button class="btn-hello-primary" id="btnUploadSubmit" style="width:100%;display:none" onclick="submitSendAttachment()">Enviar al Chat</button>
   </dialog>
 
   <dialog id="noticeModal"><h3 id="noticeTitle" style="margin:0 0 10px;font-weight:700"></h3><p id="noticeDesc" style="color:var(--hello-text-muted);font-size:14px;line-height:1.5"></p><button class="btn-hello-primary" style="width:100%;margin-top:10px" onclick="noticeModal.close()">OK</button></dialog>
@@ -591,13 +557,13 @@
   <script>
     const $ = id => document.getElementById(id);
     const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const SERVER_URL = 'https://hello-server-p2p.onrender.com';
 
     function generateId(len) {
       const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
       let r = ''; for (let i = 0; i < len; i++) r += chars.charAt(Math.floor(Math.random() * chars.length)); return r;
     }
 
-    // --- EFECTO DE AUDIO SINTETIZADO: ROGER BEEP ---
     function playRogerBeep() {
       try {
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -605,21 +571,17 @@
         const gain = audioCtx.createGain();
         osc.connect(gain);
         gain.connect(audioCtx.destination);
-        
         osc.type = 'sine';
         const now = audioCtx.currentTime;
         osc.frequency.setValueAtTime(1200, now);
         osc.frequency.setValueAtTime(1600, now + 0.07);
-        
         gain.gain.setValueAtTime(0.12, now);
         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
-        
         osc.start(now);
         osc.stop(now + 0.16);
       } catch (e) {}
     }
 
-    // --- ACCESO POR PIN ---
     function switchAuthTab(type) {
       if (type === 'new') {
         $('tabBtnNew').classList.add('active');
@@ -638,35 +600,66 @@
       const newPin = generateId(8);
       localStorage.helloCurrentPin = newPin;
       localStorage['helloName_' + newPin] = 'Usuario ' + newPin.slice(0, 4);
+      syncToCloud();
       location.reload();
     }
 
-    function handleLoginAccountOnlyPin(e) {
+    async function handleLoginAccountOnlyPin(e) {
       e.preventDefault();
       const pin = $('loginUserPin').value.trim().toUpperCase();
       if (pin.length < 4) return showNotice('Error', 'Ingresa un PIN válido.');
+      
+      $('btnLoginSubmit').textContent = 'Descargando datos de la nube...';
+      $('btnLoginSubmit').disabled = true;
+
       localStorage.helloCurrentPin = pin;
       if (!localStorage['helloName_' + pin]) {
         localStorage['helloName_' + pin] = 'Usuario ' + pin.slice(0, 4);
       }
+
+      // RESTAURAR COPIA DE SEGURIDAD DESDE RENDER
+      try {
+        const res = await fetch(`${SERVER_URL}/api/backup/${pin}`);
+        if (res.ok) {
+          const cloudData = await res.json();
+          if (cloudData.contacts) localStorage['helloContacts_' + pin] = JSON.stringify(cloudData.contacts);
+          if (cloudData.name) localStorage['helloName_' + pin] = cloudData.name;
+          if (cloudData.status) localStorage['helloStatus_' + pin] = cloudData.status;
+          if (cloudData.photo) localStorage['helloPhoto_' + pin] = cloudData.photo;
+
+          if (cloudData.msgs) {
+            const database = await openPinDatabase(pin);
+            const tx = database.transaction('chats', 'readwrite');
+            const store = tx.objectStore('chats');
+            store.clear();
+            for (const targetPin in cloudData.msgs) {
+              cloudData.msgs[targetPin].forEach(m => {
+                m.targetPin = targetPin;
+                store.add(m);
+              });
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Sin conexión para descarga de nube previa.');
+      }
+
       location.reload();
     }
 
     function logoutAccount() {
-      if (confirm('¿Cerrar sesión? Tus datos y chats quedan guardados en este teléfono para cuando vuelvas a ingresar tu PIN.')) {
+      if (confirm('¿Cerrar sesión? Tus datos están guardados en este equipo y en la nube de tu servidor Render.')) {
         if (peer) peer.destroy();
         localStorage.removeItem('helloCurrentPin');
         location.reload();
       }
     }
 
-    // --- BOTÓN DE PÁNICO (KILL SWITCH) ---
     async function executePanicKillSwitch() {
       if (confirm('🚨 BOTÓN DE PÁNICO: ¿Deseas destruir todas las conversaciones, cerrar sesión y borrar los datos de este equipo de inmediato?')) {
         if (peer) peer.destroy();
         localStorage.clear();
-        const dbs = ['HelloDB_' + myPin, 'HelloChatDB'];
-        dbs.forEach(d => { try { indexedDB.deleteDatabase(d); } catch(e){} });
+        try { indexedDB.deleteDatabase('HelloDB_' + myPin); } catch(e){}
         location.reload();
       }
     }
@@ -694,10 +687,11 @@
 
     // --- BASE DE DATOS LOCAL POR PIN (INDEXEDDB) ---
     let db = null;
-    function openPinDatabase() {
+    function openPinDatabase(customPin = null) {
+      const pinTarget = customPin || myPin;
       return new Promise((resolve, reject) => {
-        if (!myPin) return resolve(null);
-        const req = indexedDB.open('HelloDB_' + myPin, 1);
+        if (!pinTarget) return resolve(null);
+        const req = indexedDB.open('HelloDB_' + pinTarget, 1);
         req.onupgradeneeded = e => {
           const database = e.target.result;
           if (!database.objectStoreNames.contains('chats')) {
@@ -715,6 +709,7 @@
       const tx = db.transaction('chats', 'readwrite');
       msgObj.targetPin = targetPin;
       tx.objectStore('chats').add(msgObj);
+      syncToCloud();
     }
 
     async function loadMessages() {
@@ -727,8 +722,32 @@
         e.target.result.forEach(m => {
           (msgs[m.targetPin] ??= []).push(m);
         });
-        if (currentTab === 'chats' && contacts.length) drawChatMessages();
+        if (contacts.length) drawChatMessages();
       };
+    }
+
+    // --- SINCRONIZACIÓN AUTOMÁTICA CON RENDER (CLOUD BACKUP) ---
+    let syncTimeout = null;
+    function syncToCloud() {
+      if (!myPin) return;
+      clearTimeout(syncTimeout);
+      syncTimeout = setTimeout(async () => {
+        try {
+          await fetch(`${SERVER_URL}/api/backup/${myPin}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              pin: myPin,
+              name: myName,
+              status: myStatus,
+              photo: myPhoto,
+              contacts: contacts,
+              msgs: msgs,
+              updatedAt: Date.now()
+            })
+          });
+        } catch(e) {}
+      }, 1500);
     }
 
     function saveState() {
@@ -737,15 +756,17 @@
       localStorage['helloName_' + myPin] = myName;
       localStorage['helloStatus_' + myPin] = myStatus;
       localStorage['helloPhoto_' + myPin] = myPhoto;
+      syncToCloud();
     }
 
     function renderAvatarHtml(c, size = 48) {
+      if (c.isGroup) return `<div class="avatar" style="width:${size}px;height:${size}px;background:#00a884;font-size:${size*0.4}px">👥</div>`;
       if (c.isRadioChannel) return `<div class="avatar" style="width:${size}px;height:${size}px;background:#7c3aed;font-size:${size*0.4}px">📻</div>`;
       if (c.photo) return `<div class="avatar" style="width:${size}px;height:${size}px"><img src="${c.photo}"></div>`;
       return `<div class="avatar" style="width:${size}px;height:${size}px;font-size:${size*0.4}px">${esc((c.name || 'U').charAt(0).toUpperCase())}</div>`;
     }
 
-    // --- CONFIGURACIÓN WEBRTC (CONECTADO A TU SERVIDOR RENDER + STUN/TURN) ---
+    // --- CONEXIÓN PEERJS Y WEBRTC ---
     const peerServerConfig = {
       host: 'hello-server-p2p.onrender.com',
       port: 443,
@@ -787,13 +808,14 @@
         call.on('stream', stream => {
           const player = $('liveSpeaker'); player.srcObject = stream; player.play().catch(e => console.log(e));
           const sender = call.metadata?.name || 'Contacto';
-          $('radioAlertSender').textContent = `📻 ${sender} transmitiendo en vivo...`;
+          const grp = call.metadata?.groupName ? ` [${call.metadata.groupName}]` : '';
+          $('radioAlertSender').textContent = `📻 ${sender}${grp} en vivo...`;
           $('liveRadioAlert').style.display = 'flex';
         });
         call.on('close', () => {
           $('liveRadioAlert').style.display = 'none';
           $('liveSpeaker').srcObject = null;
-          playRogerBeep(); // Roger beep al terminar la transmisión entrante
+          playRogerBeep();
         });
       });
 
@@ -837,9 +859,18 @@
             try { conn.send({ type: 'HANDSHAKE_REPLY', pin: myPin, name: myName, status: myStatus, photo: myPhoto }); } catch(e){}
           }
         }
+
+        if (data.type === 'GROUP_SYNC') {
+          let idx = contacts.findIndex(c => c.pin === data.group.pin);
+          if (idx < 0) contacts.unshift(data.group);
+          else { contacts[idx].members = [...new Set(data.group.members)]; contacts[idx].name = data.group.name; }
+          saveState(); renderChatList();
+        }
+
         if (data.type === 'CHAT_MSG') appendMessage(remotePin, { text: data.text, mine: false, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+        if (data.type === 'GROUP_MSG') appendGroupMessage(data.groupId, data.senderName, { text: data.text, mine: false, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
         if (data.type === 'AUDIO_MSG') appendMessage(remotePin, { audio: data.audioData, duration: data.duration, mine: false, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
-        if (data.type === 'FILE_MSG') appendMessage(remotePin, { text: data.name, file: { name: data.name, type: data.fileType, data: data.fileData }, mine: false, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+        if (data.type === 'GROUP_AUDIO_MSG') appendGroupMessage(data.groupId, data.senderName, { audio: data.audioData, duration: data.duration, mine: false, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
       });
 
       conn.on('close', () => peerConns.delete(remotePin));
@@ -858,7 +889,7 @@
     }
 
     function emitToRecipient(contact, payload) {
-      const recipients = [contact.pin];
+      const recipients = contact.isGroup ? contact.members.filter(m => m !== myPin) : [contact.pin];
       recipients.forEach(pin => {
         let conn = peerConns.get(pin);
         if (conn && conn.open) {
@@ -874,14 +905,14 @@
     function syncContactInfo(pin, realName, status, photo) {
       let c = contacts.find(x => x.pin === pin);
       if (!c) contacts.push({ name: realName, pin: pin, status: status, photo: photo || '', lastMsg: 'Conectado', time: 'Ahora' });
-      else { c.name = realName; c.status = status; if (photo) c.photo = photo; }
+      else if (!c.isGroup) { c.name = realName; c.status = status; if (photo) c.photo = photo; }
       saveState(); renderChatList();
       if (contacts[activeChatIndex]?.pin === pin) selectChat(activeChatIndex, false);
     }
 
     function appendMessage(fromPin, msg) {
       let idx = contacts.findIndex(c => c.pin === fromPin);
-      const preview = msg.audio ? '🎤 Nota de voz' : (msg.file ? '📎 ' + msg.file.name : msg.text);
+      const preview = msg.audio ? '🎤 Nota de voz' : msg.text;
       if (idx < 0) contacts.push({ name: 'PIN ' + fromPin, pin: fromPin, lastMsg: preview, time: msg.time });
       else { contacts[idx].lastMsg = preview; contacts[idx].time = msg.time; }
       (msgs[fromPin] ??= []).push(msg);
@@ -891,31 +922,53 @@
       renderChatList();
     }
 
+    function appendGroupMessage(groupId, sender, msg) {
+      let g = contacts.find(c => c.pin === groupId);
+      if (g) {
+        msg.senderName = sender;
+        g.lastMsg = sender + ': ' + (msg.audio ? '🎤 Nota de voz' : msg.text);
+        g.time = msg.time;
+        (msgs[groupId] ??= []).push(msg);
+        saveMsgToDB(groupId, msg);
+        saveState();
+        if (contacts[activeChatIndex]?.pin === groupId) drawChatMessages();
+        renderChatList();
+      }
+    }
+
     function showNotice(title, desc) { $('noticeTitle').textContent = title; $('noticeDesc').textContent = desc; $('noticeModal').showModal(); }
 
-    // --- PESTAÑAS Y NAVEGACIÓN ---
+    // --- PESTAÑAS MODELO WHATSAPP ---
     function viewTab(tab) {
       currentTab = tab;
       document.querySelectorAll('.nav-tab-btn').forEach(b => b.classList.remove('active'));
       const tabId = 'tabBtn' + tab.charAt(0).toUpperCase() + tab.slice(1);
       if ($(tabId)) $(tabId).classList.add('active');
-      $('searchContainer').style.display = (tab === 'chats') ? 'block' : 'none';
+      $('searchContainer').style.display = (tab === 'chats' || tab === 'groups') ? 'block' : 'none';
 
-      if (tab === 'chats') { renderChatList(); if (contacts.length) selectChat(activeChatIndex, false); }
+      if (tab === 'chats') renderChatList();
+      else if (tab === 'groups') renderGroupsList();
       else if (tab === 'radio') renderRadioFrequencies();
       else if (tab === 'settings') renderSettingsOverview();
     }
 
+    function renderFilteredList(query) {
+      if (currentTab === 'groups') renderGroupsList(query);
+      else renderChatList(query);
+    }
+
     function renderChatList(filter = '') {
       const container = $('sidebarListContent');
-      if (!contacts.length) {
-        container.innerHTML = `<div style="text-align:center;padding:50px 20px;color:var(--hello-text-muted)"><div style="font-size:42px;margin-bottom:12px">💬</div><strong style="color:var(--hello-text);font-size:16px">Sin conversaciones</strong><p style="font-size:13.5px;margin:8px 0 16px">Inicia un chat ingresando un PIN.</p><button class="btn-hello-primary" onclick="openQuickAddModal()">Iniciar un Chat</button></div>`;
+      const directChats = contacts.filter(c => !c.isGroup && !c.isRadioChannel);
+      if (!directChats.length) {
+        container.innerHTML = `<div style="text-align:center;padding:50px 20px;color:var(--hello-text-muted)"><div style="font-size:42px;margin-bottom:12px">💬</div><strong style="color:var(--hello-text);font-size:16px">Sin chats individuales</strong><p style="font-size:13px;margin:8px 0 16px">Inicia una conversación agregando un PIN.</p><button class="btn-hello-primary" onclick="openQuickAddModal()">Iniciar un Chat</button></div>`;
         return;
       }
-      container.innerHTML = contacts.map((c, i) => {
+      container.innerHTML = directChats.map((c, i) => {
+        const realIdx = contacts.indexOf(c);
         if (filter && !c.name.toLowerCase().includes(filter.toLowerCase()) && !c.pin.toLowerCase().includes(filter.toLowerCase())) return '';
         return `
-          <div class="chat-item ${i === activeChatIndex ? 'selected' : ''}" onclick="selectChat(${i})">
+          <div class="chat-item ${realIdx === activeChatIndex ? 'selected' : ''}" onclick="selectChat(${realIdx})">
             ${renderAvatarHtml(c, 48)}
             <div class="chat-details">
               <div class="title-row"><strong>${esc(c.name)}</strong><span class="time">${c.time || ''}</span></div>
@@ -925,44 +978,113 @@
       }).join('');
     }
 
+    function renderGroupsList(filter = '') {
+      const container = $('sidebarListContent');
+      const groupChats = contacts.filter(c => c.isGroup);
+      if (!groupChats.length) {
+        container.innerHTML = `<div style="text-align:center;padding:50px 20px;color:var(--hello-text-muted)"><div style="font-size:42px;margin-bottom:12px">👥</div><strong style="color:var(--hello-text);font-size:16px">Sin grupos</strong><p style="font-size:13px;margin:8px 0 16px">Crea un grupo para hablar por radio walkie-talkie con varios amigos.</p><button class="btn-hello-primary" onclick="openCreateGroupModal()">Crear Grupo P2P</button></div>`;
+        return;
+      }
+      container.innerHTML = groupChats.map(c => {
+        const realIdx = contacts.indexOf(c);
+        if (filter && !c.name.toLowerCase().includes(filter.toLowerCase())) return '';
+        return `
+          <div class="chat-item ${realIdx === activeChatIndex ? 'selected' : ''}" onclick="selectChat(${realIdx})">
+            ${renderAvatarHtml(c, 48)}
+            <div class="chat-details">
+              <div class="title-row"><strong>${esc(c.name)}</strong><span class="time">${c.time || ''}</span></div>
+              <div class="desc-row">${esc(c.lastMsg || (c.members.length + ' participantes'))}</div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    // --- FRECUENCIAS PÚBLICAS PTT ---
+    const PUBLIC_FREQUENCIES = [
+      { name: '🌐 Frecuencia 1 - General Libre', pin: 'FREQ-GENERAL' },
+      { name: '🚨 Frecuencia 2 - Emergencias & SOS', pin: 'FREQ-SOS' },
+      { name: '🎮 Frecuencia 3 - Gamers & Amigos', pin: 'FREQ-GAMERS' }
+    ];
+
+    function renderRadioFrequencies() {
+      $('sidebarListContent').innerHTML = `
+        <div style="padding:18px 16px">
+          <strong style="color:var(--hello-text-muted);font-size:12px;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:12px">Frecuencias Públicas en Vivo</strong>
+          ${PUBLIC_FREQUENCIES.map(f => `
+            <div class="chat-item" onclick="tuneIntoFrequency('${f.name}', '${f.pin}')" style="border-radius:12px;margin-bottom:8px">
+              ${renderAvatarHtml({ isRadioChannel: true }, 44)}
+              <div class="chat-details">
+                <div class="title-row"><strong>${esc(f.name)}</strong></div>
+                <div class="desc-row">Canal abierto • Toca para sintonizar y hablar</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    async function tuneIntoFrequency(name, pin) {
+      let idx = contacts.findIndex(c => c.pin === pin);
+      if (idx < 0) {
+        contacts.unshift({ name, pin, isRadioChannel: true, lastMsg: 'Sintonizado', time: 'Ahora' });
+        idx = 0;
+        saveState();
+      }
+      // Anunciar sintonización en el servidor Render
+      try {
+        await fetch(`${SERVER_URL}/api/frequency/join`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ freq: pin, pin: myPin })
+        });
+      } catch(e){}
+
+      selectChat(idx);
+    }
+
+    // --- SELECCIONAR Y DIBUJAR CONVERSACIÓN ---
     function selectChat(idx, isMobile = true) {
       activeChatIndex = idx; const c = contacts[idx];
-      if (!c) { $('mainArea').innerHTML = `<div style="display:grid;place-items:center;height:100%;color:var(--hello-text-muted);text-align:center"><div><div style="font-size:64px;margin-bottom:16px;opacity:0.3">💬</div><h2 style="color:var(--hello-text);margin:0 0 8px;font-weight:800">HELLO Red Privada</h2><p style="max-width:360px;font-size:14px;line-height:1.5">Conexión cifrada sin número celular mediante PIN.</p></div></div>`; return; }
+      if (!c) { $('mainArea').innerHTML = `<div style="display:grid;place-items:center;height:100%;color:var(--hello-text-muted);text-align:center"><div><div style="font-size:64px;margin-bottom:16px;opacity:0.3">💬</div><h2 style="color:var(--hello-text);margin:0 0 8px;font-weight:800">HELLO Red Segura</h2><p style="max-width:360px;font-size:14px;line-height:1.5">Conexión cifrada sin número telefónico mediante PIN.</p></div></div>`; return; }
       if (isMobile) $('appShell').classList.add('chat-open');
+
+      const headerAction = c.isGroup ? `<button class="icon-btn" title="Info del grupo" onclick="openManageGroupModal('${c.pin}')">⚙️</button>` : ``;
 
       $('mainArea').innerHTML = `
         <div class="main-header">
-          <div class="contact-summary">
+          <div class="contact-summary" ${c.isGroup ? `onclick="openManageGroupModal('${c.pin}')"` : ''}>
             <button class="icon-btn mobile-back" onclick="$('appShell').classList.remove('chat-open')">‹</button>
             ${renderAvatarHtml(c, 42)}
-            <div><strong id="activeNameHeader">${esc(c.name)}</strong><small>PIN: ${esc(c.pin)}</small></div>
+            <div>
+              <strong id="activeNameHeader">${esc(c.name)}</strong>
+              <small>${c.isGroup ? c.members.length + ' participantes (Toca para ver info)' : (c.isRadioChannel ? 'Canal en vivo' : 'PIN: ' + esc(c.pin))}</small>
+            </div>
           </div>
+          <div style="display:flex;align-items:center;gap:6px">${headerAction}</div>
         </div>
         <div class="conversation" id="conversationBox"></div>
         
-        <!-- BARRA DE ENTRADA CON 3 BOTONES DE ACCIÓN -->
         <div style="display:flex;flex-direction:column;background:var(--hello-card)">
-          <div id="voiceRecordBanner" class="voice-record-banner" style="margin:4px 16px 0">
+          <div id="voiceRecordBanner" class="voice-record-banner">
             <span>🔴</span> <span id="voiceRecordTimer">Grabando audio... (0s)</span>
           </div>
           <form class="chat-footer" onsubmit="handleSendText(event)">
             <button type="button" class="icon-btn" title="Emojis" onclick="openEmojiDialog()">☺</button>
-            <button type="button" class="icon-btn" title="Adjuntar" onclick="openAttachmentDialog()">📎</button>
             <input class="input-box" id="msgInput" placeholder="Escribe un mensaje..." autocomplete="off">
             
             <!-- Botón 1: Enviar Mensaje de Texto -->
             <button type="submit" class="btn-action-round btn-send-text" title="Enviar Mensaje">➤</button>
             
-            <!-- Botón 2: Grabar Nota de Voz (Tipo WhatsApp) -->
+            <!-- Botón 2: Grabar Nota de Voz Tipo WhatsApp -->
             <button type="button" class="btn-action-round btn-voice-note" id="btnVoiceNote" title="Grabar Nota de Voz" onclick="toggleVoiceNoteRecording(contacts[activeChatIndex])">🎤</button>
             
-            <!-- Botón 3: Walkie-Talkie PTT en Vivo -->
-            <button type="button" class="btn-ptt-mic" id="btnPttTrigger" title="Mantén presionado para hablar en vivo (PTT)">📻</button>
+            <!-- Botón 3: Walkie-Talkie PTT Radio en Vivo (En Grupos o Privado) -->
+            <button type="button" class="btn-ptt-mic" id="btnPttTrigger" title="Mantén presionado para hablar en radio en vivo (PTT)">📻</button>
           </form>
         </div>
       `;
       bindPttEvents(c);
-      if (!c.isRadioChannel) getPeerConn(c.pin);
+      if (!c.isGroup && !c.isRadioChannel) getPeerConn(c.pin);
       drawChatMessages();
     }
 
@@ -975,34 +1097,31 @@
           body = `<div style="display:flex;align-items:center;gap:8px">
                     <audio controls src="${m.audio}" style="max-width:240px;height:36px"></audio>
                   </div>`;
-        } else if (m.file) {
-          if (/^image\//.test(m.file.type)) body = `<img src="${m.file.data}" class="chat-img" onclick="window.open('${m.file.data}')">`;
-          body += `<div style="display:flex;align-items:center;gap:8px"><span>📄</span><a href="${m.file.data}" download="${esc(m.file.name)}" style="color:var(--hello-teal);font-weight:700">${esc(m.file.name)}</a></div>`;
         } else {
           body = esc(m.text);
         }
-        return `<div class="bubble ${m.mine ? 'mine' : 'them'}">${body}<div class="meta"><span>${m.time}</span></div></div>`;
+        const senderTag = (c.isGroup && !m.mine && m.senderName) ? `<div style="font-weight:700;color:var(--hello-teal-dark);font-size:12px;margin-bottom:2px">${esc(m.senderName)}</div>` : '';
+        return `<div class="bubble ${m.mine ? 'mine' : 'them'}">${senderTag}${body}<div class="meta"><span>${m.time}</span></div></div>`;
       }).join('');
       box.scrollTop = box.scrollHeight;
     }
 
-    // --- ACCIÓN 1: ENVIAR MENSAJE DE TEXTO ---
     function handleSendText(e) {
       e.preventDefault(); const input = $('msgInput'); const text = input.value.trim(); const c = contacts[activeChatIndex];
       if (!text || !c) return;
       const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       const msgObj = { text, mine: true, time };
       (msgs[c.pin] ??= []).push(msgObj);
-      c.lastMsg = text; c.time = time;
+      c.lastMsg = (c.isGroup ? 'Tú: ' : '') + text; c.time = time;
       
       saveMsgToDB(c.pin, msgObj);
       saveState();
 
-      emitToRecipient(c, { type: 'CHAT_MSG', text });
-      input.value = ''; drawChatMessages(); renderChatList();
+      emitToRecipient(c, { type: c.isGroup ? 'GROUP_MSG' : 'CHAT_MSG', groupId: c.pin, text, senderName: myName });
+      input.value = ''; drawChatMessages(); renderFilteredList('');
     }
 
-    // --- ACCIÓN 2: NOTA DE VOZ (TIPO WHATSAPP) ---
+    // --- NOTA DE VOZ (TIPO WHATSAPP) ---
     let mediaRecorder = null;
     let audioChunks = [];
     let isRecordingVoiceNote = false;
@@ -1016,12 +1135,10 @@
       const timerSpan = $('voiceRecordTimer');
 
       if (!isRecordingVoiceNote) {
-        // Iniciar Grabación
         try {
           const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
           mediaRecorder = new MediaRecorder(stream);
           audioChunks = [];
-          
           mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
           mediaRecorder.onstop = () => {
             const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
@@ -1031,11 +1148,18 @@
               const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
               const msgObj = { audio: base64Audio, duration: voiceSeconds, mine: true, time };
               (msgs[contact.pin] ??= []).push(msgObj);
-              contact.lastMsg = '🎤 Nota de voz (' + voiceSeconds + 's)'; contact.time = time;
+              contact.lastMsg = (contact.isGroup ? 'Tú: ' : '') + '🎤 Nota de voz (' + voiceSeconds + 's)';
+              contact.time = time;
               saveMsgToDB(contact.pin, msgObj);
               saveState();
-              emitToRecipient(contact, { type: 'AUDIO_MSG', audioData: base64Audio, duration: voiceSeconds });
-              drawChatMessages(); renderChatList();
+              emitToRecipient(contact, {
+                type: contact.isGroup ? 'GROUP_AUDIO_MSG' : 'AUDIO_MSG',
+                groupId: contact.pin,
+                audioData: base64Audio,
+                duration: voiceSeconds,
+                senderName: myName
+              });
+              drawChatMessages(); renderFilteredList('');
             };
             reader.readAsDataURL(audioBlob);
             stream.getTracks().forEach(t => t.stop());
@@ -1055,10 +1179,7 @@
           showNotice('Micrófono', 'Se requiere acceso al micrófono para grabar notas de voz.');
         }
       } else {
-        // Detener y Enviar Grabación
-        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-          mediaRecorder.stop();
-        }
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
         clearInterval(voiceNoteTimerInterval);
         isRecordingVoiceNote = false;
         btn.classList.remove('recording');
@@ -1067,7 +1188,7 @@
       }
     }
 
-    // --- ACCIÓN 3: WALKIE-TALKIE EN VIVO (PTT CON ROGER BEEP) ---
+    // --- WALKIE-TALKIE EN GRUPOS Y PRIVADO ---
     function bindPttEvents(contact) {
       const btn = $('btnPttTrigger'); if (!btn) return;
       btn.onpointerdown = e => { e.preventDefault(); btn.setPointerCapture(e.pointerId); startPttStream(contact); };
@@ -1078,10 +1199,26 @@
       try {
         const btn = $('btnPttTrigger'); btn.classList.add('transmitting'); btn.textContent = '🔴';
         currentAudioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const targets = [contact.pin];
+
+        let targets = [];
+        if (contact.isRadioChannel) {
+          // Obtener usuarios conectados a la frecuencia desde el servidor
+          try {
+            const res = await fetch(`${SERVER_URL}/api/frequency/${contact.pin}`);
+            const data = await res.json();
+            targets = (data.members || []).filter(p => p !== myPin);
+          } catch(e){}
+        } else if (contact.isGroup) {
+          targets = contact.members.filter(m => m !== myPin);
+        } else {
+          targets = [contact.pin];
+        }
+
         targets.forEach(targetPin => {
           try {
-            const call = peer.call('HELLO-' + targetPin, currentAudioStream, { metadata: { name: myName } });
+            const call = peer.call('HELLO-' + targetPin, currentAudioStream, {
+              metadata: { name: myName, groupName: contact.name }
+            });
             liveRadioCalls.push(call);
           } catch(e){}
         });
@@ -1095,53 +1232,90 @@
       liveRadioCalls.forEach(c => { try { c.close(); } catch(e){} }); liveRadioCalls = [];
       if (currentAudioStream) { currentAudioStream.getTracks().forEach(t => t.stop()); currentAudioStream = null; }
       if ($('btnPttTrigger')) { $('btnPttTrigger').classList.remove('transmitting'); $('btnPttTrigger').textContent = '📻'; }
-      playRogerBeep(); // Roger Beep característico al soltar el botón
+      playRogerBeep();
     }
 
-    // --- TARJETA QR VIRAL PARA HISTORIAS ---
-    function openStoryShareModal() {
-      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=10&data=${encodeURIComponent(myPin)}`;
-      $('qrDisplayImg').src = qrUrl;
-      $('qrPinLabel').textContent = 'PIN: ' + myPin;
-      $('storyShareModal').showModal();
-    }
-
-    // --- FRECUENCIAS PÚBLICAS DE RADIO PTT ---
-    const PUBLIC_FREQUENCIES = [
-      { name: '🌐 Frecuencia 1 - General Libre', pin: 'FREQ-GENERAL' },
-      { name: '🚨 Frecuencia 2 - Emergencias & SOS', pin: 'FREQ-SOS' },
-      { name: '🎮 Frecuencia 3 - Gamers & Amigos', pin: 'FREQ-GAMERS' }
-    ];
-
-    function renderRadioFrequencies() {
-      $('sidebarListContent').innerHTML = `
-        <div style="padding:18px 16px">
-          <strong style="color:var(--hello-text-muted);font-size:12px;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:12px">Frecuencias Públicas en Vivo</strong>
-          ${PUBLIC_FREQUENCIES.map(f => `
-            <div class="chat-item" onclick="tuneIntoFrequency('${f.name}', '${f.pin}')" style="border-radius:12px;margin-bottom:8px">
-              ${renderAvatarHtml({ isRadioChannel: true }, 44)}
-              <div class="chat-details">
-                <div class="title-row"><strong>${esc(f.name)}</strong></div>
-                <div class="desc-row">Canal abierto • Toca para sintonizar</div>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      `;
-    }
-
-    function tuneIntoFrequency(name, pin) {
-      let idx = contacts.findIndex(c => c.pin === pin);
-      if (idx < 0) {
-        contacts.unshift({ name, pin, isRadioChannel: true, lastMsg: 'Sintonizado', time: 'Ahora' });
-        idx = 0;
-        saveState();
+    // --- GRUPOS P2P ---
+    function openCreateGroupModal() {
+      const directContacts = contacts.filter(c => !c.isGroup && !c.isRadioChannel);
+      const container = $('groupMembersCheckboxes');
+      if (!directContacts.length) {
+        container.innerHTML = '<p style="color:var(--hello-text-muted);font-size:13px">Agrega primero contactos por PIN para crear un grupo.</p>';
+      } else {
+        container.innerHTML = directContacts.map(c => `
+          <label style="display:flex;align-items:center;gap:10px;padding:8px;background:var(--hello-card);border-radius:8px;cursor:pointer">
+            <input type="checkbox" value="${c.pin}" class="cb-group-member" style="width:18px;height:18px">
+            <strong>${esc(c.name)}</strong> <small style="color:var(--hello-text-muted)">(${esc(c.pin)})</small>
+          </label>
+        `).join('');
       }
-      viewTab('chats');
-      selectChat(idx);
+      $('newGroupNameInput').value = '';
+      $('createGroupModal').showModal();
     }
 
-    // --- MODALES Y ADJUNTOS ---
+    function confirmCreateGroup(e) {
+      e.preventDefault();
+      const name = $('newGroupNameInput').value.trim();
+      const cbs = document.querySelectorAll('.cb-group-member:checked');
+      if (!name) return showNotice('Error', 'Escribe el nombre del grupo.');
+      if (!cbs.length) return showNotice('Error', 'Selecciona al menos un contacto.');
+
+      const selectedPins = Array.from(cbs).map(cb => cb.value);
+      selectedPins.push(myPin);
+
+      const group = {
+        name,
+        pin: 'GRP-' + generateId(6),
+        isGroup: true,
+        members: [...new Set(selectedPins)],
+        lastMsg: 'Grupo creado',
+        time: 'Ahora'
+      };
+
+      contacts.unshift(group);
+      saveState();
+
+      try { emitToRecipient(group, { type: 'GROUP_SYNC', group }); } catch(e){}
+      $('createGroupModal').close();
+      viewTab('groups');
+      selectChat(0);
+    }
+
+    function openManageGroupModal(groupPin) {
+      const g = contacts.find(c => c.pin === groupPin); if (!g) return;
+      g.members = [...new Set(g.members)];
+      const membersList = g.members.map(mPin => {
+        const isMe = (mPin === myPin);
+        const item = contacts.find(c => c.pin === mPin) || { name: isMe ? 'Tú' : 'PIN: ' + mPin };
+        return `
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--hello-border)">
+            <div>
+              <strong style="font-size:14px">${esc(isMe ? 'Tú' : item.name)}</strong>
+              <small style="display:block;color:var(--hello-text-muted)">${isMe ? 'Administrador' : 'PIN: ' + esc(mPin)}</small>
+            </div>
+          </div>`;
+      }).join('');
+
+      $('manageGroupContent').innerHTML = `
+        <div style="margin-bottom:14px">
+          <strong style="display:block;margin-bottom:8px;font-size:14px">Participantes (${g.members.length})</strong>
+          <div style="max-height:160px;overflow-y:auto;border:1px solid var(--hello-border);border-radius:8px;padding:0 12px;background:var(--hello-sidebar)">${membersList}</div>
+        </div>
+        <button class="btn-hello-primary" style="background:#fee2e2;color:var(--danger);width:100%;margin-top:10px" onclick="deleteGroup('${groupPin}')">Salir y Eliminar Grupo</button>
+      `;
+      $('manageGroupModal').showModal();
+    }
+
+    function deleteGroup(groupPin) {
+      if (!confirm('¿Deseas salir y borrar este grupo?')) return;
+      contacts = contacts.filter(c => c.pin !== groupPin);
+      delete msgs[groupPin];
+      saveState();
+      $('manageGroupModal').close();
+      viewTab('groups');
+      selectChat(0, false);
+    }
+
     function openQuickAddModal() { $('addPinInput').value = ''; $('quickAddModal').showModal(); }
     function confirmAddPin(e) {
       e.preventDefault(); const pin = $('addPinInput').value.trim().toUpperCase(); $('quickAddModal').close();
@@ -1152,33 +1326,16 @@
       getPeerConn(pin); viewTab('chats'); selectChat(idx);
     }
 
+    function openStoryShareModal() {
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=10&data=${encodeURIComponent(myPin)}`;
+      $('qrDisplayImg').src = qrUrl;
+      $('qrPinLabel').textContent = 'PIN: ' + myPin;
+      $('storyShareModal').showModal();
+    }
+
     const EMOJIS = ['😀','😂','🥰','😎','🤔','😴','👍','🙌','👏','🔥','🎉','❤️','✨','✅','⭐','☀️','☕','🌿','🥑','🍕','🚀','💡','💬','📱','🔒','🌍','🎵','👋','👌','💯','💪','🥳','🙏','👀','😇','🤩','😱','🤷‍♂️','🍻','🎈','📍','📎','💻','⚡'];
     function openEmojiDialog() { $('emojiGridBox').innerHTML = EMOJIS.map(e => `<button type="button" onclick="insertEmojiChar('${e}')">${e}</button>`).join(''); $('emojiDialog').showModal(); }
     function insertEmojiChar(e) { const field = $('msgInput'); if (field) { field.value += e; field.focus(); } $('emojiDialog').close(); }
-
-    let queuedFile = null;
-    function openAttachmentDialog() { queuedFile = null; $('filePreviewNotice').innerHTML = ''; $('btnUploadSubmit').style.display = 'none'; $('fileHiddenInput').value = ''; $('attachmentDialog').showModal(); }
-    function selectAttachment(type) { $('fileHiddenInput').accept = type; $('fileHiddenInput').click(); }
-    $('fileHiddenInput').onchange = e => {
-      const file = e.target.files[0]; if (!file) return;
-      if (file.size > 25 * 1024 * 1024) return showNotice('Archivo grande', 'Elige un archivo de máximo 25 MB.');
-      const reader = new FileReader();
-      reader.onload = ev => {
-        queuedFile = { name: file.name, type: file.type, size: file.size, data: ev.target.result };
-        $('filePreviewNotice').innerHTML = `<strong>${esc(file.name)}</strong> (${Math.round(file.size / 1024)} KB)`; $('btnUploadSubmit').style.display = 'block';
-      };
-      reader.readAsDataURL(file);
-    };
-    function submitSendAttachment() {
-      if (!queuedFile) return; const c = contacts[activeChatIndex]; if (!c) return;
-      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const msgObj = { text: queuedFile.name, file: queuedFile, mine: true, time };
-      (msgs[c.pin] ??= []).push(msgObj);
-      c.lastMsg = '📎 ' + queuedFile.name; c.time = time;
-      saveMsgToDB(c.pin, msgObj); saveState();
-      emitToRecipient(c, { type: 'FILE_MSG', name: queuedFile.name, fileType: queuedFile.type, fileData: queuedFile.data });
-      $('attachmentDialog').close(); drawChatMessages(); renderChatList();
-    }
 
     async function processProfilePhotoUpload(e) {
       const file = e.target.files[0]; if (!file) return;
@@ -1194,15 +1351,15 @@
         <div style="padding:16px;background:var(--hello-sidebar);border-bottom:1px solid var(--hello-border);display:flex;align-items:center;gap:14px;cursor:pointer" onclick="openSettingsSection('profile')">
           ${renderAvatarHtml({photo: myPhoto, name: myName}, 56)}
           <div style="flex:1">
-            <strong style="font-size:17px;font-weight:700;color:var(--hello-text)">${esc(myName)}</strong>
+            <strong style="font-size:17px;font-weight:700">${esc(myName)}</strong>
             <div style="font-size:13px;color:var(--hello-text-muted)">${esc(myStatus)}</div>
             <div style="font-size:12px;color:var(--hello-teal);font-weight:800;margin-top:2px">PIN: ${myPin}</div>
           </div>
         </div>
         <div style="background:var(--hello-card);padding:12px 0">
           <div style="background:var(--hello-sidebar);border-top:1px solid var(--hello-border);border-bottom:1px solid var(--hello-border)">
-            <div class="chat-item" onclick="openSettingsSection('profile')"><span style="font-size:22px;width:34px;text-align:center">👤</span><div class="chat-details"><strong>Perfil</strong><div class="desc-row">Nombre y foto visible</div></div></div>
-            <div class="chat-item" onclick="openStoryShareModal()"><span style="font-size:22px;width:34px;text-align:center">📱</span><div class="chat-details"><strong>Compartir Tarjeta QR</strong><div class="desc-row">Imagen para Instagram o WhatsApp</div></div></div>
+            <div class="chat-item" onclick="openSettingsSection('profile')"><span style="font-size:22px;width:34px;text-align:center">👤</span><div class="chat-details"><strong>Perfil</strong><div class="desc-row">Nombre y foto de perfil</div></div></div>
+            <div class="chat-item" onclick="openStoryShareModal()"><span style="font-size:22px;width:34px;text-align:center">📱</span><div class="chat-details"><strong>Tarjeta QR</strong><div class="desc-row">Compartir en Instagram o WhatsApp</div></div></div>
             <div class="chat-item" onclick="openSettingsSection('account')"><span style="font-size:22px;width:34px;text-align:center">🔑</span><div class="chat-details"><strong>Cuenta</strong><div class="desc-row">Cerrar sesión y cambiar PIN</div></div></div>
           </div>
         </div>
@@ -1220,7 +1377,7 @@
               <div style="margin:0 auto 16px;display:flex;justify-content:center">${renderAvatarHtml({photo: myPhoto, name: myName}, 120)}</div>
               <div style="display:flex;gap:10px;justify-content:center;margin-bottom:8px">
                 <button class="btn-hello-primary" onclick="$('profilePicHiddenInput').click()">Cambiar Foto</button>
-                ${myPhoto ? `<button class="btn-hello-primary" style="background:#fee2e2;color:var(--danger);border:1px solid #fecaca" onclick="removeProfilePhoto()">Quitar</button>` : ''}
+                ${myPhoto ? `<button class="btn-hello-primary" style="background:#fee2e2;color:var(--danger)" onclick="removeProfilePhoto()">Quitar</button>` : ''}
               </div>
             </div>
             <div style="background:var(--hello-sidebar);border:1px solid var(--hello-border);border-radius:14px;padding:20px">
@@ -1236,7 +1393,7 @@
           <div style="padding:24px;overflow-y:auto;background:var(--hello-card);flex:1">
             <div style="background:var(--hello-sidebar);border:1px solid var(--hello-border);border-radius:14px;padding:20px">
               <h3 style="margin:0 0 8px;font-size:16px">Cerrar Sesión</h3>
-              <p style="font-size:13.5px;color:var(--hello-text-muted);margin:0 0 16px">Tus conversaciones permanecerán seguras en este dispositivo para cuando vuelvas a ingresar tu PIN.</p>
+              <p style="font-size:13.5px;color:var(--hello-text-muted);margin:0 0 16px">Tu historial está respaldado en la nube de tu servidor. Podrás volver a entrar con tu PIN en este o cualquier otro dispositivo.</p>
               <button class="btn-hello-primary" style="width:100%;background:var(--hello-card);color:var(--hello-text);border:1px solid var(--hello-border)" onclick="logoutAccount()">Cerrar Sesión</button>
             </div>
           </div>
