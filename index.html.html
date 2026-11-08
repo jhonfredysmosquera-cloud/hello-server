@@ -1,0 +1,1417 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+  <title>HELLO — Mensajería Privada y Radio P2P</title>
+
+  <!-- Bibliotecas WebRTC y Utilidades por CDN -->
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.9/pdf-lib.min.js"></script>
+  <script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+  <style>
+    :root {
+      --hello-teal: #008069;
+      --hello-teal-dark: #075e54;
+      --hello-teal-light: #00a884;
+      --hello-green: #25d366;
+      --hello-bg: #efeae2;
+      --hello-sidebar: #ffffff;
+      --hello-card: #f0f2f5;
+      --hello-border: #e9edef;
+      --hello-text: #111b21;
+      --hello-text-muted: #667781;
+      --hello-bubble-in: #ffffff;
+      --hello-bubble-out: #d9fdd3;
+      --hello-check-blue: #53bdeb;
+      --hello-check-gray: #8696a0;
+      --danger: #ea0038;
+      --shadow: 0 1px 3px rgba(11, 20, 26, 0.08);
+    }
+
+    body.dark-theme {
+      --hello-teal: #00a884;
+      --hello-teal-dark: #008069;
+      --hello-teal-light: #25d366;
+      --hello-bg: #0b141a;
+      --hello-sidebar: #111b21;
+      --hello-card: #202c33;
+      --hello-border: #222d34;
+      --hello-text: #e9edef;
+      --hello-text-muted: #8696a0;
+      --hello-bubble-in: #202c33;
+      --hello-bubble-out: #005c4b;
+      --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      background: #dadfe2;
+      color: var(--hello-text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      height: 100dvh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    body.dark-theme { background: #0c1317; }
+
+    button, input, textarea, select { font: inherit; color: inherit; }
+    button { cursor: pointer; border: 0; }
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid var(--hello-border);
+      background: var(--hello-card);
+      border-radius: 8px;
+      padding: 10px 14px;
+      outline: none;
+      color: var(--hello-text);
+    }
+    input:focus, textarea:focus, select:focus { border-color: var(--hello-teal); }
+
+    .app {
+      display: flex;
+      height: 100dvh;
+      width: 100vw;
+      max-width: 1600px;
+      background: var(--hello-sidebar);
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .sidebar {
+      width: 420px;
+      border-right: 1px solid var(--hello-border);
+      display: flex;
+      flex-direction: column;
+      background: var(--hello-sidebar);
+      flex-shrink: 0;
+    }
+
+    .sidebar-header {
+      background: var(--hello-card);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+      border-bottom: 1px solid var(--hello-border);
+    }
+
+    .user-avatar-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--hello-teal);
+      color: #ffffff;
+      font-weight: bold;
+      display: grid;
+      place-items: center;
+      font-size: 16px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .user-avatar-badge strong { font-size: 15px; color: var(--hello-text); }
+    .user-avatar-badge small { display: block; color: var(--hello-teal); font-weight: 700; font-size: 11px; }
+
+    .header-icons { display: flex; align-items: center; gap: 8px; }
+    .icon-btn {
+      background: transparent;
+      color: var(--hello-text-muted);
+      font-size: 18px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      transition: background 0.2s;
+    }
+    .icon-btn:hover { background: rgba(0, 0, 0, 0.05); }
+
+    .nav-tabs { display: flex; background: var(--hello-sidebar); border-bottom: 1px solid var(--hello-border); }
+    .nav-tab-btn {
+      flex: 1;
+      padding: 12px 0;
+      background: transparent;
+      color: var(--hello-text-muted);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+    }
+    .nav-tab-btn.active { color: var(--hello-teal); border-bottom-color: var(--hello-teal); }
+
+    .search-wrapper { padding: 8px 14px; background: var(--hello-sidebar); border-bottom: 1px solid var(--hello-border); }
+    .search-bar { display: flex; align-items: center; background: var(--hello-card); border-radius: 8px; padding: 0 12px; }
+    .search-bar input { border: 0; background: transparent; padding: 8px 10px; font-size: 14px; }
+
+    .chat-list { flex: 1; overflow-y: auto; background: var(--hello-sidebar); }
+    .chat-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 16px;
+      width: 100%;
+      text-align: left;
+      border-bottom: 1px solid var(--hello-border);
+      background: var(--hello-sidebar);
+      transition: background 0.15s;
+    }
+    .chat-item:hover, .chat-item.selected { background: var(--hello-card); }
+
+    .chat-item .avatar { width: 48px; height: 48px; font-size: 20px; }
+    .chat-details { flex: 1; min-width: 0; }
+    .chat-details .title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .title-row strong { font-size: 16px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--hello-text); }
+    .title-row .time { font-size: 11px; color: var(--hello-text-muted); }
+    .chat-details .desc-row { font-size: 13.5px; color: var(--hello-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .main-chat {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--hello-bg);
+      position: relative;
+    }
+    .main-chat::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: 0.35;
+      background-image: radial-gradient(var(--hello-text-muted) 1px, transparent 1px);
+      background-size: 26px 26px;
+      pointer-events: none;
+    }
+
+    .main-header {
+      height: 60px;
+      background: var(--hello-card);
+      border-bottom: 1px solid var(--hello-border);
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 2;
+    }
+    .main-header .contact-summary { display: flex; align-items: center; gap: 12px; }
+    .main-header .avatar { width: 40px; height: 40px; }
+    .contact-summary strong { font-size: 16px; display: block; color: var(--hello-text); }
+    .contact-summary small { font-size: 12px; color: var(--hello-text-muted); }
+
+    .conversation {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 7%;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 1;
+    }
+
+    .bubble {
+      max-width: 65%;
+      padding: 8px 12px;
+      font-size: 14.2px;
+      line-height: 19px;
+      border-radius: 8px;
+      position: relative;
+      box-shadow: 0 1px 0.5px rgba(11,20,26,0.13);
+      word-break: break-word;
+      color: var(--hello-text);
+    }
+    .bubble.them { background: var(--hello-bubble-in); align-self: flex-start; border-top-left-radius: 0; }
+    .bubble.mine { background: var(--hello-bubble-out); align-self: flex-end; border-top-right-radius: 0; }
+    .bubble .meta {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 4px;
+      font-size: 10.5px;
+      color: var(--hello-text-muted);
+      margin-top: 4px;
+      float: right;
+      padding-left: 12px;
+    }
+    .bubble .checks { color: var(--hello-check-blue); font-weight: bold; }
+    .bubble .checks.gray { color: var(--hello-check-gray); }
+    .bubble img.chat-img { max-width: 100%; border-radius: 6px; display: block; margin-bottom: 4px; cursor: pointer; }
+
+    .chat-footer {
+      min-height: 62px;
+      background: var(--hello-card);
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 2;
+    }
+    .input-box { flex: 1; background: var(--hello-sidebar); border-radius: 8px; padding: 10px 14px; border: 0; outline: none; font-size: 15px; color: var(--hello-text); }
+
+    .btn-ptt-mic {
+      background: var(--hello-teal);
+      color: #ffffff;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      flex-shrink: 0;
+      transition: all 0.2s;
+      user-select: none;
+      touch-action: none;
+    }
+    .btn-ptt-mic.transmitting { background: var(--danger); animation: pulse 1s infinite; }
+    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+
+    #liveRadioAlert {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--danger);
+      color: #ffffff;
+      padding: 10px 24px;
+      border-radius: 30px;
+      font-weight: 700;
+      font-size: 13.5px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 8px 24px rgba(234, 0, 56, 0.4);
+      z-index: 9999;
+    }
+
+    .settings-detail-container {
+      flex: 1;
+      overflow-y: auto;
+      background: var(--hello-card);
+      padding: 24px;
+      z-index: 2;
+    }
+    .settings-card {
+      background: var(--hello-sidebar);
+      border: 1px solid var(--hello-border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .settings-card h3 { margin: 0 0 8px; font-size: 16px; color: var(--hello-text); }
+    .settings-card p { font-size: 13px; color: var(--hello-text-muted); margin: 0 0 16px; line-height: 1.5; }
+    .setting-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--hello-border);
+    }
+    .setting-row:last-child { border-bottom: 0; }
+
+    .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #cbd5e1; transition: .3s; border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
+      background-color: white; transition: .3s; border-radius: 50%;
+    }
+    input:checked + .slider { background-color: var(--hello-teal); }
+    input:checked + .slider:before { transform: translateX(20px); }
+
+    .status-item-card {
+      background: var(--hello-sidebar);
+      border: 1px solid var(--hello-border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .status-item-card img.status-display-img {
+      width: 100%;
+      max-height: 260px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin: 10px 0;
+      display: block;
+    }
+
+    dialog {
+      background: var(--hello-sidebar);
+      color: var(--hello-text);
+      border: 0;
+      border-radius: 12px;
+      max-width: 440px;
+      width: 90vw;
+      padding: 24px;
+      box-shadow: 0 16px 48px rgba(11,20,26,0.25);
+    }
+    dialog::backdrop { background: rgba(11,20,26,0.5); backdrop-filter: blur(2px); }
+
+    .btn-hello-primary {
+      background: var(--hello-teal);
+      color: #ffffff;
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 24px;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+    .btn-hello-primary:hover { background: var(--hello-teal-dark); }
+
+    .emoji-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; max-height: 260px; overflow-y: auto; margin-top: 14px; }
+    .emoji-grid button { background: var(--hello-card); border-radius: 8px; font-size: 22px; padding: 8px 0; }
+
+    .attach-grid { display: grid; gap: 10px; margin-top: 14px; }
+    .attach-grid button { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--hello-card); border-radius: 8px; font-weight: 600; font-size: 14px; }
+
+    .mobile-back { display: none; }
+    @media (max-width: 768px) {
+      .app { height: 100dvh; width: 100vw; }
+      .sidebar { width: 100%; }
+      .main-chat { display: none; }
+      .app.chat-open .sidebar { display: none; }
+      .app.chat-open .main-chat { display: flex; }
+      .mobile-back { display: block; margin-right: 6px; }
+      .bubble { max-width: 85%; }
+    }
+
+    /* PANTALLA COMPLETA DE LOGIN / BIENVENIDA */
+    #authOverlay {
+      position: fixed;
+      inset: 0;
+      background: var(--hello-bg);
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .auth-card {
+      background: var(--hello-sidebar);
+      border: 1px solid var(--hello-border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 420px;
+      padding: 32px 24px;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.12);
+      text-align: center;
+    }
+    .auth-tab-group {
+      display: flex;
+      gap: 8px;
+      background: var(--hello-card);
+      padding: 4px;
+      border-radius: 10px;
+      margin-bottom: 24px;
+    }
+    .auth-tab-btn {
+      flex: 1;
+      padding: 10px 0;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 13px;
+      background: transparent;
+      color: var(--hello-text-muted);
+      transition: all 0.2s;
+    }
+    .auth-tab-btn.active {
+      background: var(--hello-sidebar);
+      color: var(--hello-teal);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PANTALLA DE ACCESO / LOGIN / REGISTRO -->
+  <div id="authOverlay" style="display: none;">
+    <div class="auth-card">
+      <div style="font-size: 48px; margin-bottom: 8px;">✦</div>
+      <h2 style="margin: 0 0 6px; color: var(--hello-text)">HELLO</h2>
+      <p style="font-size: 13.5px; color: var(--hello-text-muted); margin: 0 0 20px;">Mensajería privada sin número de teléfono</p>
+      
+      <div class="auth-tab-group">
+        <button type="button" class="auth-tab-btn active" id="tabBtnNew" onclick="switchAuthTab('new')">Crear Cuenta</button>
+        <button type="button" class="auth-tab-btn" id="tabBtnLogin" onclick="switchAuthTab('login')">Ya tengo un PIN</button>
+      </div>
+
+      <!-- FORMULARIO 1: CREAR NUEVA CUENTA -->
+      <form id="formNewUser" onsubmit="handleCreateAccount(event)">
+        <div style="text-align: left; margin-bottom: 14px;">
+          <label style="font-size: 12.5px; font-weight: 700; color: var(--hello-text-muted); display: block; margin-bottom: 6px;">TU NOMBRE</label>
+          <input id="newUserName" placeholder="Ej. Jhon Mosquera" required maxlength="25">
+        </div>
+        <p style="font-size: 12px; color: var(--hello-text-muted); text-align: left; margin: 0 0 18px; line-height: 1.4;">
+          Se te asignará un <strong>PIN único de 8 caracteres</strong> para que otros usuarios se comuniquen contigo sin pedir tu número.
+        </p>
+        <button class="btn-hello-primary" style="width: 100%; padding: 12px;">Crear mi PIN y Entrar</button>
+      </form>
+
+      <!-- FORMULARIO 2: INICIAR SESIÓN CON PIN EXISTENTE -->
+      <form id="formLoginUser" onsubmit="handleLoginAccount(event)" style="display: none;">
+        <div style="text-align: left; margin-bottom: 14px;">
+          <label style="font-size: 12.5px; font-weight: 700; color: var(--hello-text-muted); display: block; margin-bottom: 6px;">TU NOMBRE</label>
+          <input id="loginUserName" placeholder="Ej. Jhon Mosquera" required maxlength="25">
+        </div>
+        <div style="text-align: left; margin-bottom: 18px;">
+          <label style="font-size: 12.5px; font-weight: 700; color: var(--hello-text-muted); display: block; margin-bottom: 6px;">TU PIN REGISTRADO</label>
+          <input id="loginUserPin" placeholder="Ej. A8F2K9M1" required maxlength="8" style="text-transform: uppercase; font-weight: 700; letter-spacing: 2px; text-align: center;">
+        </div>
+        <button class="btn-hello-primary" style="width: 100%; padding: 12px;">Iniciar Sesión</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="liveRadioAlert">
+    <span>📻</span> <span id="radioAlertSender">Canal de Radio PTT activo...</span>
+  </div>
+  <audio id="liveSpeaker" autoplay playsinline></audio>
+
+  <div class="app" id="appShell">
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <div class="user-avatar-badge" onclick="openSettingsSection('profile')">
+          <div class="avatar" id="myHeaderAvatar">U</div>
+          <div><strong id="myHeaderName">Mi Usuario</strong><small>PIN: <span id="myHeaderPin">...</span></small></div>
+        </div>
+        <div class="header-icons">
+          <button class="icon-btn" onclick="openCreateGroupModal()" title="Nuevo Grupo">👥</button>
+          <button class="icon-btn" onclick="openQuickAddModal()" title="Nuevo Chat por PIN">💬</button>
+          <button class="icon-btn" onclick="viewTab('settings')" title="Ajustes">⚙️</button>
+        </div>
+      </div>
+
+      <div class="nav-tabs">
+        <button class="nav-tab-btn active" id="tabBtnChats" onclick="viewTab('chats')">Chats</button>
+        <button class="nav-tab-btn" id="tabBtnStates" onclick="viewTab('states')">Estados</button>
+        <button class="nav-tab-btn" id="tabBtnRadio" onclick="viewTab('radio')">Radio PTT</button>
+        <button class="nav-tab-btn" id="tabBtnSettings" onclick="viewTab('settings')">Ajustes</button>
+      </div>
+
+      <div class="search-wrapper" id="searchContainer">
+        <div class="search-bar"><span>🔍</span><input id="searchInput" placeholder="Buscar un chat o escribir PIN..." oninput="renderChatList(this.value)"></div>
+      </div>
+      <div class="chat-list" id="sidebarListContent"></div>
+    </div>
+
+    <div class="main-chat" id="mainArea"></div>
+  </div>
+
+  <!-- MODALES -->
+  <dialog id="quickAddModal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0;font-size:18px">Nuevo Chat por PIN</h3><button class="icon-btn" onclick="quickAddModal.close()">✕</button></div>
+    <form onsubmit="confirmAddPin(event)"><input id="addPinInput" placeholder="Ej. VA7K2M9X" maxlength="8" style="text-transform:uppercase;letter-spacing:2px;font-weight:700;text-align:center;font-size:17px" required autofocus><button class="btn-hello-primary" style="width:100%;margin-top:16px">Comenzar Conversación</button></form>
+  </dialog>
+
+  <dialog id="createStateModal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><h3 style="margin:0;font-size:18px">Crear Estado</h3><button class="icon-btn" onclick="closeStateModal()">✕</button></div>
+    <button type="button" class="btn-hello-primary" style="width:100%;margin-bottom:12px;background:var(--hello-card);color:var(--hello-text);border:1px dashed var(--hello-teal)" onclick="$('statusFileInput').click()">📷 Seleccionar Foto de Estado</button>
+    <input type="file" id="statusFileInput" accept="image/*" style="display:none" onchange="previewStatusImage(event)">
+    <div id="stateImagePreviewBox" style="display:none;margin-bottom:12px"><img id="stateImgPreview" style="width:100%;max-height:220px;object-fit:cover;border-radius:8px"></div>
+    <textarea id="stateCaptionInput" placeholder="Escribe una descripción..." maxlength="400" style="min-height:80px;margin-bottom:14px"></textarea>
+    <button class="btn-hello-primary" style="width:100%" onclick="confirmPublishState()">Publicar Estado</button>
+  </dialog>
+
+  <dialog id="createGroupModal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0;font-size:18px">Crear Grupo P2P</h3><button class="icon-btn" onclick="createGroupModal.close()">✕</button></div>
+    <input id="groupNameInput" placeholder="Asunto del grupo..." style="margin-bottom:12px" required>
+    <div id="groupMembersSelection" style="max-height:180px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;margin-bottom:16px"></div>
+    <button class="btn-hello-primary" style="width:100%" onclick="confirmCreateGroup()">Crear Grupo</button>
+  </dialog>
+
+  <dialog id="manageGroupModal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0;font-size:18px">Info. del Grupo</h3><button class="icon-btn" onclick="manageGroupModal.close()">✕</button></div>
+    <div id="manageGroupContent"></div>
+  </dialog>
+
+  <dialog id="emojiDialog">
+    <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0;font-size:16px">Emojis</h3><button class="icon-btn" onclick="emojiDialog.close()">✕</button></div>
+    <div class="emoji-grid" id="emojiGridBox"></div>
+  </dialog>
+
+  <dialog id="attachmentDialog">
+    <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0;font-size:16px">Compartir Contenido</h3><button class="icon-btn" onclick="attachmentDialog.close()">✕</button></div>
+    <div class="attach-grid">
+      <button type="button" onclick="selectAttachment('image/*')">📷 Fotos e Imágenes</button>
+      <button type="button" onclick="selectAttachment('.pdf,.doc,.docx,.xls,.xlsx,.txt,.csv')">📄 Documento</button>
+    </div>
+    <input type="file" id="fileHiddenInput" hidden>
+    <div id="filePreviewNotice" style="margin:12px 0;font-size:13px"></div>
+    <button class="btn-hello-primary" id="btnUploadSubmit" style="width:100%;display:none" onclick="submitSendAttachment()">Enviar al Chat</button>
+  </dialog>
+
+  <dialog id="noticeModal"><h3 id="noticeTitle" style="margin:0 0 10px"></h3><p id="noticeDesc" style="color:var(--hello-text-muted);font-size:14px;line-height:1.5"></p><button class="btn-hello-primary" style="width:100%;margin-top:10px" onclick="noticeModal.close()">OK</button></dialog>
+
+  <input type="file" id="profilePicHiddenInput" accept="image/*" style="display:none" onchange="processProfilePhotoUpload(event)">
+  <input type="file" id="restoreBackupInput" accept=".json" style="display:none" onchange="processRestoreBackup(event)">
+
+  <script>
+    const $ = id => document.getElementById(id);
+    const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    function generateId(len) {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let r = ''; for (let i = 0; i < len; i++) r += chars.charAt(Math.floor(Math.random() * chars.length)); return r;
+    }
+
+    // --- MANEJO DE PESTAÑAS DEL LOGIN ---
+    function switchAuthTab(type) {
+      if (type === 'new') {
+        $('tabBtnNew').classList.add('active');
+        $('tabBtnLogin').classList.remove('active');
+        $('formNewUser').style.display = 'block';
+        $('formLoginUser').style.display = 'none';
+      } else {
+        $('tabBtnLogin').classList.add('active');
+        $('tabBtnNew').classList.remove('active');
+        $('formNewUser').style.display = 'none';
+        $('formLoginUser').style.display = 'block';
+      }
+    }
+
+    function handleCreateAccount(e) {
+      e.preventDefault();
+      const name = $('newUserName').value.trim();
+      if (!name) return;
+      const newPin = generateId(8);
+      const newKey = generateId(6) + '-' + generateId(6);
+      localStorage.helloPin = newPin;
+      localStorage.helloName = name;
+      localStorage.helloKey = newKey;
+      location.reload();
+    }
+
+    function handleLoginAccount(e) {
+      e.preventDefault();
+      const name = $('loginUserName').value.trim();
+      const pin = $('loginUserPin').value.trim().toUpperCase();
+      if (!name || pin.length < 4) return showNotice('Error', 'Ingresa un PIN válido.');
+      localStorage.helloPin = pin;
+      localStorage.helloName = name;
+      if (!localStorage.helloKey) localStorage.helloKey = generateId(6) + '-' + generateId(6);
+      location.reload();
+    }
+
+    function logoutAccount() {
+      if (confirm('¿Cerrar sesión en este dispositivo? Podrás volver a entrar con tu PIN cuando quieras.')) {
+        if (peer) peer.destroy();
+        localStorage.removeItem('helloPin');
+        location.reload();
+      }
+    }
+
+    // Verificar si el usuario ya inició sesión
+    if (!localStorage.helloPin) {
+      $('authOverlay').style.display = 'flex';
+    }
+
+    const myPin = localStorage.helloPin || '';
+    const myKey = localStorage.helloKey || '';
+    let myName = localStorage.helloName || 'Usuario';
+    let myStatus = localStorage.helloStatus || 'Disponible en HELLO.';
+    let myPhoto = localStorage.helloPhoto || '';
+    let activeChatIndex = 0;
+    let currentTab = 'chats';
+
+    // CONFIGURACIÓN AVANZADA
+    let appSettings = JSON.parse(localStorage.helloAppSettings || JSON.stringify({
+      theme: 'light',
+      enterToSend: true,
+      mediaVisibility: true,
+      readReceipts: true,
+      lastSeen: 'contacts',
+      profilePhoto: 'all',
+      statusPrivacy: 'contacts',
+      disappearingTimer: 'off',
+      twoFactorPin: '',
+      emailBackup: '',
+      satelliteMode: 'off',
+      satelliteOperator: '',
+      highPriority: true,
+      radioTone: true,
+      mediaQuality: 'hd'
+    }));
+
+    if (appSettings.theme === 'dark') document.body.classList.add('dark-theme');
+
+    function updateHeaderIdentity() {
+      if ($('myHeaderPin')) $('myHeaderPin').textContent = myPin;
+      if ($('myHeaderName')) $('myHeaderName').textContent = myName;
+      if ($('myHeaderAvatar')) $('myHeaderAvatar').innerHTML = myPhoto ? `<img src="${myPhoto}">` : myName.charAt(0).toUpperCase();
+    }
+    updateHeaderIdentity();
+
+    // --- BASE DE DATOS LOCAL (INDEXEDDB) ---
+    const dbPromise = new Promise((resolve, reject) => {
+      const request = indexedDB.open('HelloChatDB', 1);
+      request.onupgradeneeded = e => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains('chats')) {
+          db.createObjectStore('chats', { keyPath: 'id', autoIncrement: true });
+        }
+      };
+      request.onsuccess = e => resolve(e.target.result);
+      request.onerror = e => reject(e.target.error);
+    });
+
+    async function saveMsgToDB(pin, msgObj) {
+      const db = await dbPromise;
+      const tx = db.transaction('chats', 'readwrite');
+      msgObj.targetPin = pin;
+      tx.objectStore('chats').add(msgObj);
+    }
+
+    async function deleteChatFromDB(pin) {
+      const db = await dbPromise;
+      const tx = db.transaction('chats', 'readwrite');
+      const store = tx.objectStore('chats');
+      const req = store.openCursor();
+      req.onsuccess = e => {
+        const cursor = e.target.result;
+        if (cursor) {
+          if (cursor.value.targetPin === pin) cursor.delete();
+          cursor.continue();
+        }
+      };
+    }
+
+    async function clearAllChatsDB() {
+      const db = await dbPromise;
+      const tx = db.transaction('chats', 'readwrite');
+      tx.objectStore('chats').clear();
+    }
+
+    let contacts = JSON.parse(localStorage.helloContacts || '[]');
+    let msgs = {};
+    let states = JSON.parse(localStorage.helloStates || '[]');
+
+    contacts.forEach(c => { if (c.isGroup && Array.isArray(c.members)) c.members = [...new Set(c.members)]; });
+
+    async function loadMessages() {
+      const db = await dbPromise;
+      const tx = db.transaction('chats', 'readonly');
+      const req = tx.objectStore('chats').getAll();
+      req.onsuccess = e => {
+        msgs = {};
+        e.target.result.forEach(m => {
+          (msgs[m.targetPin] ??= []).push(m);
+        });
+        if (currentTab === 'chats' && contacts.length) drawChatMessages();
+      };
+    }
+    loadMessages();
+
+    function renderAvatarHtml(c, size = 48) {
+      if (c.isGroup) return `<div class="avatar" style="width:${size}px;height:${size}px;background:#00a884;font-size:${size*0.4}px">👥</div>`;
+      if (c.photo) return `<div class="avatar" style="width:${size}px;height:${size}px"><img src="${c.photo}"></div>`;
+      return `<div class="avatar" style="width:${size}px;height:${size}px;font-size:${size*0.4}px">${esc((c.name || 'U').charAt(0).toUpperCase())}</div>`;
+    }
+
+    // --- CONFIGURACIÓN DE TU SERVIDOR PROPIO EN RENDER + SERVIDORES STUN ---
+    const peerServerConfig = {
+      host: 'hello-server-p2p.onrender.com',
+      port: 443,
+      path: '/myapp',
+      secure: true,
+      config: {
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:stun1.l.google.com:19302' },
+          { urls: 'stun:stun2.l.google.com:19302' }
+        ]
+      }
+    };
+
+    // --- PEERJS P2P & TRANSMISIÓN DE RADIO MULTIUSUARIO ---
+    let peer = null;
+    const peerConns = new Map();
+    let currentAudioStream = null;
+    let liveRadioCalls = [];
+
+    if (myPin) {
+      peer = new Peer('HELLO-' + myPin, peerServerConfig);
+
+      peer.on('open', id => console.log('HELLO P2P activo:', id));
+      peer.on('connection', conn => {
+        const remotePin = conn.peer.replace('HELLO-', '');
+        bindConnHandlers(conn, remotePin);
+      });
+
+      peer.on('call', call => {
+        call.answer();
+        call.on('stream', stream => {
+          const player = $('liveSpeaker'); player.srcObject = stream; player.play().catch(e => console.log('Autoplay:', e));
+          const sender = call.metadata?.name || 'Contacto';
+          const grp = call.metadata?.groupName ? ` (${call.metadata.groupName})` : '';
+          $('radioAlertSender').textContent = `📻 ${sender}${grp} en vivo...`; $('liveRadioAlert').style.display = 'flex';
+        });
+        call.on('close', () => { $('liveRadioAlert').style.display = 'none'; $('liveSpeaker').srcObject = null; });
+      });
+
+      peer.on('error', err => {
+        console.warn('Alerta de red P2P:', err.type);
+        if (err.type === 'unavailable-id') {
+          showNotice('PIN en uso', 'Este PIN ya está abierto en otra ventana o dispositivo.');
+        }
+      });
+    }
+
+    function bindConnHandlers(conn, remotePin) {
+      conn.on('open', () => {
+        peerConns.set(remotePin, conn);
+        try { conn.send({ type: 'HANDSHAKE', pin: myPin, name: myName, status: myStatus, photo: myPhoto }); } catch(e){}
+      });
+
+      conn.on('data', data => {
+        if (data.type === 'HANDSHAKE' || data.type === 'HANDSHAKE_REPLY') {
+          syncContactInfo(data.pin, data.name, data.status, data.photo);
+          if (data.type === 'HANDSHAKE') {
+            try { conn.send({ type: 'HANDSHAKE_REPLY', pin: myPin, name: myName, status: myStatus, photo: myPhoto }); } catch(e){}
+          }
+        }
+
+        if (data.type === 'GROUP_SYNC') {
+          let idx = contacts.findIndex(c => c.pin === data.group.pin);
+          if (idx < 0) contacts.unshift(data.group);
+          else { contacts[idx].members = [...new Set(data.group.members)]; contacts[idx].name = data.group.name; }
+          saveState(); renderChatList();
+          if (contacts[activeChatIndex]?.pin === data.group.pin) { selectChat(activeChatIndex, false); if ($('manageGroupModal').open) openManageGroupModal(data.group.pin); }
+        }
+
+        if (data.type === 'GROUP_DELETE') {
+          contacts = contacts.filter(c => c.pin !== data.groupPin);
+          delete msgs[data.groupPin];
+          deleteChatFromDB(data.groupPin);
+          saveState(); renderChatList();
+          if (contacts[activeChatIndex]?.pin === data.groupPin) selectChat(0, false);
+          if ($('manageGroupModal').open) $('manageGroupModal').close();
+        }
+
+        if (data.type === 'CHAT_MSG') appendMessage(remotePin, { text: data.text, mine: false, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+        if (data.type === 'GROUP_MSG') appendGroupMessage(data.groupId, data.senderName, { text: data.text, mine: false, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+        if (data.type === 'FILE_MSG') appendMessage(remotePin, { text: data.name, file: { name: data.name, type: data.fileType, data: data.fileData }, mine: false, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+        if (data.type === 'GROUP_FILE_MSG') appendGroupMessage(data.groupId, data.senderName, { text: data.name, file: { name: data.name, type: data.fileType, data: data.fileData }, mine: false, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+
+        if (data.type === 'KICK_DEVICE' && data.key === myKey) { peer.destroy(); localStorage.clear(); clearAllChatsDB(); alert('Tu cuenta ha sido vinculada en otro dispositivo.'); location.reload(); }
+      });
+
+      conn.on('close', () => peerConns.delete(remotePin));
+      conn.on('error', () => peerConns.delete(remotePin));
+    }
+
+    function getPeerConn(pin) {
+      if (peerConns.has(pin) && peerConns.get(pin).open) return peerConns.get(pin);
+      if (!peer || peer.destroyed) return null;
+      try {
+        const conn = peer.connect('HELLO-' + pin, { reliable: true });
+        bindConnHandlers(conn, pin);
+        return conn;
+      } catch (err) {
+        return null;
+      }
+    }
+
+    function emitToRecipient(contact, payload) {
+      const recipients = contact.isGroup ? contact.members.filter(m => m !== myPin) : [contact.pin];
+      recipients.forEach(pin => {
+        try {
+          let conn = peerConns.get(pin);
+          if (conn && conn.open) {
+            conn.send(payload);
+          } else {
+            conn = getPeerConn(pin);
+            if (conn) {
+              conn.on('open', () => {
+                try { conn.send(payload); } catch(e){}
+              });
+            }
+          }
+        } catch(e) {}
+      });
+    }
+
+    function syncContactInfo(pin, realName, status, photo) {
+      let c = contacts.find(x => x.pin === pin);
+      if (!c) contacts.push({ name: realName, pin: pin, status: status, photo: photo || '', lastMsg: 'Conectado', time: 'Ahora' });
+      else if (!c.isGroup) { c.name = realName; c.status = status; if (photo) c.photo = photo; }
+      saveState(); renderChatList();
+      if (contacts[activeChatIndex]?.pin === pin) selectChat(activeChatIndex, false);
+    }
+
+    function appendMessage(fromPin, msg) {
+      let idx = contacts.findIndex(c => c.pin === fromPin);
+      if (idx < 0) contacts.push({ name: 'PIN ' + fromPin, pin: fromPin, lastMsg: msg.file ? '📎 ' + msg.file.name : msg.text, time: msg.time });
+      else { contacts[idx].lastMsg = msg.file ? '📎 ' + msg.file.name : msg.text; contacts[idx].time = msg.time; }
+      (msgs[fromPin] ??= []).push(msg);
+      saveMsgToDB(fromPin, msg);
+      saveState();
+      if (contacts[activeChatIndex]?.pin === fromPin) drawChatMessages();
+      renderChatList();
+    }
+
+    function appendGroupMessage(groupId, sender, msg) {
+      let g = contacts.find(c => c.pin === groupId);
+      if (g) {
+        msg.senderName = sender;
+        g.lastMsg = sender + ': ' + (msg.file ? '📎 ' + msg.file.name : msg.text);
+        g.time = msg.time;
+        (msgs[groupId] ??= []).push(msg);
+        saveMsgToDB(groupId, msg);
+        saveState();
+        if (contacts[activeChatIndex]?.pin === groupId) drawChatMessages();
+        renderChatList();
+      }
+    }
+
+    function saveState() {
+      localStorage.helloContacts = JSON.stringify(contacts);
+      localStorage.helloName = myName;
+      localStorage.helloStatus = myStatus;
+      localStorage.helloPhoto = myPhoto;
+      localStorage.helloAppSettings = JSON.stringify(appSettings);
+    }
+
+    function showNotice(title, desc) { $('noticeTitle').textContent = title; $('noticeDesc').textContent = desc; $('noticeModal').showModal(); }
+
+    // --- PESTAÑAS Y NAVEGACIÓN ---
+    function viewTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.nav-tab-btn').forEach(b => b.classList.remove('active'));
+      const tabId = 'tabBtn' + tab.charAt(0).toUpperCase() + tab.slice(1);
+      if ($(tabId)) $(tabId).classList.add('active');
+      $('searchContainer').style.display = (tab === 'chats') ? 'block' : 'none';
+
+      if (tab === 'chats') { renderChatList(); if (contacts.length) selectChat(activeChatIndex, false); }
+      else if (tab === 'states') renderStatesList();
+      else if (tab === 'radio') renderRadioList();
+      else if (tab === 'settings') renderSettingsOverview();
+    }
+
+    function renderChatList(filter = '') {
+      const container = $('sidebarListContent');
+      if (!contacts.length) {
+        container.innerHTML = `<div style="text-align:center;padding:50px 20px;color:var(--hello-text-muted)"><div style="font-size:40px;margin-bottom:12px">💬</div><strong style="color:var(--hello-text);font-size:16px">Sin conversaciones</strong><p style="font-size:13.5px;margin:8px 0 16px">Inicia un chat ingresando un PIN.</p><button class="btn-hello-primary" onclick="openQuickAddModal()">Iniciar un Chat</button></div>`;
+        return;
+      }
+      container.innerHTML = contacts.map((c, i) => {
+        if (filter && !c.name.toLowerCase().includes(filter.toLowerCase()) && !c.pin.toLowerCase().includes(filter.toLowerCase())) return '';
+        return `
+          <div class="chat-item ${i === activeChatIndex ? 'selected' : ''}" onclick="selectChat(${i})">
+            ${renderAvatarHtml(c, 48)}
+            <div class="chat-details">
+              <div class="title-row"><strong>${esc(c.name)}</strong><span class="time">${c.time || ''}</span></div>
+              <div class="desc-row">${esc(c.lastMsg || (c.isGroup ? 'Grupo P2P' : c.pin))}</div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    function selectChat(idx, isMobile = true) {
+      activeChatIndex = idx; const c = contacts[idx];
+      if (!c) { $('mainArea').innerHTML = `<div style="display:grid;place-items:center;height:100%;color:var(--hello-text-muted);text-align:center"><div><div style="font-size:64px;margin-bottom:16px;opacity:0.3">💬</div><h2 style="color:var(--hello-text);margin:0 0 8px">HELLO Red Segura</h2><p style="max-width:360px;font-size:14px;line-height:1.5">Conexión cifrada sin número de teléfono mediante PIN.</p></div></div>`; return; }
+      if (isMobile) $('appShell').classList.add('chat-open');
+
+      const headerAction = c.isGroup ? `<button class="icon-btn" title="Info. del grupo" onclick="openManageGroupModal('${c.pin}')">⚙️</button>` : ``;
+      $('mainArea').innerHTML = `
+        <div class="main-header">
+          <div class="contact-summary" style="${c.isGroup ? 'cursor:pointer' : ''}" ${c.isGroup ? `onclick="openManageGroupModal('${c.pin}')"` : ''}>
+            <button class="icon-btn mobile-back" onclick="$('appShell').classList.remove('chat-open')">‹</button>
+            ${renderAvatarHtml(c, 40)}
+            <div><strong id="activeNameHeader">${esc(c.name)}</strong><small>${c.isGroup ? c.members.length + ' participantes' : 'PIN: ' + esc(c.pin)}</small></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">${headerAction}</div>
+        </div>
+        <div class="conversation" id="conversationBox"></div>
+        <form class="chat-footer" onsubmit="handleSendText(event)">
+          <button type="button" class="icon-btn" title="Emojis" onclick="openEmojiDialog()">☺</button>
+          <button type="button" class="icon-btn" title="Adjuntar" onclick="openAttachmentDialog()">📎</button>
+          <input class="input-box" id="msgInput" placeholder="Escribe un mensaje" autocomplete="off" onkeydown="handleInputKeydown(event)">
+          <button type="button" class="btn-ptt-mic" id="btnPttTrigger" title="Walkie-Talkie">🎙️</button>
+        </form>
+      `;
+      bindPttEvents(c); if (!c.isGroup) getPeerConn(c.pin); drawChatMessages();
+    }
+
+    function handleInputKeydown(e) { if (e.key === 'Enter' && !e.shiftKey) { if (appSettings.enterToSend) { e.preventDefault(); handleSendText(e); } } }
+
+    function drawChatMessages() {
+      const c = contacts[activeChatIndex]; const box = $('conversationBox'); if (!c || !box) return;
+      const list = msgs[c.pin] || [];
+      box.innerHTML = list.map(m => {
+        let body = '';
+        if (m.file) {
+          if (/^image\//.test(m.file.type)) body = `<img src="${m.file.data}" class="chat-img" onclick="window.open('${m.file.data}')">`;
+          body += `<div style="display:flex;align-items:center;gap:8px"><span>📄</span><a href="${m.file.data}" download="${esc(m.file.name)}" style="color:var(--hello-teal);font-weight:600">${esc(m.file.name)}</a></div>`;
+        } else body = esc(m.text);
+        const senderTag = (c.isGroup && !m.mine && m.senderName) ? `<div style="font-weight:700;color:var(--hello-teal-dark);font-size:12px;margin-bottom:2px">${esc(m.senderName)}</div>` : '';
+        let checkHtml = m.mine ? (appSettings.readReceipts ? `<span class="checks">✓✓</span>` : `<span class="checks gray">✓✓</span>`) : '';
+        return `<div class="bubble ${m.mine ? 'mine' : 'them'}">${senderTag}${body}<div class="meta"><span>${m.time}</span>${checkHtml}</div></div>`;
+      }).join('');
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function handleSendText(e) {
+      e.preventDefault(); const input = $('msgInput'); const text = input.value.trim(); const c = contacts[activeChatIndex];
+      if (!text || !c) return;
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const msgObj = { text, mine: true, time };
+      (msgs[c.pin] ??= []).push(msgObj);
+      c.lastMsg = (c.isGroup ? 'Tú: ' : '') + text; c.time = time;
+      
+      saveMsgToDB(c.pin, msgObj);
+      saveState();
+
+      emitToRecipient(c, { type: c.isGroup ? 'GROUP_MSG' : 'CHAT_MSG', groupId: c.pin, text, senderName: myName });
+      input.value = ''; drawChatMessages(); renderChatList();
+    }
+
+    // --- WALKIE-TALKIE EN VIVO (PTT) ---
+    function bindPttEvents(contact) {
+      const btn = $('btnPttTrigger'); if (!btn) return;
+      btn.onpointerdown = e => { e.preventDefault(); btn.setPointerCapture(e.pointerId); startPttStream(contact); };
+      btn.onpointerup = stopPttStream; btn.onpointercancel = stopPttStream;
+    }
+
+    async function startPttStream(contact) {
+      try {
+        const btn = $('btnPttTrigger'); btn.classList.add('transmitting'); btn.textContent = '🔴';
+        currentAudioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const targets = contact.isGroup ? contact.members.filter(m => m !== myPin) : [contact.pin];
+        targets.forEach(targetPin => {
+          try { const call = peer.call('HELLO-' + targetPin, currentAudioStream, { metadata: { name: myName, groupName: contact.isGroup ? contact.name : null } }); liveRadioCalls.push(call); } catch(e){}
+        });
+      } catch (err) { stopPttStream(); showNotice('Micrófono', 'Se requiere acceso al micrófono para transmitir en vivo.'); }
+    }
+
+    function stopPttStream() {
+      liveRadioCalls.forEach(c => { try { c.close(); } catch(e){} }); liveRadioCalls = [];
+      if (currentAudioStream) { currentAudioStream.getTracks().forEach(t => t.stop()); currentAudioStream = null; }
+      if ($('btnPttTrigger')) { $('btnPttTrigger').classList.remove('transmitting'); $('btnPttTrigger').textContent = '🎙️'; }
+    }
+
+    // --- GRUPOS P2P ---
+    function openCreateGroupModal() {
+      const realContacts = contacts.filter(c => !c.isGroup); const container = $('groupMembersSelection');
+      if (!realContacts.length) { container.innerHTML = '<p style="color:var(--hello-text-muted);font-size:13px">Agrega contactos por PIN para crear un grupo.</p>'; }
+      else { container.innerHTML = realContacts.map(c => `<label style="display:flex;align-items:center;gap:10px;padding:8px;background:var(--hello-card);border-radius:6px;cursor:pointer"><input type="checkbox" value="${c.pin}" class="group-select-cb" style="width:18px;height:18px"><span>${esc(c.name)}</span></label>`).join(''); }
+      $('groupNameInput').value = ''; $('createGroupModal').showModal();
+    }
+    function confirmCreateGroup() {
+      const name = $('groupNameInput').value.trim(); if (!name) return showNotice('Error', 'Escribe un nombre para el grupo.');
+      const cbs = document.querySelectorAll('.group-select-cb:checked'); if (!cbs.length) return showNotice('Error', 'Selecciona al menos un contacto.');
+      const selected = Array.from(cbs).map(cb => cb.value); selected.push(myPin);
+      const group = { name, pin: 'GRP-' + generateId(6), isGroup: true, members: [...new Set(selected)], lastMsg: 'Grupo creado', time: 'Ahora' };
+      contacts.unshift(group); saveState(); try { emitToRecipient(group, { type: 'GROUP_SYNC', group }); } catch(e){}
+      $('createGroupModal').close(); viewTab('chats'); selectChat(0);
+    }
+    function openManageGroupModal(groupPin) {
+      const g = contacts.find(c => c.pin === groupPin); if (!g) return;
+      g.members = [...new Set(g.members)]; saveState();
+      const membersList = g.members.map(mPin => {
+        const isMe = (mPin === myPin); const item = contacts.find(c => c.pin === mPin) || { name: isMe ? 'Tú' : 'PIN: ' + mPin };
+        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--hello-border)"><div><strong style="font-size:14px;color:var(--hello-text)">${esc(isMe ? 'Tú' : item.name)}</strong><small style="display:block;color:var(--hello-text-muted);font-size:11px">${isMe ? 'Administrador' : 'PIN: ' + esc(mPin)}</small></div>${!isMe ? `<button class="icon-btn" style="color:var(--danger);font-size:15px;width:32px;height:32px" onclick="removeMemberFromGroup('${groupPin}', '${mPin}')">✕</button>` : ''}</div>`;
+      }).join('');
+      const nonMembers = contacts.filter(c => !c.isGroup && !g.members.includes(c.pin));
+      $('manageGroupContent').innerHTML = `
+        <div style="margin-bottom:14px"><strong style="display:block;margin-bottom:8px;font-size:14px">Participantes (${g.members.length})</strong><div style="max-height:160px;overflow-y:auto;border:1px solid var(--hello-border);border-radius:8px;padding:0 12px;background:var(--hello-sidebar)">${membersList}</div></div>
+        <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--hello-border)"><strong style="display:block;font-size:13px;margin-bottom:8px">Añadir Participante</strong>
+          ${nonMembers.length ? `<div style="display:flex;gap:8px;margin-bottom:10px"><select id="selectAddMember" style="flex:1"><option value="">-- Seleccionar --</option>${nonMembers.map(c => `<option value="${c.pin}">${esc(c.name)}</option>`).join('')}</select><button class="btn-hello-primary" onclick="addMemberFromDropdown('${groupPin}')">Añadir</button></div>` : ''}
+          <div style="display:flex;gap:8px"><input id="inputDirectAddPin" placeholder="O escribe un PIN" maxlength="8" style="text-transform:uppercase;letter-spacing:1px;font-weight:600;font-size:13px"><button class="btn-hello-primary" onclick="addMemberFromInput('${groupPin}')">Añadir</button></div>
+        </div>
+        <button class="btn-hello-primary" style="background:#fee2e2;color:var(--danger);border:1px solid #fecaca;width:100%;margin-top:20px;padding:12px" onclick="deleteOrExitGroup('${groupPin}')">Salir y Eliminar Grupo</button>
+      `;
+      if (!$('manageGroupModal').open) $('manageGroupModal').showModal();
+    }
+    function addMemberFromDropdown(groupPin) { const sel = $('selectAddMember'); if (!sel || !sel.value) return; executeAddMember(groupPin, sel.value); }
+    function addMemberFromInput(groupPin) { const pin = $('inputDirectAddPin')?.value.trim().toUpperCase(); if (!pin || pin.length < 4) return; executeAddMember(groupPin, pin); }
+    function executeAddMember(groupPin, newPin) {
+      const g = contacts.find(c => c.pin === groupPin); if (!g) return;
+      newPin = newPin.trim().toUpperCase(); if (g.members.includes(newPin)) return showNotice('Aviso', 'Este contacto ya está en el grupo.');
+      g.members.push(newPin); g.members = [...new Set(g.members)]; saveState();
+      try { emitToRecipient(g, { type: 'GROUP_SYNC', group: g }); } catch(e){}
+      openManageGroupModal(groupPin); selectChat(activeChatIndex, false); renderChatList();
+    }
+    function removeMemberFromGroup(groupPin, memberPin) {
+      const g = contacts.find(c => c.pin === groupPin); if (!g) return;
+      try { const conn = getPeerConn(memberPin); if (conn) { if (conn.open) conn.send({ type: 'GROUP_DELETE', groupPin }); else conn.on('open', () => { try { conn.send({ type: 'GROUP_DELETE', groupPin }); } catch(e){} }); } } catch (err) {}
+      g.members = g.members.filter(m => m !== memberPin); saveState();
+      try { emitToRecipient(g, { type: 'GROUP_SYNC', group: g }); } catch(e){}
+      openManageGroupModal(groupPin); selectChat(activeChatIndex, false); renderChatList();
+    }
+    function deleteOrExitGroup(groupPin) {
+      if (!confirm('¿Deseas salir y eliminar este grupo?')) return;
+      const g = contacts.find(c => c.pin === groupPin);
+      if (g) { g.members = g.members.filter(m => m !== myPin); try { emitToRecipient(g, { type: 'GROUP_SYNC', group: g }); } catch(e){} }
+      contacts = contacts.filter(c => c.pin !== groupPin); delete msgs[groupPin]; deleteChatFromDB(groupPin); saveState();
+      $('manageGroupModal').close(); renderChatList(); selectChat(0, false);
+    }
+
+    // --- AGREGAR PIN RÁPIDO ---
+    function openQuickAddModal() { $('addPinInput').value = ''; $('quickAddModal').showModal(); }
+    function confirmAddPin(e) {
+      e.preventDefault(); const pin = $('addPinInput').value.trim().toUpperCase(); $('quickAddModal').close();
+      if (pin.length < 4) return showNotice('Error', 'Ingresa un PIN válido.');
+      if (pin === myPin) return showNotice('Aviso', 'No puedes agregarte a ti mismo.');
+      let idx = contacts.findIndex(c => c.pin === pin);
+      if (idx < 0) { contacts.unshift({ name: 'Usuario ' + pin.slice(0, 4), pin: pin, lastMsg: 'Conectando...', time: 'Ahora' }); idx = 0; saveState(); }
+      getPeerConn(pin); viewTab('chats'); selectChat(idx);
+    }
+
+    // --- EMOJIS & ARCHIVOS ---
+    const EMOJIS = ['😀','😂','🥰','😎','🤔','😴','👍','🙌','👏','🔥','🎉','❤️','✨','✅','⭐','☀️','☕','🌿','🥑','🍕','🚀','💡','💬','📱','🔒','🌍','🎵','👋','👌','💯','💪','🥳','🙏','👀','😇','🤩','😱','🤷‍♂️','🍻','🎈','📍','📎','💻','⚡'];
+    function openEmojiDialog() { $('emojiGridBox').innerHTML = EMOJIS.map(e => `<button type="button" onclick="insertEmojiChar('${e}')">${e}</button>`).join(''); $('emojiDialog').showModal(); }
+    function insertEmojiChar(e) { const field = $('msgInput'); if (field) { field.value += e; field.focus(); } $('emojiDialog').close(); }
+
+    let queuedFile = null;
+    function openAttachmentDialog() { queuedFile = null; $('filePreviewNotice').innerHTML = ''; $('btnUploadSubmit').style.display = 'none'; $('fileHiddenInput').value = ''; $('attachmentDialog').showModal(); }
+    function selectAttachment(type) { $('fileHiddenInput').accept = type; $('fileHiddenInput').click(); }
+    $('fileHiddenInput').onchange = e => {
+      const file = e.target.files[0]; if (!file) return;
+      if (file.size > 25 * 1024 * 1024) return showNotice('Archivo grande', 'Elige un archivo de máximo 25 MB.');
+      const reader = new FileReader();
+      reader.onload = ev => {
+        queuedFile = { name: file.name, type: file.type, size: file.size, data: ev.target.result };
+        $('filePreviewNotice').innerHTML = `<strong>${esc(file.name)}</strong> (${Math.round(file.size / 1024)} KB)`; $('btnUploadSubmit').style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    };
+    function submitSendAttachment() {
+      if (!queuedFile) return; const c = contacts[activeChatIndex]; if (!c) return;
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const msgObj = { text: queuedFile.name, file: queuedFile, mine: true, time };
+      (msgs[c.pin] ??= []).push(msgObj);
+      c.lastMsg = (c.isGroup ? 'Tú: ' : '') + '📎 ' + queuedFile.name; c.time = time;
+      
+      saveMsgToDB(c.pin, msgObj);
+      saveState();
+
+      emitToRecipient(c, { type: c.isGroup ? 'GROUP_FILE_MSG' : 'FILE_MSG', groupId: c.pin, name: queuedFile.name, fileType: queuedFile.type, fileData: queuedFile.data, senderName: myName });
+      $('attachmentDialog').close(); drawChatMessages(); renderChatList();
+    }
+
+    // --- FOTO DE PERFIL ---
+    async function processProfilePhotoUpload(e) {
+      const file = e.target.files[0]; if (!file) return;
+      try {
+        const compressed = await compressImageFile(file, 260, 260, 0.8);
+        myPhoto = compressed; saveState(); updateHeaderIdentity(); openSettingsSection('profile');
+        contacts.forEach(c => { const conn = peerConns.get(c.pin); if (conn && conn.open && !c.isGroup) { try { conn.send({ type: 'HANDSHAKE', pin: myPin, name: myName, status: myStatus, photo: myPhoto }); } catch(err){} } });
+        showNotice('Foto Actualizada', 'Tu avatar se ha guardado.');
+      } catch (err) { showNotice('Error', 'No se pudo procesar la imagen.'); }
+    }
+
+    function removeProfilePhoto() {
+      myPhoto = ''; saveState(); updateHeaderIdentity(); openSettingsSection('profile');
+      contacts.forEach(c => { const conn = peerConns.get(c.pin); if (conn && conn.open && !c.isGroup) { try { conn.send({ type: 'HANDSHAKE', pin: myPin, name: myName, status: myStatus, photo: '' }); } catch(err){} } });
+      showNotice('Foto Eliminada', 'Se ha restablecido tu inicial.');
+    }
+
+    function compressImageFile(file, maxWidth, maxHeight, quality) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = ev => {
+          const img = new Image();
+          img.onload = () => {
+            let w = img.width, h = img.height;
+            const ratio = Math.min(1, Math.min(maxWidth / w, maxHeight / h));
+            w = Math.round(w * ratio); h = Math.round(h * ratio);
+            const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h); resolve(canvas.toDataURL('image/jpeg', quality));
+          };
+          img.onerror = reject; img.src = ev.target.result;
+        };
+        reader.onerror = reject; reader.readAsDataURL(file);
+      });
+    }
+
+    // --- ESTADOS CON FOTO Y DESCRIPCIÓN ---
+    let pendingStateImage = '';
+    function renderStatesList() {
+      states = states.filter(s => Date.now() - s.at < 86400000);
+      $('sidebarListContent').innerHTML = `
+        <div style="padding:16px 20px">
+          <button class="btn-hello-primary" style="width:100%;margin-bottom:16px" onclick="openCreateStateModal()">＋ Crear Estado con Foto</button>
+          <strong style="color:var(--hello-text-muted);font-size:12px;text-transform:uppercase;letter-spacing:1px">Mis Estados (24h)</strong>
+          <div style="margin-top:12px">
+            ${states.length ? states.map((s, idx) => `
+              <div class="status-item-card">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+                  <div style="display:flex;align-items:center;gap:10px">
+                    ${renderAvatarHtml({photo: myPhoto, name: myName}, 36)}
+                    <div><strong style="font-size:14px;color:var(--hello-text)">${esc(myName)}</strong><small style="display:block;color:var(--hello-text-muted)">${new Date(s.at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</small></div>
+                  </div>
+                  <button class="icon-btn" style="color:var(--danger);font-size:14px;width:28px;height:28px" onclick="deleteStateItem(${idx})" title="Eliminar">✕</button>
+                </div>
+                ${s.photo ? `<img src="${s.photo}" class="status-display-img" onclick="window.open('${s.photo}')">` : ''}
+                ${s.text ? `<p style="margin:4px 0 0;font-size:14px;color:var(--hello-text);line-height:1.4">${esc(s.text)}</p>` : ''}
+              </div>
+            `).join('') : '<p style="color:var(--hello-text-muted);font-size:13.5px">No tienes estados activos en este momento.</p>'}
+          </div>
+        </div>
+      `;
+    }
+    function openCreateStateModal() { pendingStateImage = ''; $('stateImgPreview').src = ''; $('stateImagePreviewBox').style.display = 'none'; $('stateCaptionInput').value = ''; $('statusFileInput').value = ''; $('createStateModal').showModal(); }
+    function closeStateModal() { $('createStateModal').close(); }
+    async function previewStatusImage(e) {
+      const file = e.target.files[0]; if (!file) return;
+      try {
+        const compressed = await compressImageFile(file, 800, 800, 0.75);
+        pendingStateImage = compressed; $('stateImgPreview').src = compressed; $('stateImagePreviewBox').style.display = 'block';
+      } catch (err) { showNotice('Error', 'No se pudo procesar la imagen.'); }
+    }
+    function confirmPublishState() {
+      const caption = $('stateCaptionInput').value.trim();
+      if (!caption && !pendingStateImage) return showNotice('Estado Vacío', 'Selecciona imagen o descripción.');
+      states.unshift({ id: generateId(6), text: caption, photo: pendingStateImage, at: Date.now() });
+      localStorage.helloStates = JSON.stringify(states); closeStateModal(); renderStatesList();
+    }
+    function deleteStateItem(idx) { states.splice(idx, 1); localStorage.helloStates = JSON.stringify(states); renderStatesList(); }
+
+    function renderRadioList() {
+      $('sidebarListContent').innerHTML = `
+        <div style="padding:20px;text-align:center">
+          <div style="font-size:48px;margin-bottom:10px">📻</div>
+          <h3 style="margin:0 0 8px;color:var(--hello-text)">Canal Walkie-Talkie</h3>
+          <p style="font-size:13.5px;color:var(--hello-text-muted);margin:0 0 20px;line-height:1.5">
+            Abre cualquier chat y mantén presionado el botón 🎙️ para emitir voz en vivo directo al altavoz.
+          </p>
+        </div>
+      `;
+    }
+
+    // --- AJUSTES Y CONFIGURACIÓN ---
+    function renderSettingsOverview() {
+      $('sidebarListContent').innerHTML = `
+        <div style="padding:16px;background:var(--hello-sidebar);border-bottom:1px solid var(--hello-border);display:flex;align-items:center;gap:14px;cursor:pointer" onclick="openSettingsSection('profile')">
+          ${renderAvatarHtml({photo: myPhoto, name: myName}, 56)}
+          <div style="flex:1">
+            <strong style="font-size:17px;color:var(--hello-text)">${esc(myName)}</strong>
+            <div style="font-size:13px;color:var(--hello-text-muted)">${esc(myStatus)}</div>
+            <div style="font-size:12px;color:var(--hello-teal);font-weight:700;margin-top:2px">PIN: ${myPin}</div>
+          </div>
+        </div>
+        <div style="background:var(--hello-card);padding:12px 0">
+          <div style="background:var(--hello-sidebar);border-top:1px solid var(--hello-border);border-bottom:1px solid var(--hello-border)">
+            <div class="chat-item" onclick="openSettingsSection('profile')"><span style="font-size:22px;width:34px;text-align:center">👤</span><div class="chat-details"><strong>Perfil</strong><div class="desc-row">Foto de perfil, nombre, estado y PIN</div></div></div>
+            <div class="chat-item" onclick="openSettingsSection('account')"><span style="font-size:22px;width:34px;text-align:center">🔑</span><div class="chat-details"><strong>Cuenta</strong><div class="desc-row">Seguridad, verificación, cerrar sesión</div></div></div>
+            <div class="chat-item" onclick="openSettingsSection('privacy')"><span style="font-size:22px;width:34px;text-align:center">🔒</span><div class="chat-details"><strong>Privacidad</strong><div class="desc-row">Confirmaciones de lectura, última vez</div></div></div>
+            <div class="chat-item" onclick="openSettingsSection('chats')"><span style="font-size:22px;width:34px;text-align:center">💬</span><div class="chat-details"><strong>Chats</strong><div class="desc-row">Tema, Enter para enviar, copia de seguridad</div></div></div>
+            <div class="chat-item" onclick="openSettingsSection('satellite')"><span style="font-size:22px;width:34px;text-align:center">🛰️</span><div class="chat-details"><strong>Conexión Satelital</strong><div class="desc-row">Preferencias para zonas sin cobertura</div></div></div>
+            <div class="chat-item" onclick="openSettingsSection('storage')"><span style="font-size:22px;width:34px;text-align:center">💾</span><div class="chat-details"><strong>Almacenamiento (Base de datos)</strong><div class="desc-row">Gestión de disco interno IndexedDB</div></div></div>
+            <div class="chat-item" onclick="openSettingsSection('help')"><span style="font-size:22px;width:34px;text-align:center">❓</span><div class="chat-details"><strong>Ayuda</strong><div class="desc-row">Info. de la aplicación y estado de red</div></div></div>
+          </div>
+        </div>
+      `;
+      openSettingsSection('profile');
+    }
+
+    function openSettingsSection(section) {
+      $('appShell').classList.add('chat-open'); const area = $('mainArea');
+      if (section === 'profile') {
+        area.innerHTML = `
+          <div class="main-header"><div class="contact-summary"><button class="icon-btn mobile-back" onclick="$('appShell').classList.remove('chat-open')">‹</button><strong>Perfil</strong></div></div>
+          <div class="settings-detail-container">
+            <div class="settings-card" style="text-align:center">
+              <div style="margin:0 auto 16px;display:flex;justify-content:center">${renderAvatarHtml({photo: myPhoto, name: myName}, 120)}</div>
+              <div style="display:flex;gap:10px;justify-content:center;margin-bottom:8px">
+                <button class="btn-hello-primary" onclick="$('profilePicHiddenInput').click()">Cambiar Foto</button>
+                ${myPhoto ? `<button class="btn-hello-primary" style="background:#fee2e2;color:var(--danger);border:1px solid #fecaca" onclick="removeProfilePhoto()">Quitar Foto</button>` : ''}
+              </div>
+            </div>
+            <div class="settings-card">
+              <h3>Tu Nombre y Estado</h3>
+              <input id="setProfName" value="${esc(myName)}" style="margin-bottom:10px">
+              <input id="setProfStatus" value="${esc(myStatus)}" style="margin-bottom:10px">
+              <button class="btn-hello-primary" style="width:100%" onclick="saveProfileDetail()">Guardar Perfil</button>
+            </div>
+            <div class="settings-card">
+              <h3>Tu PIN Exclusivo</h3>
+              <div style="background:var(--hello-card);padding:14px;border-radius:8px;font-weight:bold;letter-spacing:2px;font-size:18px;color:var(--hello-teal);text-align:center">${myPin}</div>
+            </div>
+          </div>
+        `;
+      }
+      else if (section === 'account') {
+        area.innerHTML = `
+          <div class="main-header"><div class="contact-summary"><button class="icon-btn mobile-back" onclick="$('appShell').classList.remove('chat-open')">‹</button><strong>Cuenta</strong></div></div>
+          <div class="settings-detail-container">
+            <div class="settings-card">
+              <h3>Cerrar Sesión</h3>
+              <p>Sal de tu cuenta en este dispositivo. Podrás volver a ingresar escribiendo tu PIN.</p>
+              <button class="btn-hello-primary" style="width:100%;background:var(--hello-card);color:var(--hello-text);border:1px solid var(--hello-border)" onclick="logoutAccount()">Cerrar Sesión / Cambiar PIN</button>
+            </div>
+            <div class="settings-card">
+              <h3>Migrar a otro equipo</h3>
+              <p>Tu Clave Secreta para transferir este PIN a otro celular:</p>
+              <div style="background:var(--hello-card);padding:14px;border-radius:8px;font-family:monospace;font-size:15px;color:var(--hello-teal);margin-bottom:14px;text-align:center"><strong>${myKey}</strong></div>
+            </div>
+            <div class="settings-card">
+              <h3>Verificación en dos pasos</h3>
+              <input id="set2FAPin" type="password" maxlength="6" placeholder="Ingresa un PIN de 6 dígitos" value="${esc(appSettings.twoFactorPin)}" style="letter-spacing:3px;text-align:center;font-weight:bold;margin-bottom:10px">
+              <button class="btn-hello-primary" onclick="save2FAPin()">Guardar Código</button>
+            </div>
+            <div class="settings-card" style="border-color:#fecaca">
+              <h3 style="color:var(--danger)">Eliminar mi cuenta</h3>
+              <button class="btn-hello-primary" style="background:var(--danger)" onclick="deleteAccountAction()">Eliminar Cuenta Definitivamente</button>
+            </div>
+          </div>
+        `;
+      }
+      else if (section === 'privacy') {
+        area.innerHTML = `
+          <div class="main-header"><div class="contact-summary"><button class="icon-btn mobile-back" onclick="$('appShell').classList.remove('chat-open')">‹</button><strong>Privacidad</strong></div></div>
+          <div class="settings-detail-container">
+            <div class="settings-card">
+              <h3>Confirmaciones de lectura</h3>
+              <div class="setting-row">
+                <div><strong>Doble check azul</strong></div>
+                <label class="switch"><input type="checkbox" ${appSettings.readReceipts?'checked':''} onchange="updateAppSettings('readReceipts', this.checked)"><span class="slider"></span></label>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      else if (section === 'chats') {
+        area.innerHTML = `
+          <div class="main-header"><div class="contact-summary"><button class="icon-btn mobile-back" onclick="$('appShell').classList.remove('chat-open')">‹</button><strong>Chats</strong></div></div>
+          <div class="settings-detail-container">
+            <div class="settings-card">
+              <div class="setting-row">
+                <div><strong>Tema Oscuro</strong></div>
+                <label class="switch"><input type="checkbox" ${appSettings.theme==='dark'?'checked':''} onchange="switchThemeWa(this.checked ? 'dark' : 'light')"><span class="slider"></span></label>
+              </div>
+              <div class="setting-row">
+                <div><strong>Enter para enviar</strong></div>
+                <label class="switch"><input type="checkbox" ${appSettings.enterToSend?'checked':''} onchange="updateAppSettings('enterToSend', this.checked)"><span class="slider"></span></label>
+              </div>
+            </div>
+            <div class="settings-card">
+              <h3>Copia de seguridad</h3>
+              <button class="btn-hello-primary" style="width:100%;margin-bottom:10px" onclick="exportFullBackup()">Descargar Copia (.JSON)</button>
+              <button class="btn-hello-primary" style="background:var(--hello-card);color:var(--hello-text);border:1px solid var(--hello-border);width:100%" onclick="$('restoreBackupInput').click()">Restaurar Copia</button>
+            </div>
+            <div class="settings-card">
+              <button class="btn-hello-primary" style="background:#fee2e2;color:var(--danger);border:1px solid #fecaca;width:100%" onclick="clearAllChatHistory()">Vaciar historial de chats (Base de Datos)</button>
+            </div>
+          </div>
+        `;
+      }
+      else if (section === 'satellite') {
+        area.innerHTML = `
+          <div class="main-header"><div class="contact-summary"><button class="icon-btn mobile-back" onclick="$('appShell').classList.remove('chat-open')">‹</button><strong>Conexión Satelital</strong></div></div>
+          <div class="settings-detail-container">
+            <div class="settings-card">
+              <h3>Modo Satelital HELLO</h3>
+              <p>Configura el comportamiento en caso de pérdida total de señal móvil:</p>
+              <div class="setting-row">
+                <div><strong>Uso de satélite</strong></div>
+                <select style="width:160px" onchange="updateAppSettings('satelliteMode', this.value)">
+                  <option value="off" ${appSettings.satelliteMode==='off'?'selected':''}>Desactivado</option>
+                  <option value="ask" ${appSettings.satelliteMode==='ask'?'selected':''}>Preguntar</option>
+                  <option value="auto" ${appSettings.satelliteMode==='auto'?'selected':''}>Automático</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      else if (section === 'storage') {
+        area.innerHTML = `
+          <div class="main-header"><div class="contact-summary"><button class="icon-btn mobile-back" onclick="$('appShell').classList.remove('chat-open')">‹</button><strong>Almacenamiento</strong></div></div>
+          <div class="settings-detail-container">
+            <div class="settings-card">
+              <h3>Base de Datos en Disco (IndexedDB)</h3>
+              <p>Tus fotografías y mensajes se guardan en el almacenamiento local de tu navegador.</p>
+            </div>
+          </div>
+        `;
+      }
+      else if (section === 'help') {
+        area.innerHTML = `
+          <div class="main-header"><div class="contact-summary"><button class="icon-btn mobile-back" onclick="$('appShell').classList.remove('chat-open')">‹</button><strong>Ayuda</strong></div></div>
+          <div class="settings-detail-container">
+            <div class="settings-card" style="text-align:center">
+              <div style="font-size:48px;margin-bottom:12px">✦</div>
+              <h3>HELLO</h3>
+              <p>Versión 3.1 P2P Multiusuario</p>
+              <p>Conexión directa mediante servidor privado y STUN.</p>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function updateAppSettings(key, val) { appSettings[key] = val; saveState(); drawChatMessages(); }
+    function switchThemeWa(theme) { appSettings.theme = theme; if (theme === 'dark') document.body.classList.add('dark-theme'); else document.body.classList.remove('dark-theme'); saveState(); }
+    function saveProfileDetail() {
+      const name = $('setProfName').value.trim(); const status = $('setProfStatus').value.trim();
+      if (!name) return showNotice('Error', 'El nombre no puede estar vacío.');
+      myName = name; myStatus = status || myStatus; saveState(); updateHeaderIdentity();
+      contacts.forEach(c => { const conn = peerConns.get(c.pin); if (conn && conn.open && !c.isGroup) { try { conn.send({ type: 'HANDSHAKE', pin: myPin, name: myName, status: myStatus, photo: myPhoto }); } catch(e){} } });
+      showNotice('Perfil Guardado', 'Los cambios se han actualizado.');
+    }
+    function save2FAPin() {
+      const p = $('set2FAPin').value.trim();
+      appSettings.twoFactorPin = p;
+      saveState();
+      showNotice('Seguridad', p ? 'Código PIN de 6 dígitos activado.' : 'Verificación desactivada.');
+    }
+    function deleteAccountAction() {
+      if (confirm('¿ADVERTENCIA: Deseas borrar tu cuenta, mensajes, contactos y PIN para siempre?')) {
+        if (peer) peer.destroy();
+        localStorage.clear();
+        clearAllChatsDB();
+        alert('Cuenta eliminada.');
+        location.reload();
+      }
+    }
+    function exportFullBackup() {
+      const backupData = { pin: myPin, key: myKey, name: myName, status: myStatus, photo: myPhoto, contacts, msgs, states, appSettings, date: new Date().toISOString() };
+      const blob = new Blob([JSON.stringify(backupData)], { type: 'application/json' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `hello_backup_${new Date().toISOString().slice(0,10)}.json`; a.click();
+    }
+    function processRestoreBackup(e) {
+      const file = e.target.files[0]; if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        try {
+          const d = JSON.parse(ev.target.result);
+          if (d.pin && d.contacts && d.msgs) {
+            localStorage.helloPin = d.pin; localStorage.helloKey = d.key || myKey; localStorage.helloName = d.name || myName; localStorage.helloStatus = d.status || myStatus; localStorage.helloPhoto = d.photo || ''; localStorage.helloContacts = JSON.stringify(d.contacts); localStorage.helloMessages = JSON.stringify(d.msgs); if (d.states) localStorage.helloStates = JSON.stringify(d.states); if (d.appSettings) localStorage.helloAppSettings = JSON.stringify(d.appSettings);
+            alert('¡Copia de seguridad restaurada con éxito!'); location.reload();
+          } else { showNotice('Error', 'Formato inválido.'); }
+        } catch(err) { showNotice('Error', 'No se pudo leer el archivo.'); }
+      }; reader.readAsText(file);
+    }
+    async function clearAllChatHistory() {
+      if (confirm('¿Vaciar todos los mensajes de todas las conversaciones de la base de datos?')) {
+        msgs = {}; contacts.forEach(c => c.lastMsg = ''); saveState();
+        await clearAllChatsDB();
+        drawChatMessages(); renderChatList(); showNotice('Historial', 'Mensajes eliminados del disco.');
+      }
+    }
+
+    if (myPin) viewTab('chats');
+  </script>
+</body>
+</html>
