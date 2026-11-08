@@ -1,10 +1,14 @@
 {
   "name": "hello-server",
-  "version": "1.0.0",
+  "version": "1.1.0",
+  "description": "Servidor de Señalización WebRTC y Nube HELLO",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
     "peer": "^1.0.2"
   }
 }
