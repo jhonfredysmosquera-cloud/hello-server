@@ -395,7 +395,7 @@
       .bubble { max-width: 85%; }
     }
 
-    /* PANTALLA COMPLETA DE LOGIN / BIENVENIDA */
+    /* PANTALLA DE ACCESO EXCLUSIVA POR PIN */
     #authOverlay {
       position: fixed;
       inset: 0;
@@ -412,8 +412,8 @@
       border-radius: 16px;
       width: 100%;
       max-width: 420px;
-      padding: 32px 24px;
-      box-shadow: 0 12px 36px rgba(0,0,0,0.12);
+      padding: 34px 26px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.14);
       text-align: center;
     }
     .auth-tab-group {
@@ -443,41 +443,33 @@
 </head>
 <body>
 
-  <!-- PANTALLA DE ACCESO / LOGIN / REGISTRO -->
+  <!-- PANTALLA DE ACCESO EXCLUSIVA POR PIN -->
   <div id="authOverlay" style="display: none;">
     <div class="auth-card">
-      <div style="font-size: 48px; margin-bottom: 8px;">✦</div>
+      <div style="font-size: 46px; margin-bottom: 8px;">✦</div>
       <h2 style="margin: 0 0 6px; color: var(--hello-text)">HELLO</h2>
-      <p style="font-size: 13.5px; color: var(--hello-text-muted); margin: 0 0 20px;">Mensajería privada sin número de teléfono</p>
+      <p style="font-size: 13.5px; color: var(--hello-text-muted); margin: 0 0 22px;">Mensajería privada y Walkie-Talkie sin número de teléfono</p>
       
       <div class="auth-tab-group">
-        <button type="button" class="auth-tab-btn active" id="tabBtnNew" onclick="switchAuthTab('new')">Crear Cuenta</button>
+        <button type="button" class="auth-tab-btn active" id="tabBtnNew" onclick="switchAuthTab('new')">Nuevo PIN</button>
         <button type="button" class="auth-tab-btn" id="tabBtnLogin" onclick="switchAuthTab('login')">Ya tengo un PIN</button>
       </div>
 
-      <!-- FORMULARIO 1: CREAR NUEVA CUENTA -->
-      <form id="formNewUser" onsubmit="handleCreateAccount(event)">
-        <div style="text-align: left; margin-bottom: 14px;">
-          <label style="font-size: 12.5px; font-weight: 700; color: var(--hello-text-muted); display: block; margin-bottom: 6px;">TU NOMBRE</label>
-          <input id="newUserName" placeholder="Ej. Jhon Mosquera" required maxlength="25">
-        </div>
-        <p style="font-size: 12px; color: var(--hello-text-muted); text-align: left; margin: 0 0 18px; line-height: 1.4;">
-          Se te asignará un <strong>PIN único de 8 caracteres</strong> para que otros usuarios se comuniquen contigo sin pedir tu número.
+      <!-- 1. CREAR PIN NUEVO -->
+      <div id="formNewUser">
+        <p style="font-size: 13px; color: var(--hello-text-muted); text-align: left; margin: 0 0 20px; line-height: 1.5;">
+          No requieres correo, contraseña ni número de celular. Genera tu PIN criptográfico para comunicarte con total privacidad.
         </p>
-        <button class="btn-hello-primary" style="width: 100%; padding: 12px;">Crear mi PIN y Entrar</button>
-      </form>
+        <button class="btn-hello-primary" style="width: 100%; padding: 13px; font-size: 15px;" onclick="handleCreateAccountOnlyPin()">✨ Generar mi PIN y Entrar</button>
+      </div>
 
-      <!-- FORMULARIO 2: INICIAR SESIÓN CON PIN EXISTENTE -->
-      <form id="formLoginUser" onsubmit="handleLoginAccount(event)" style="display: none;">
-        <div style="text-align: left; margin-bottom: 14px;">
-          <label style="font-size: 12.5px; font-weight: 700; color: var(--hello-text-muted); display: block; margin-bottom: 6px;">TU NOMBRE</label>
-          <input id="loginUserName" placeholder="Ej. Jhon Mosquera" required maxlength="25">
-        </div>
+      <!-- 2. INGRESAR CON PIN EXISTENTE -->
+      <form id="formLoginUser" onsubmit="handleLoginAccountOnlyPin(event)" style="display: none;">
         <div style="text-align: left; margin-bottom: 18px;">
-          <label style="font-size: 12.5px; font-weight: 700; color: var(--hello-text-muted); display: block; margin-bottom: 6px;">TU PIN REGISTRADO</label>
-          <input id="loginUserPin" placeholder="Ej. A8F2K9M1" required maxlength="8" style="text-transform: uppercase; font-weight: 700; letter-spacing: 2px; text-align: center;">
+          <label style="font-size: 12px; font-weight: 700; color: var(--hello-text-muted); display: block; margin-bottom: 8px;">TU PIN REGISTRADO</label>
+          <input id="loginUserPin" placeholder="Ej. A8F2K9M1" required maxlength="8" style="text-transform: uppercase; font-weight: 700; letter-spacing: 3px; text-align: center; font-size: 18px; padding: 12px;">
         </div>
-        <button class="btn-hello-primary" style="width: 100%; padding: 12px;">Iniciar Sesión</button>
+        <button class="btn-hello-primary" style="width: 100%; padding: 13px; font-size: 15px;">Entrar con este PIN</button>
       </form>
     </div>
   </div>
@@ -574,7 +566,7 @@
       let r = ''; for (let i = 0; i < len; i++) r += chars.charAt(Math.floor(Math.random() * chars.length)); return r;
     }
 
-    // --- MANEJO DE PESTAÑAS DEL LOGIN ---
+    // --- ACCESO EXCLUSIVO POR PIN ---
     function switchAuthTab(type) {
       if (type === 'new') {
         $('tabBtnNew').classList.add('active');
@@ -589,25 +581,21 @@
       }
     }
 
-    function handleCreateAccount(e) {
-      e.preventDefault();
-      const name = $('newUserName').value.trim();
-      if (!name) return;
+    function handleCreateAccountOnlyPin() {
       const newPin = generateId(8);
       const newKey = generateId(6) + '-' + generateId(6);
       localStorage.helloPin = newPin;
-      localStorage.helloName = name;
       localStorage.helloKey = newKey;
+      localStorage.helloName = 'Usuario ' + newPin.slice(0, 4);
       location.reload();
     }
 
-    function handleLoginAccount(e) {
+    function handleLoginAccountOnlyPin(e) {
       e.preventDefault();
-      const name = $('loginUserName').value.trim();
       const pin = $('loginUserPin').value.trim().toUpperCase();
-      if (!name || pin.length < 4) return showNotice('Error', 'Ingresa un PIN válido.');
+      if (pin.length < 4) return showNotice('Error', 'Ingresa un PIN válido.');
       localStorage.helloPin = pin;
-      localStorage.helloName = name;
+      if (!localStorage.helloName) localStorage.helloName = 'Usuario ' + pin.slice(0, 4);
       if (!localStorage.helloKey) localStorage.helloKey = generateId(6) + '-' + generateId(6);
       location.reload();
     }
@@ -620,7 +608,6 @@
       }
     }
 
-    // Verificar si el usuario ya inició sesión
     if (!localStorage.helloPin) {
       $('authOverlay').style.display = 'flex';
     }
@@ -633,7 +620,6 @@
     let activeChatIndex = 0;
     let currentTab = 'chats';
 
-    // CONFIGURACIÓN AVANZADA
     let appSettings = JSON.parse(localStorage.helloAppSettings || JSON.stringify({
       theme: 'light',
       enterToSend: true,
@@ -727,7 +713,7 @@
       return `<div class="avatar" style="width:${size}px;height:${size}px;font-size:${size*0.4}px">${esc((c.name || 'U').charAt(0).toUpperCase())}</div>`;
     }
 
-    // --- CONFIGURACIÓN DE TU SERVIDOR PROPIO EN RENDER + SERVIDORES STUN ---
+    // --- CONFIGURACIÓN WEBRTC ROBUSTA (RENDER + STUN/TURN MULTI-RED) ---
     const peerServerConfig = {
       host: 'hello-server-p2p.onrender.com',
       port: 443,
@@ -737,21 +723,41 @@
         iceServers: [
           { urls: 'stun:stun.l.google.com:19302' },
           { urls: 'stun:stun1.l.google.com:19302' },
-          { urls: 'stun:stun2.l.google.com:19302' }
-        ]
+          { urls: 'stun:stun2.l.google.com:19302' },
+          { urls: 'stun:stun.cloudflare.com:3478' },
+          { urls: 'stun:openrelay.metered.ca:80' },
+          {
+            urls: 'turn:freeturn.net:3478',
+            username: 'free',
+            credential: 'free'
+          },
+          {
+            urls: 'turns:freeturn.net:5349',
+            username: 'free',
+            credential: 'free'
+          }
+        ],
+        sdpSemantics: 'unified-plan'
       }
     };
 
-    // --- PEERJS P2P & TRANSMISIÓN DE RADIO MULTIUSUARIO ---
+    // --- GESTIÓN P2P CON COLA DE MENSAJES Y RECONEXIÓN ---
     let peer = null;
     const peerConns = new Map();
+    const pendingMsgQueues = new Map();
     let currentAudioStream = null;
     let liveRadioCalls = [];
 
     if (myPin) {
       peer = new Peer('HELLO-' + myPin, peerServerConfig);
 
-      peer.on('open', id => console.log('HELLO P2P activo:', id));
+      peer.on('open', id => console.log('HELLO P2P activo en Render:', id));
+
+      peer.on('disconnected', () => {
+        console.warn('Conexión perdida con Render. Reconectando...');
+        if (!peer.destroyed) peer.reconnect();
+      });
+
       peer.on('connection', conn => {
         const remotePin = conn.peer.replace('HELLO-', '');
         bindConnHandlers(conn, remotePin);
@@ -769,18 +775,45 @@
       });
 
       peer.on('error', err => {
-        console.warn('Alerta de red P2P:', err.type);
-        if (err.type === 'unavailable-id') {
-          showNotice('PIN en uso', 'Este PIN ya está abierto en otra ventana o dispositivo.');
+        console.warn('Alerta P2P:', err.type);
+        if (err.type === 'peer-unavailable') {
+          console.log('El destinatario no está conectado en este momento.');
         }
       });
+
+      // Latido para evitar que Render congele el WebSocket
+      setInterval(() => {
+        if (peer && !peer.destroyed) {
+          if (peer.disconnected) peer.reconnect();
+          else if (peer.socket && peer.socket._ws && peer.socket._ws.readyState === 1) {
+            peer.socket._ws.send(JSON.stringify({ type: 'HEARTBEAT' }));
+          }
+        }
+      }, 20000);
+    }
+
+    function flushOutbox(pin, conn) {
+      if (pendingMsgQueues.has(pin) && conn && conn.open) {
+        const queue = pendingMsgQueues.get(pin);
+        while (queue.length > 0) {
+          const payload = queue.shift();
+          try { conn.send(payload); } catch(e){}
+        }
+        pendingMsgQueues.delete(pin);
+      }
     }
 
     function bindConnHandlers(conn, remotePin) {
-      conn.on('open', () => {
+      peerConns.set(remotePin, conn);
+
+      const onReady = () => {
         peerConns.set(remotePin, conn);
         try { conn.send({ type: 'HANDSHAKE', pin: myPin, name: myName, status: myStatus, photo: myPhoto }); } catch(e){}
-      });
+        flushOutbox(remotePin, conn);
+      };
+
+      if (conn.open) onReady();
+      else conn.on('open', onReady);
 
       conn.on('data', data => {
         if (data.type === 'HANDSHAKE' || data.type === 'HANDSHAKE_REPLY') {
@@ -815,15 +848,16 @@
         if (data.type === 'KICK_DEVICE' && data.key === myKey) { peer.destroy(); localStorage.clear(); clearAllChatsDB(); alert('Tu cuenta ha sido vinculada en otro dispositivo.'); location.reload(); }
       });
 
-      conn.on('close', () => peerConns.delete(remotePin));
-      conn.on('error', () => peerConns.delete(remotePin));
+      conn.on('close', () => { peerConns.delete(remotePin); });
+      conn.on('error', () => { peerConns.delete(remotePin); });
     }
 
     function getPeerConn(pin) {
-      if (peerConns.has(pin) && peerConns.get(pin).open) return peerConns.get(pin);
+      let conn = peerConns.get(pin);
+      if (conn && conn.open) return conn;
       if (!peer || peer.destroyed) return null;
       try {
-        const conn = peer.connect('HELLO-' + pin, { reliable: true });
+        conn = peer.connect('HELLO-' + pin, { reliable: true });
         bindConnHandlers(conn, pin);
         return conn;
       } catch (err) {
@@ -834,19 +868,14 @@
     function emitToRecipient(contact, payload) {
       const recipients = contact.isGroup ? contact.members.filter(m => m !== myPin) : [contact.pin];
       recipients.forEach(pin => {
-        try {
-          let conn = peerConns.get(pin);
-          if (conn && conn.open) {
-            conn.send(payload);
-          } else {
-            conn = getPeerConn(pin);
-            if (conn) {
-              conn.on('open', () => {
-                try { conn.send(payload); } catch(e){}
-              });
-            }
-          }
-        } catch(e) {}
+        let conn = peerConns.get(pin);
+        if (conn && conn.open) {
+          try { conn.send(payload); } catch(e){}
+        } else {
+          if (!pendingMsgQueues.has(pin)) pendingMsgQueues.set(pin, []);
+          pendingMsgQueues.get(pin).push(payload);
+          getPeerConn(pin);
+        }
       });
     }
 
@@ -1212,7 +1241,7 @@
         </div>
         <div style="background:var(--hello-card);padding:12px 0">
           <div style="background:var(--hello-sidebar);border-top:1px solid var(--hello-border);border-bottom:1px solid var(--hello-border)">
-            <div class="chat-item" onclick="openSettingsSection('profile')"><span style="font-size:22px;width:34px;text-align:center">👤</span><div class="chat-details"><strong>Perfil</strong><div class="desc-row">Foto de perfil, nombre, estado y PIN</div></div></div>
+            <div class="chat-item" onclick="openSettingsSection('profile')"><span style="font-size:22px;width:34px;text-align:center">👤</span><div class="chat-details"><strong>Perfil</strong><div class="desc-row">Nombre opcional, estado y foto</div></div></div>
             <div class="chat-item" onclick="openSettingsSection('account')"><span style="font-size:22px;width:34px;text-align:center">🔑</span><div class="chat-details"><strong>Cuenta</strong><div class="desc-row">Seguridad, verificación, cerrar sesión</div></div></div>
             <div class="chat-item" onclick="openSettingsSection('privacy')"><span style="font-size:22px;width:34px;text-align:center">🔒</span><div class="chat-details"><strong>Privacidad</strong><div class="desc-row">Confirmaciones de lectura, última vez</div></div></div>
             <div class="chat-item" onclick="openSettingsSection('chats')"><span style="font-size:22px;width:34px;text-align:center">💬</span><div class="chat-details"><strong>Chats</strong><div class="desc-row">Tema, Enter para enviar, copia de seguridad</div></div></div>
@@ -1239,9 +1268,9 @@
               </div>
             </div>
             <div class="settings-card">
-              <h3>Tu Nombre y Estado</h3>
-              <input id="setProfName" value="${esc(myName)}" style="margin-bottom:10px">
-              <input id="setProfStatus" value="${esc(myStatus)}" style="margin-bottom:10px">
+              <h3>Nombre Visible (Opcional) y Estado</h3>
+              <input id="setProfName" value="${esc(myName)}" style="margin-bottom:10px" placeholder="Nombre opcional">
+              <input id="setProfStatus" value="${esc(myStatus)}" style="margin-bottom:10px" placeholder="Tu estado">
               <button class="btn-hello-primary" style="width:100%" onclick="saveProfileDetail()">Guardar Perfil</button>
             </div>
             <div class="settings-card">
@@ -1261,14 +1290,9 @@
               <button class="btn-hello-primary" style="width:100%;background:var(--hello-card);color:var(--hello-text);border:1px solid var(--hello-border)" onclick="logoutAccount()">Cerrar Sesión / Cambiar PIN</button>
             </div>
             <div class="settings-card">
-              <h3>Migrar a otro equipo</h3>
-              <p>Tu Clave Secreta para transferir este PIN a otro celular:</p>
+              <h3>Clave Secreta de Recuperación</h3>
+              <p>Tu clave para migrar tu PIN a otro celular:</p>
               <div style="background:var(--hello-card);padding:14px;border-radius:8px;font-family:monospace;font-size:15px;color:var(--hello-teal);margin-bottom:14px;text-align:center"><strong>${myKey}</strong></div>
-            </div>
-            <div class="settings-card">
-              <h3>Verificación en dos pasos</h3>
-              <input id="set2FAPin" type="password" maxlength="6" placeholder="Ingresa un PIN de 6 dígitos" value="${esc(appSettings.twoFactorPin)}" style="letter-spacing:3px;text-align:center;font-weight:bold;margin-bottom:10px">
-              <button class="btn-hello-primary" onclick="save2FAPin()">Guardar Código</button>
             </div>
             <div class="settings-card" style="border-color:#fecaca">
               <h3 style="color:var(--danger)">Eliminar mi cuenta</h3>
@@ -1300,15 +1324,6 @@
                 <div><strong>Tema Oscuro</strong></div>
                 <label class="switch"><input type="checkbox" ${appSettings.theme==='dark'?'checked':''} onchange="switchThemeWa(this.checked ? 'dark' : 'light')"><span class="slider"></span></label>
               </div>
-              <div class="setting-row">
-                <div><strong>Enter para enviar</strong></div>
-                <label class="switch"><input type="checkbox" ${appSettings.enterToSend?'checked':''} onchange="updateAppSettings('enterToSend', this.checked)"><span class="slider"></span></label>
-              </div>
-            </div>
-            <div class="settings-card">
-              <h3>Copia de seguridad</h3>
-              <button class="btn-hello-primary" style="width:100%;margin-bottom:10px" onclick="exportFullBackup()">Descargar Copia (.JSON)</button>
-              <button class="btn-hello-primary" style="background:var(--hello-card);color:var(--hello-text);border:1px solid var(--hello-border);width:100%" onclick="$('restoreBackupInput').click()">Restaurar Copia</button>
             </div>
             <div class="settings-card">
               <button class="btn-hello-primary" style="background:#fee2e2;color:var(--danger);border:1px solid #fecaca;width:100%" onclick="clearAllChatHistory()">Vaciar historial de chats (Base de Datos)</button>
@@ -1322,15 +1337,7 @@
           <div class="settings-detail-container">
             <div class="settings-card">
               <h3>Modo Satelital HELLO</h3>
-              <p>Configura el comportamiento en caso de pérdida total de señal móvil:</p>
-              <div class="setting-row">
-                <div><strong>Uso de satélite</strong></div>
-                <select style="width:160px" onchange="updateAppSettings('satelliteMode', this.value)">
-                  <option value="off" ${appSettings.satelliteMode==='off'?'selected':''}>Desactivado</option>
-                  <option value="ask" ${appSettings.satelliteMode==='ask'?'selected':''}>Preguntar</option>
-                  <option value="auto" ${appSettings.satelliteMode==='auto'?'selected':''}>Automático</option>
-                </select>
-              </div>
+              <p>Mantiene la app en bajo consumo para enlaces de emergencia.</p>
             </div>
           </div>
         `;
@@ -1353,8 +1360,8 @@
             <div class="settings-card" style="text-align:center">
               <div style="font-size:48px;margin-bottom:12px">✦</div>
               <h3>HELLO</h3>
-              <p>Versión 3.1 P2P Multiusuario</p>
-              <p>Conexión directa mediante servidor privado y STUN.</p>
+              <p>Versión 3.2 P2P Multi-Red</p>
+              <p>Conexión directa mediante servidor privado Render y STUN/TURN.</p>
             </div>
           </div>
         `;
@@ -1365,16 +1372,9 @@
     function switchThemeWa(theme) { appSettings.theme = theme; if (theme === 'dark') document.body.classList.add('dark-theme'); else document.body.classList.remove('dark-theme'); saveState(); }
     function saveProfileDetail() {
       const name = $('setProfName').value.trim(); const status = $('setProfStatus').value.trim();
-      if (!name) return showNotice('Error', 'El nombre no puede estar vacío.');
-      myName = name; myStatus = status || myStatus; saveState(); updateHeaderIdentity();
+      myName = name || myName; myStatus = status || myStatus; saveState(); updateHeaderIdentity();
       contacts.forEach(c => { const conn = peerConns.get(c.pin); if (conn && conn.open && !c.isGroup) { try { conn.send({ type: 'HANDSHAKE', pin: myPin, name: myName, status: myStatus, photo: myPhoto }); } catch(e){} } });
       showNotice('Perfil Guardado', 'Los cambios se han actualizado.');
-    }
-    function save2FAPin() {
-      const p = $('set2FAPin').value.trim();
-      appSettings.twoFactorPin = p;
-      saveState();
-      showNotice('Seguridad', p ? 'Código PIN de 6 dígitos activado.' : 'Verificación desactivada.');
     }
     function deleteAccountAction() {
       if (confirm('¿ADVERTENCIA: Deseas borrar tu cuenta, mensajes, contactos y PIN para siempre?')) {
@@ -1384,24 +1384,6 @@
         alert('Cuenta eliminada.');
         location.reload();
       }
-    }
-    function exportFullBackup() {
-      const backupData = { pin: myPin, key: myKey, name: myName, status: myStatus, photo: myPhoto, contacts, msgs, states, appSettings, date: new Date().toISOString() };
-      const blob = new Blob([JSON.stringify(backupData)], { type: 'application/json' });
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `hello_backup_${new Date().toISOString().slice(0,10)}.json`; a.click();
-    }
-    function processRestoreBackup(e) {
-      const file = e.target.files[0]; if (!file) return;
-      const reader = new FileReader();
-      reader.onload = ev => {
-        try {
-          const d = JSON.parse(ev.target.result);
-          if (d.pin && d.contacts && d.msgs) {
-            localStorage.helloPin = d.pin; localStorage.helloKey = d.key || myKey; localStorage.helloName = d.name || myName; localStorage.helloStatus = d.status || myStatus; localStorage.helloPhoto = d.photo || ''; localStorage.helloContacts = JSON.stringify(d.contacts); localStorage.helloMessages = JSON.stringify(d.msgs); if (d.states) localStorage.helloStates = JSON.stringify(d.states); if (d.appSettings) localStorage.helloAppSettings = JSON.stringify(d.appSettings);
-            alert('¡Copia de seguridad restaurada con éxito!'); location.reload();
-          } else { showNotice('Error', 'Formato inválido.'); }
-        } catch(err) { showNotice('Error', 'No se pudo leer el archivo.'); }
-      }; reader.readAsText(file);
     }
     async function clearAllChatHistory() {
       if (confirm('¿Vaciar todos los mensajes de todas las conversaciones de la base de datos?')) {
