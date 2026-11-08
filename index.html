@@ -3,12 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-  <title>HELLO — Mensajería y Radio P2P</title>
+  <title>WhatsApp P2P — HELLO</title>
 
+  <!-- Tipografía Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
+  <!-- Librerías WebRTC y Utilidades -->
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.9/pdf-lib.min.js"></script>
   <script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
@@ -16,41 +18,42 @@
 
   <style>
     :root {
-      --hello-teal: #008069;
-      --hello-teal-dark: #075e54;
-      --hello-teal-light: #00a884;
-      --hello-green: #25d366;
-      --hello-bg: #efeae2;
-      --hello-sidebar: #ffffff;
-      --hello-card: #f0f2f5;
-      --hello-border: #e9edef;
-      --hello-text: #111b21;
-      --hello-text-muted: #667781;
-      --hello-bubble-in: #ffffff;
-      --hello-bubble-out: #d9fdd3;
+      --wa-teal: #008069;
+      --wa-teal-dark: #075e54;
+      --wa-teal-light: #00a884;
+      --wa-green: #25d366;
+      --wa-bg: #efeae2;
+      --wa-sidebar: #ffffff;
+      --wa-card: #f0f2f5;
+      --wa-border: #e9edef;
+      --wa-text: #111b21;
+      --wa-text-muted: #667781;
+      --wa-bubble-in: #ffffff;
+      --wa-bubble-out: #d9fdd3;
+      --wa-check-blue: #53bdeb;
       --danger: #ea0038;
-      --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
     body.dark-theme {
-      --hello-teal: #00a884;
-      --hello-teal-dark: #008069;
-      --hello-teal-light: #25d366;
-      --hello-bg: #0b141a;
-      --hello-sidebar: #111b21;
-      --hello-card: #202c33;
-      --hello-border: #222d34;
-      --hello-text: #e9edef;
-      --hello-text-muted: #8696a0;
-      --hello-bubble-in: #202c33;
-      --hello-bubble-out: #005c4b;
+      --wa-teal: #00a884;
+      --wa-teal-dark: #008069;
+      --wa-teal-light: #25d366;
+      --wa-bg: #0b141a;
+      --wa-sidebar: #111b21;
+      --wa-card: #202c33;
+      --wa-border: #222d34;
+      --wa-text: #e9edef;
+      --wa-text-muted: #8696a0;
+      --wa-bubble-in: #202c33;
+      --wa-bubble-out: #005c4b;
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
       margin: 0;
       background: #dadfe2;
-      color: var(--hello-text);
+      color: var(--wa-text);
       font-family: var(--font-main);
       height: 100dvh;
       overflow: hidden;
@@ -64,42 +67,43 @@
     button { cursor: pointer; border: 0; outline: none; }
     input, textarea, select {
       width: 100%;
-      border: 1px solid var(--hello-border);
-      background: var(--hello-card);
+      border: 1px solid var(--wa-border);
+      background: var(--wa-card);
       border-radius: 8px;
       padding: 10px 14px;
       outline: none;
       font-size: 14px;
     }
-    input:focus, textarea:focus, select:focus { border-color: var(--hello-teal); }
+    input:focus, textarea:focus, select:focus { border-color: var(--wa-teal); }
 
     .app {
       display: flex;
       height: 100dvh;
       width: 100vw;
       max-width: 1600px;
-      background: var(--hello-sidebar);
+      background: var(--wa-sidebar);
       overflow: hidden;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     }
 
+    /* BARRA LATERAL ESTILO WHATSAPP */
     .sidebar {
       width: 430px;
-      border-right: 1px solid var(--hello-border);
+      border-right: 1px solid var(--wa-border);
       display: flex;
       flex-direction: column;
-      background: var(--hello-sidebar);
+      background: var(--wa-sidebar);
       flex-shrink: 0;
     }
 
     .sidebar-header {
-      background: var(--hello-card);
+      background: var(--wa-card);
       padding: 10px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       height: 64px;
-      border-bottom: 1px solid var(--hello-border);
+      border-bottom: 1px solid var(--wa-border);
     }
 
     .user-avatar-badge { display: flex; align-items: center; gap: 12px; cursor: pointer; }
@@ -107,7 +111,7 @@
       width: 42px;
       height: 42px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--hello-teal), var(--hello-teal-dark));
+      background: linear-gradient(135deg, var(--wa-teal), var(--wa-teal-dark));
       color: #ffffff;
       font-weight: 700;
       display: grid;
@@ -119,12 +123,12 @@
     .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
     .user-avatar-badge strong { font-size: 15px; font-weight: 700; }
-    .user-avatar-badge small { display: block; color: var(--hello-teal); font-weight: 700; font-size: 11.5px; }
+    .user-avatar-badge small { display: block; color: var(--wa-teal); font-weight: 700; font-size: 11.5px; }
 
     .header-icons { display: flex; align-items: center; gap: 4px; }
     .icon-btn {
       background: transparent;
-      color: var(--hello-text-muted);
+      color: var(--wa-text-muted);
       font-size: 18px;
       width: 38px;
       height: 38px;
@@ -135,12 +139,13 @@
     }
     .icon-btn:hover { background: rgba(0, 0, 0, 0.06); }
 
-    .nav-tabs { display: flex; background: var(--hello-sidebar); border-bottom: 1px solid var(--hello-border); }
+    /* PESTAÑAS NATIVAS WHATSAPP */
+    .nav-tabs { display: flex; background: var(--wa-sidebar); border-bottom: 1px solid var(--wa-border); }
     .nav-tab-btn {
       flex: 1;
       padding: 13px 0;
       background: transparent;
-      color: var(--hello-text-muted);
+      color: var(--wa-text-muted);
       font-weight: 700;
       font-size: 12px;
       text-transform: uppercase;
@@ -148,13 +153,13 @@
       border-bottom: 3px solid transparent;
       transition: all 0.2s;
     }
-    .nav-tab-btn.active { color: var(--hello-teal); border-bottom-color: var(--hello-teal); }
+    .nav-tab-btn.active { color: var(--wa-teal); border-bottom-color: var(--wa-teal); }
 
-    .search-wrapper { padding: 10px 14px; background: var(--hello-sidebar); border-bottom: 1px solid var(--hello-border); }
-    .search-bar { display: flex; align-items: center; background: var(--hello-card); border-radius: 8px; padding: 0 12px; }
+    .search-wrapper { padding: 10px 14px; background: var(--wa-sidebar); border-bottom: 1px solid var(--wa-border); }
+    .search-bar { display: flex; align-items: center; background: var(--wa-card); border-radius: 8px; padding: 0 12px; }
     .search-bar input { border: 0; background: transparent; padding: 8px 10px; font-size: 14px; }
 
-    .chat-list { flex: 1; overflow-y: auto; background: var(--hello-sidebar); }
+    .chat-list { flex: 1; overflow-y: auto; background: var(--wa-sidebar); }
     .chat-item {
       display: flex;
       align-items: center;
@@ -162,40 +167,41 @@
       padding: 12px 16px;
       width: 100%;
       text-align: left;
-      border-bottom: 1px solid var(--hello-border);
-      background: var(--hello-sidebar);
+      border-bottom: 1px solid var(--wa-border);
+      background: var(--wa-sidebar);
       transition: background 0.15s;
     }
-    .chat-item:hover, .chat-item.selected { background: var(--hello-card); }
+    .chat-item:hover, .chat-item.selected { background: var(--wa-card); }
     .chat-item .avatar { width: 48px; height: 48px; font-size: 19px; }
     .chat-details { flex: 1; min-width: 0; }
     .chat-details .title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-    .title-row strong { font-size: 15.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--hello-text); }
-    .title-row .time { font-size: 11px; font-weight: 600; color: var(--hello-text-muted); }
-    .chat-details .desc-row { font-size: 13.5px; color: var(--hello-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .title-row strong { font-size: 15.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--wa-text); }
+    .title-row .time { font-size: 11px; font-weight: 600; color: var(--wa-text-muted); }
+    .chat-details .desc-row { font-size: 13.5px; color: var(--wa-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+    /* ÁREA PRINCIPAL DE CHAT */
     .main-chat {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
-      background: var(--hello-bg);
+      background: var(--wa-bg);
       position: relative;
     }
     .main-chat::before {
       content: "";
       position: absolute;
       inset: 0;
-      opacity: 0.3;
-      background-image: radial-gradient(var(--hello-text-muted) 1px, transparent 1px);
+      opacity: 0.28;
+      background-image: radial-gradient(var(--wa-text-muted) 1px, transparent 1px);
       background-size: 24px 24px;
       pointer-events: none;
     }
 
     .main-header {
       height: 64px;
-      background: var(--hello-card);
-      border-bottom: 1px solid var(--hello-border);
+      background: var(--wa-card);
+      border-bottom: 1px solid var(--wa-border);
       padding: 10px 18px;
       display: flex;
       align-items: center;
@@ -205,7 +211,7 @@
     .main-header .contact-summary { display: flex; align-items: center; gap: 12px; cursor: pointer; }
     .main-header .avatar { width: 42px; height: 42px; }
     .contact-summary strong { font-size: 16px; font-weight: 700; display: block; }
-    .contact-summary small { font-size: 12px; font-weight: 600; color: var(--hello-text-muted); }
+    .contact-summary small { font-size: 12px; font-weight: 600; color: var(--wa-text-muted); }
 
     .conversation {
       flex: 1;
@@ -217,19 +223,20 @@
       z-index: 1;
     }
 
+    /* BURBUJAS WHATSAPP */
     .bubble {
       max-width: 65%;
-      padding: 9px 13px;
+      padding: 8px 12px;
       font-size: 14.5px;
       line-height: 1.45;
-      border-radius: 10px;
+      border-radius: 8px;
       position: relative;
-      box-shadow: 0 1px 1px rgba(0,0,0,0.06);
+      box-shadow: 0 1px 0.5px rgba(11,20,26,0.13);
       word-break: break-word;
-      color: var(--hello-text);
+      color: var(--wa-text);
     }
-    .bubble.them { background: var(--hello-bubble-in); align-self: flex-start; border-top-left-radius: 2px; }
-    .bubble.mine { background: var(--hello-bubble-out); align-self: flex-end; border-top-right-radius: 2px; }
+    .bubble.them { background: var(--wa-bubble-in); align-self: flex-start; border-top-left-radius: 0; }
+    .bubble.mine { background: var(--wa-bubble-out); align-self: flex-end; border-top-right-radius: 0; }
     .bubble .meta {
       display: flex;
       align-items: center;
@@ -237,15 +244,17 @@
       gap: 4px;
       font-size: 10.5px;
       font-weight: 600;
-      color: var(--hello-text-muted);
+      color: var(--wa-text-muted);
       margin-top: 4px;
       float: right;
       padding-left: 12px;
     }
+    .bubble .checks { color: var(--wa-check-blue); font-weight: bold; }
 
+    /* FOOTER CON BOTONES DEDICADOS */
     .chat-footer {
       min-height: 68px;
-      background: var(--hello-card);
+      background: var(--wa-card);
       padding: 8px 14px;
       display: flex;
       align-items: center;
@@ -254,7 +263,7 @@
     }
     .input-box {
       flex: 1;
-      background: var(--hello-sidebar);
+      background: var(--wa-sidebar);
       border-radius: 24px;
       padding: 12px 18px;
       border: 0;
@@ -273,7 +282,7 @@
       transition: all 0.2s;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
-    .btn-send-text { background: var(--hello-teal); color: #ffffff; }
+    .btn-send-text { background: var(--wa-teal); color: #ffffff; }
     .btn-voice-note { background: #0284c7; color: #ffffff; }
     .btn-voice-note.recording { background: var(--danger); animation: pulse 1s infinite; }
     .btn-ptt-mic {
@@ -329,10 +338,11 @@
       margin: 4px 16px 0;
     }
 
+    /* PANTALLA DE ACCESO POR PIN */
     #authOverlay {
       position: fixed;
       inset: 0;
-      background: var(--hello-bg);
+      background: var(--wa-bg);
       z-index: 99999;
       display: flex;
       align-items: center;
@@ -340,8 +350,8 @@
       padding: 20px;
     }
     .auth-card {
-      background: var(--hello-sidebar);
-      border: 1px solid var(--hello-border);
+      background: var(--wa-sidebar);
+      border: 1px solid var(--wa-border);
       border-radius: 20px;
       width: 100%;
       max-width: 420px;
@@ -352,7 +362,7 @@
     .auth-tab-group {
       display: flex;
       gap: 8px;
-      background: var(--hello-card);
+      background: var(--wa-card);
       padding: 4px;
       border-radius: 12px;
       margin-bottom: 24px;
@@ -364,17 +374,17 @@
       font-weight: 700;
       font-size: 13px;
       background: transparent;
-      color: var(--hello-text-muted);
+      color: var(--wa-text-muted);
     }
     .auth-tab-btn.active {
-      background: var(--hello-sidebar);
-      color: var(--hello-teal);
+      background: var(--wa-sidebar);
+      color: var(--wa-teal);
       box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
 
     dialog {
-      background: var(--hello-sidebar);
-      color: var(--hello-text);
+      background: var(--wa-sidebar);
+      color: var(--wa-text);
       border: 0;
       border-radius: 16px;
       max-width: 440px;
@@ -385,17 +395,17 @@
     dialog::backdrop { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(3px); }
 
     .btn-hello-primary {
-      background: var(--hello-teal);
+      background: var(--wa-teal);
       color: #ffffff;
       font-weight: 700;
       padding: 12px 20px;
       border-radius: 24px;
       font-size: 14.5px;
     }
-    .btn-hello-primary:hover { background: var(--hello-teal-dark); }
+    .btn-hello-primary:hover { background: var(--wa-teal-dark); }
 
     .emoji-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; max-height: 260px; overflow-y: auto; margin-top: 14px; }
-    .emoji-grid button { background: var(--hello-card); border-radius: 8px; font-size: 22px; padding: 10px 0; }
+    .emoji-grid button { background: var(--wa-card); border-radius: 8px; font-size: 22px; padding: 10px 0; }
 
     .story-card-box {
       background: linear-gradient(135deg, #075e54 0%, #00a884 50%, #25d366 100%);
@@ -436,7 +446,7 @@
     <div class="auth-card">
       <div style="font-size: 48px; margin-bottom: 6px;">✦</div>
       <h2 style="margin: 0 0 6px; font-size: 24px; font-weight: 800;">HELLO</h2>
-      <p style="font-size: 13.5px; color: var(--hello-text-muted); margin: 0 0 24px;">Mensajería privada y Radio P2P sin número celular</p>
+      <p style="font-size: 13.5px; color: var(--wa-text-muted); margin: 0 0 24px;">WhatsApp P2P y Walkie-Talkie sin número celular</p>
       
       <div class="auth-tab-group">
         <button type="button" class="auth-tab-btn active" id="tabBtnNew" onclick="switchAuthTab('new')">Generar PIN</button>
@@ -444,7 +454,7 @@
       </div>
 
       <div id="formNewUser">
-        <p style="font-size: 13px; color: var(--hello-text-muted); text-align: left; margin: 0 0 20px; line-height: 1.5;">
+        <p style="font-size: 13px; color: var(--wa-text-muted); text-align: left; margin: 0 0 20px; line-height: 1.5;">
           Obtén un PIN privado para comenzar a chatear. No se requiere correo ni datos personales.
         </p>
         <button class="btn-hello-primary" style="width: 100%; padding: 14px;" onclick="handleCreateAccountOnlyPin()">✨ Generar mi PIN y Entrar</button>
@@ -452,7 +462,7 @@
 
       <form id="formLoginUser" onsubmit="handleLoginAccountOnlyPin(event)" style="display: none;">
         <div style="text-align: left; margin-bottom: 20px;">
-          <label style="font-size: 12px; font-weight: 700; color: var(--hello-text-muted); display: block; margin-bottom: 8px;">ESCRIBE TU PIN</label>
+          <label style="font-size: 12px; font-weight: 700; color: var(--wa-text-muted); display: block; margin-bottom: 8px;">ESCRIBE TU PIN</label>
           <input id="loginUserPin" placeholder="Ej. A8F2K9M1" required maxlength="8" style="text-transform: uppercase; font-weight: 800; letter-spacing: 3px; text-align: center; font-size: 19px; padding: 13px;">
         </div>
         <button class="btn-hello-primary" id="btnLoginSubmit" style="width: 100%; padding: 14px;">Acceder y Restaurar mis Chats</button>
@@ -473,7 +483,7 @@
           <div><strong id="myHeaderName">Mi Usuario</strong><small>PIN: <span id="myHeaderPin">...</span></small></div>
         </div>
         <div class="header-icons">
-          <button class="icon-btn" onclick="openCreateGroupModal()" title="Crear Grupo P2P">👥</button>
+          <button class="icon-btn" onclick="openCreateGroupModal()" title="Crear Grupo">👥</button>
           <button class="icon-btn" onclick="openStoryShareModal()" title="Tarjeta QR">📱</button>
           <button class="icon-btn" onclick="openQuickAddModal()" title="Nuevo Chat PIN">💬</button>
           <button class="icon-btn" onclick="executePanicKillSwitch()" title="Botón de Pánico" style="color:var(--danger)">🚨</button>
@@ -485,7 +495,7 @@
       <div class="nav-tabs">
         <button class="nav-tab-btn active" id="tabBtnChats" onclick="viewTab('chats')">Chats</button>
         <button class="nav-tab-btn" id="tabBtnGroups" onclick="viewTab('groups')">Grupos</button>
-        <button class="nav-tab-btn" id="tabBtnRadio" onclick="viewTab('radio')">Frecuencias</button>
+        <button class="nav-tab-btn" id="tabBtnRadio" onclick="viewTab('radio')">Emergencias</button>
         <button class="nav-tab-btn" id="tabBtnSettings" onclick="viewTab('settings')">Ajustes</button>
       </div>
 
@@ -506,7 +516,7 @@
     </div>
     <form onsubmit="confirmCreateGroup(event)">
       <input id="newGroupNameInput" placeholder="Nombre del grupo..." required style="margin-bottom:14px">
-      <label style="font-size:12px;font-weight:700;color:var(--hello-text-muted);display:block;margin-bottom:8px">SELECCIONA CONTACTOS</label>
+      <label style="font-size:12px;font-weight:700;color:var(--wa-text-muted);display:block;margin-bottom:8px">SELECCIONA CONTACTOS</label>
       <div id="groupMembersCheckboxes" style="max-height:180px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:16px"></div>
       <button class="btn-hello-primary" style="width:100%">Crear Grupo</button>
     </form>
@@ -550,7 +560,7 @@
     <div class="emoji-grid" id="emojiGridBox"></div>
   </dialog>
 
-  <dialog id="noticeModal"><h3 id="noticeTitle" style="margin:0 0 10px;font-weight:700"></h3><p id="noticeDesc" style="color:var(--hello-text-muted);font-size:14px;line-height:1.5"></p><button class="btn-hello-primary" style="width:100%;margin-top:10px" onclick="noticeModal.close()">OK</button></dialog>
+  <dialog id="noticeModal"><h3 id="noticeTitle" style="margin:0 0 10px;font-weight:700"></h3><p id="noticeDesc" style="color:var(--wa-text-muted);font-size:14px;line-height:1.5"></p><button class="btn-hello-primary" style="width:100%;margin-top:10px" onclick="noticeModal.close()">OK</button></dialog>
 
   <input type="file" id="profilePicHiddenInput" accept="image/*" style="display:none" onchange="processProfilePhotoUpload(event)">
 
@@ -617,7 +627,6 @@
         localStorage['helloName_' + pin] = 'Usuario ' + pin.slice(0, 4);
       }
 
-      // RESTAURAR COPIA DE SEGURIDAD DESDE RENDER
       try {
         const res = await fetch(`${SERVER_URL}/api/backup/${pin}`);
         if (res.ok) {
@@ -641,7 +650,7 @@
           }
         }
       } catch (err) {
-        console.warn('Sin conexión para descarga de nube previa.');
+        console.warn('Sin conexión para descarga de nube.');
       }
 
       location.reload();
@@ -726,7 +735,7 @@
       };
     }
 
-    // --- SINCRONIZACIÓN AUTOMÁTICA CON RENDER (CLOUD BACKUP) ---
+    // --- RESPALDO AUTOMÁTICO EN LA NUBE (RENDER) ---
     let syncTimeout = null;
     function syncToCloud() {
       if (!myPin) return;
@@ -760,13 +769,13 @@
     }
 
     function renderAvatarHtml(c, size = 48) {
+      if (c.isEmergency) return `<div class="avatar" style="width:${size}px;height:${size}px;background:var(--danger);font-size:${size*0.42}px">🚨</div>`;
       if (c.isGroup) return `<div class="avatar" style="width:${size}px;height:${size}px;background:#00a884;font-size:${size*0.4}px">👥</div>`;
-      if (c.isRadioChannel) return `<div class="avatar" style="width:${size}px;height:${size}px;background:#7c3aed;font-size:${size*0.4}px">📻</div>`;
       if (c.photo) return `<div class="avatar" style="width:${size}px;height:${size}px"><img src="${c.photo}"></div>`;
       return `<div class="avatar" style="width:${size}px;height:${size}px;font-size:${size*0.4}px">${esc((c.name || 'U').charAt(0).toUpperCase())}</div>`;
     }
 
-    // --- CONEXIÓN PEERJS Y WEBRTC ---
+    // --- PEERJS Y WEBRTC ---
     const peerServerConfig = {
       host: 'hello-server-p2p.onrender.com',
       port: 443,
@@ -948,7 +957,7 @@
 
       if (tab === 'chats') renderChatList();
       else if (tab === 'groups') renderGroupsList();
-      else if (tab === 'radio') renderRadioFrequencies();
+      else if (tab === 'radio') renderEmergencyChannel();
       else if (tab === 'settings') renderSettingsOverview();
     }
 
@@ -959,9 +968,9 @@
 
     function renderChatList(filter = '') {
       const container = $('sidebarListContent');
-      const directChats = contacts.filter(c => !c.isGroup && !c.isRadioChannel);
+      const directChats = contacts.filter(c => !c.isGroup && !c.isEmergency);
       if (!directChats.length) {
-        container.innerHTML = `<div style="text-align:center;padding:50px 20px;color:var(--hello-text-muted)"><div style="font-size:42px;margin-bottom:12px">💬</div><strong style="color:var(--hello-text);font-size:16px">Sin chats individuales</strong><p style="font-size:13px;margin:8px 0 16px">Inicia una conversación agregando un PIN.</p><button class="btn-hello-primary" onclick="openQuickAddModal()">Iniciar un Chat</button></div>`;
+        container.innerHTML = `<div style="text-align:center;padding:50px 20px;color:var(--wa-text-muted)"><div style="font-size:42px;margin-bottom:12px">💬</div><strong style="color:var(--wa-text);font-size:16px">Sin chats individuales</strong><p style="font-size:13px;margin:8px 0 16px">Inicia una conversación agregando un PIN.</p><button class="btn-hello-primary" onclick="openQuickAddModal()">Iniciar un Chat</button></div>`;
         return;
       }
       container.innerHTML = directChats.map((c, i) => {
@@ -982,7 +991,7 @@
       const container = $('sidebarListContent');
       const groupChats = contacts.filter(c => c.isGroup);
       if (!groupChats.length) {
-        container.innerHTML = `<div style="text-align:center;padding:50px 20px;color:var(--hello-text-muted)"><div style="font-size:42px;margin-bottom:12px">👥</div><strong style="color:var(--hello-text);font-size:16px">Sin grupos</strong><p style="font-size:13px;margin:8px 0 16px">Crea un grupo para hablar por radio walkie-talkie con varios amigos.</p><button class="btn-hello-primary" onclick="openCreateGroupModal()">Crear Grupo P2P</button></div>`;
+        container.innerHTML = `<div style="text-align:center;padding:50px 20px;color:var(--wa-text-muted)"><div style="font-size:42px;margin-bottom:12px">👥</div><strong style="color:var(--wa-text);font-size:16px">Sin grupos</strong><p style="font-size:13px;margin:8px 0 16px">Crea un grupo para hablar por radio walkie-talkie con varios amigos.</p><button class="btn-hello-primary" onclick="openCreateGroupModal()">Crear Grupo P2P</button></div>`;
         return;
       }
       container.innerHTML = groupChats.map(c => {
@@ -999,38 +1008,31 @@
       }).join('');
     }
 
-    // --- FRECUENCIAS PÚBLICAS PTT ---
-    const PUBLIC_FREQUENCIES = [
-      { name: '🌐 Frecuencia 1 - General Libre', pin: 'FREQ-GENERAL' },
-      { name: '🚨 Frecuencia 2 - Emergencias & SOS', pin: 'FREQ-SOS' },
-      { name: '🎮 Frecuencia 3 - Gamers & Amigos', pin: 'FREQ-GAMERS' }
-    ];
-
-    function renderRadioFrequencies() {
+    // --- SOLO CANAL DE EMERGENCIAS & SOS ---
+    function renderEmergencyChannel() {
       $('sidebarListContent').innerHTML = `
         <div style="padding:18px 16px">
-          <strong style="color:var(--hello-text-muted);font-size:12px;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:12px">Frecuencias Públicas en Vivo</strong>
-          ${PUBLIC_FREQUENCIES.map(f => `
-            <div class="chat-item" onclick="tuneIntoFrequency('${f.name}', '${f.pin}')" style="border-radius:12px;margin-bottom:8px">
-              ${renderAvatarHtml({ isRadioChannel: true }, 44)}
-              <div class="chat-details">
-                <div class="title-row"><strong>${esc(f.name)}</strong></div>
-                <div class="desc-row">Canal abierto • Toca para sintonizar y hablar</div>
-              </div>
+          <strong style="color:var(--danger);font-size:12px;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:12px">Canal Oficial SOS</strong>
+          <div class="chat-item" onclick="tuneIntoEmergency()" style="border-radius:12px;background:#fff1f2;border:1px solid #fecaca">
+            ${renderAvatarHtml({ isEmergency: true }, 48)}
+            <div class="chat-details">
+              <div class="title-row"><strong style="color:var(--danger)">🚨 Frecuencia de Emergencias & SOS</strong></div>
+              <div class="desc-row" style="color:#991b1b">Canal prioritario abierto • Toca para sintonizar y hablar</div>
             </div>
-          `).join('')}
+          </div>
         </div>
       `;
     }
 
-    async function tuneIntoFrequency(name, pin) {
+    async function tuneIntoEmergency() {
+      const pin = 'FREQ-SOS';
+      const name = '🚨 Emergencias & SOS';
       let idx = contacts.findIndex(c => c.pin === pin);
       if (idx < 0) {
-        contacts.unshift({ name, pin, isRadioChannel: true, lastMsg: 'Sintonizado', time: 'Ahora' });
+        contacts.unshift({ name, pin, isEmergency: true, lastMsg: 'Sintonizado', time: 'Ahora' });
         idx = 0;
         saveState();
       }
-      // Anunciar sintonización en el servidor Render
       try {
         await fetch(`${SERVER_URL}/api/frequency/join`, {
           method: 'POST',
@@ -1045,7 +1047,7 @@
     // --- SELECCIONAR Y DIBUJAR CONVERSACIÓN ---
     function selectChat(idx, isMobile = true) {
       activeChatIndex = idx; const c = contacts[idx];
-      if (!c) { $('mainArea').innerHTML = `<div style="display:grid;place-items:center;height:100%;color:var(--hello-text-muted);text-align:center"><div><div style="font-size:64px;margin-bottom:16px;opacity:0.3">💬</div><h2 style="color:var(--hello-text);margin:0 0 8px;font-weight:800">HELLO Red Segura</h2><p style="max-width:360px;font-size:14px;line-height:1.5">Conexión cifrada sin número telefónico mediante PIN.</p></div></div>`; return; }
+      if (!c) { $('mainArea').innerHTML = `<div style="display:grid;place-items:center;height:100%;color:var(--wa-text-muted);text-align:center"><div><div style="font-size:64px;margin-bottom:16px;opacity:0.3">💬</div><h2 style="color:var(--wa-text);margin:0 0 8px;font-weight:800">HELLO WhatsApp P2P</h2><p style="max-width:360px;font-size:14px;line-height:1.5">Conexión cifrada sin número telefónico mediante PIN.</p></div></div>`; return; }
       if (isMobile) $('appShell').classList.add('chat-open');
 
       const headerAction = c.isGroup ? `<button class="icon-btn" title="Info del grupo" onclick="openManageGroupModal('${c.pin}')">⚙️</button>` : ``;
@@ -1057,14 +1059,14 @@
             ${renderAvatarHtml(c, 42)}
             <div>
               <strong id="activeNameHeader">${esc(c.name)}</strong>
-              <small>${c.isGroup ? c.members.length + ' participantes (Toca para ver info)' : (c.isRadioChannel ? 'Canal en vivo' : 'PIN: ' + esc(c.pin))}</small>
+              <small>${c.isGroup ? c.members.length + ' participantes (Toca para ver info)' : (c.isEmergency ? 'Canal en vivo' : 'PIN: ' + esc(c.pin))}</small>
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:6px">${headerAction}</div>
         </div>
         <div class="conversation" id="conversationBox"></div>
         
-        <div style="display:flex;flex-direction:column;background:var(--hello-card)">
+        <div style="display:flex;flex-direction:column;background:var(--wa-card)">
           <div id="voiceRecordBanner" class="voice-record-banner">
             <span>🔴</span> <span id="voiceRecordTimer">Grabando audio... (0s)</span>
           </div>
@@ -1078,13 +1080,13 @@
             <!-- Botón 2: Grabar Nota de Voz Tipo WhatsApp -->
             <button type="button" class="btn-action-round btn-voice-note" id="btnVoiceNote" title="Grabar Nota de Voz" onclick="toggleVoiceNoteRecording(contacts[activeChatIndex])">🎤</button>
             
-            <!-- Botón 3: Walkie-Talkie PTT Radio en Vivo (En Grupos o Privado) -->
-            <button type="button" class="btn-ptt-mic" id="btnPttTrigger" title="Mantén presionado para hablar en radio en vivo (PTT)">📻</button>
+            <!-- Botón 3: Walkie-Talkie PTT Radio en Vivo (En Grupos, Emergencias o Privado) -->
+            <button type="button" class="btn-ptt-mic" id="btnPttTrigger" title="Mantén presionado para hablar por radio (PTT)">📻</button>
           </form>
         </div>
       `;
       bindPttEvents(c);
-      if (!c.isGroup && !c.isRadioChannel) getPeerConn(c.pin);
+      if (!c.isGroup && !c.isEmergency) getPeerConn(c.pin);
       drawChatMessages();
     }
 
@@ -1100,8 +1102,9 @@
         } else {
           body = esc(m.text);
         }
-        const senderTag = (c.isGroup && !m.mine && m.senderName) ? `<div style="font-weight:700;color:var(--hello-teal-dark);font-size:12px;margin-bottom:2px">${esc(m.senderName)}</div>` : '';
-        return `<div class="bubble ${m.mine ? 'mine' : 'them'}">${senderTag}${body}<div class="meta"><span>${m.time}</span></div></div>`;
+        const senderTag = (c.isGroup && !m.mine && m.senderName) ? `<div style="font-weight:700;color:var(--wa-teal-dark);font-size:12px;margin-bottom:2px">${esc(m.senderName)}</div>` : '';
+        const checkMark = m.mine ? `<span class="checks">✓✓</span>` : '';
+        return `<div class="bubble ${m.mine ? 'mine' : 'them'}">${senderTag}${body}<div class="meta"><span>${m.time}</span>${checkMark}</div></div>`;
       }).join('');
       box.scrollTop = box.scrollHeight;
     }
@@ -1188,7 +1191,7 @@
       }
     }
 
-    // --- WALKIE-TALKIE EN GRUPOS Y PRIVADO ---
+    // --- WALKIE-TALKIE EN GRUPOS, SOS Y PRIVADO ---
     function bindPttEvents(contact) {
       const btn = $('btnPttTrigger'); if (!btn) return;
       btn.onpointerdown = e => { e.preventDefault(); btn.setPointerCapture(e.pointerId); startPttStream(contact); };
@@ -1201,10 +1204,9 @@
         currentAudioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
         let targets = [];
-        if (contact.isRadioChannel) {
-          // Obtener usuarios conectados a la frecuencia desde el servidor
+        if (contact.isEmergency) {
           try {
-            const res = await fetch(`${SERVER_URL}/api/frequency/${contact.pin}`);
+            const res = await fetch(`${SERVER_URL}/api/frequency/FREQ-SOS`);
             const data = await res.json();
             targets = (data.members || []).filter(p => p !== myPin);
           } catch(e){}
@@ -1237,15 +1239,15 @@
 
     // --- GRUPOS P2P ---
     function openCreateGroupModal() {
-      const directContacts = contacts.filter(c => !c.isGroup && !c.isRadioChannel);
+      const directContacts = contacts.filter(c => !c.isGroup && !c.isEmergency);
       const container = $('groupMembersCheckboxes');
       if (!directContacts.length) {
-        container.innerHTML = '<p style="color:var(--hello-text-muted);font-size:13px">Agrega primero contactos por PIN para crear un grupo.</p>';
+        container.innerHTML = '<p style="color:var(--wa-text-muted);font-size:13px">Agrega primero contactos por PIN para crear un grupo.</p>';
       } else {
         container.innerHTML = directContacts.map(c => `
-          <label style="display:flex;align-items:center;gap:10px;padding:8px;background:var(--hello-card);border-radius:8px;cursor:pointer">
+          <label style="display:flex;align-items:center;gap:10px;padding:8px;background:var(--wa-card);border-radius:8px;cursor:pointer">
             <input type="checkbox" value="${c.pin}" class="cb-group-member" style="width:18px;height:18px">
-            <strong>${esc(c.name)}</strong> <small style="color:var(--hello-text-muted)">(${esc(c.pin)})</small>
+            <strong>${esc(c.name)}</strong> <small style="color:var(--wa-text-muted)">(${esc(c.pin)})</small>
           </label>
         `).join('');
       }
@@ -1288,10 +1290,10 @@
         const isMe = (mPin === myPin);
         const item = contacts.find(c => c.pin === mPin) || { name: isMe ? 'Tú' : 'PIN: ' + mPin };
         return `
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--hello-border)">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--wa-border)">
             <div>
               <strong style="font-size:14px">${esc(isMe ? 'Tú' : item.name)}</strong>
-              <small style="display:block;color:var(--hello-text-muted)">${isMe ? 'Administrador' : 'PIN: ' + esc(mPin)}</small>
+              <small style="display:block;color:var(--wa-text-muted)">${isMe ? 'Administrador' : 'PIN: ' + esc(mPin)}</small>
             </div>
           </div>`;
       }).join('');
@@ -1299,7 +1301,7 @@
       $('manageGroupContent').innerHTML = `
         <div style="margin-bottom:14px">
           <strong style="display:block;margin-bottom:8px;font-size:14px">Participantes (${g.members.length})</strong>
-          <div style="max-height:160px;overflow-y:auto;border:1px solid var(--hello-border);border-radius:8px;padding:0 12px;background:var(--hello-sidebar)">${membersList}</div>
+          <div style="max-height:160px;overflow-y:auto;border:1px solid var(--wa-border);border-radius:8px;padding:0 12px;background:var(--wa-sidebar)">${membersList}</div>
         </div>
         <button class="btn-hello-primary" style="background:#fee2e2;color:var(--danger);width:100%;margin-top:10px" onclick="deleteGroup('${groupPin}')">Salir y Eliminar Grupo</button>
       `;
@@ -1348,16 +1350,16 @@
     // --- AJUSTES ---
     function renderSettingsOverview() {
       $('sidebarListContent').innerHTML = `
-        <div style="padding:16px;background:var(--hello-sidebar);border-bottom:1px solid var(--hello-border);display:flex;align-items:center;gap:14px;cursor:pointer" onclick="openSettingsSection('profile')">
+        <div style="padding:16px;background:var(--wa-sidebar);border-bottom:1px solid var(--wa-border);display:flex;align-items:center;gap:14px;cursor:pointer" onclick="openSettingsSection('profile')">
           ${renderAvatarHtml({photo: myPhoto, name: myName}, 56)}
           <div style="flex:1">
             <strong style="font-size:17px;font-weight:700">${esc(myName)}</strong>
-            <div style="font-size:13px;color:var(--hello-text-muted)">${esc(myStatus)}</div>
-            <div style="font-size:12px;color:var(--hello-teal);font-weight:800;margin-top:2px">PIN: ${myPin}</div>
+            <div style="font-size:13px;color:var(--wa-text-muted)">${esc(myStatus)}</div>
+            <div style="font-size:12px;color:var(--wa-teal);font-weight:800;margin-top:2px">PIN: ${myPin}</div>
           </div>
         </div>
-        <div style="background:var(--hello-card);padding:12px 0">
-          <div style="background:var(--hello-sidebar);border-top:1px solid var(--hello-border);border-bottom:1px solid var(--hello-border)">
+        <div style="background:var(--wa-card);padding:12px 0">
+          <div style="background:var(--wa-sidebar);border-top:1px solid var(--wa-border);border-bottom:1px solid var(--wa-border)">
             <div class="chat-item" onclick="openSettingsSection('profile')"><span style="font-size:22px;width:34px;text-align:center">👤</span><div class="chat-details"><strong>Perfil</strong><div class="desc-row">Nombre y foto de perfil</div></div></div>
             <div class="chat-item" onclick="openStoryShareModal()"><span style="font-size:22px;width:34px;text-align:center">📱</span><div class="chat-details"><strong>Tarjeta QR</strong><div class="desc-row">Compartir en Instagram o WhatsApp</div></div></div>
             <div class="chat-item" onclick="openSettingsSection('account')"><span style="font-size:22px;width:34px;text-align:center">🔑</span><div class="chat-details"><strong>Cuenta</strong><div class="desc-row">Cerrar sesión y cambiar PIN</div></div></div>
@@ -1372,15 +1374,15 @@
       if (section === 'profile') {
         area.innerHTML = `
           <div class="main-header"><div class="contact-summary"><button class="icon-btn mobile-back" onclick="$('appShell').classList.remove('chat-open')">‹</button><strong>Perfil</strong></div></div>
-          <div style="padding:24px;overflow-y:auto;background:var(--hello-card);flex:1">
-            <div style="background:var(--hello-sidebar);border:1px solid var(--hello-border);border-radius:14px;padding:20px;text-align:center;margin-bottom:16px">
+          <div style="padding:24px;overflow-y:auto;background:var(--wa-card);flex:1">
+            <div style="background:var(--wa-sidebar);border:1px solid var(--wa-border);border-radius:14px;padding:20px;text-align:center;margin-bottom:16px">
               <div style="margin:0 auto 16px;display:flex;justify-content:center">${renderAvatarHtml({photo: myPhoto, name: myName}, 120)}</div>
               <div style="display:flex;gap:10px;justify-content:center;margin-bottom:8px">
                 <button class="btn-hello-primary" onclick="$('profilePicHiddenInput').click()">Cambiar Foto</button>
                 ${myPhoto ? `<button class="btn-hello-primary" style="background:#fee2e2;color:var(--danger)" onclick="removeProfilePhoto()">Quitar</button>` : ''}
               </div>
             </div>
-            <div style="background:var(--hello-sidebar);border:1px solid var(--hello-border);border-radius:14px;padding:20px">
+            <div style="background:var(--wa-sidebar);border:1px solid var(--wa-border);border-radius:14px;padding:20px">
               <h3 style="margin:0 0 8px;font-size:16px">Nombre Visible (Opcional)</h3>
               <input id="setProfName" value="${esc(myName)}" style="margin-bottom:10px">
               <button class="btn-hello-primary" style="width:100%" onclick="saveProfileDetail()">Guardar</button>
@@ -1390,11 +1392,11 @@
       } else if (section === 'account') {
         area.innerHTML = `
           <div class="main-header"><div class="contact-summary"><button class="icon-btn mobile-back" onclick="$('appShell').classList.remove('chat-open')">‹</button><strong>Cuenta</strong></div></div>
-          <div style="padding:24px;overflow-y:auto;background:var(--hello-card);flex:1">
-            <div style="background:var(--hello-sidebar);border:1px solid var(--hello-border);border-radius:14px;padding:20px">
+          <div style="padding:24px;overflow-y:auto;background:var(--wa-card);flex:1">
+            <div style="background:var(--wa-sidebar);border:1px solid var(--wa-border);border-radius:14px;padding:20px">
               <h3 style="margin:0 0 8px;font-size:16px">Cerrar Sesión</h3>
-              <p style="font-size:13.5px;color:var(--hello-text-muted);margin:0 0 16px">Tu historial está respaldado en la nube de tu servidor. Podrás volver a entrar con tu PIN en este o cualquier otro dispositivo.</p>
-              <button class="btn-hello-primary" style="width:100%;background:var(--hello-card);color:var(--hello-text);border:1px solid var(--hello-border)" onclick="logoutAccount()">Cerrar Sesión</button>
+              <p style="font-size:13.5px;color:var(--wa-text-muted);margin:0 0 16px">Tu historial está respaldado en la nube de tu servidor. Podrás volver a entrar con tu PIN en este o cualquier otro dispositivo.</p>
+              <button class="btn-hello-primary" style="width:100%;background:var(--wa-card);color:var(--wa-text);border:1px solid var(--wa-border)" onclick="logoutAccount()">Cerrar Sesión</button>
             </div>
           </div>
         `;
