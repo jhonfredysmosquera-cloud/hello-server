@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-  <title>WhatsApp P2P — HELLO</title>
+  <title>HELLO — Mensajería Privada y Radio P2P</title>
 
   <!-- Tipografía Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,41 +15,41 @@
 
   <style>
     :root {
-      --wa-teal: #008069;
-      --wa-teal-dark: #075e54;
-      --wa-teal-light: #00a884;
-      --wa-green: #25d366;
-      --wa-bg: #efeae2;
-      --wa-sidebar: #ffffff;
-      --wa-card: #f0f2f5;
-      --wa-border: #e9edef;
-      --wa-text: #111b21;
-      --wa-text-muted: #667781;
-      --wa-bubble-in: #ffffff;
-      --wa-bubble-out: #d9fdd3;
-      --wa-check-blue: #53bdeb;
+      --hello-teal: #008069;
+      --hello-teal-dark: #075e54;
+      --hello-teal-light: #00a884;
+      --hello-green: #25d366;
+      --hello-bg: #efeae2;
+      --hello-sidebar: #ffffff;
+      --hello-card: #f0f2f5;
+      --hello-border: #e9edef;
+      --hello-text: #111b21;
+      --hello-text-muted: #667781;
+      --hello-bubble-in: #ffffff;
+      --hello-bubble-out: #d9fdd3;
+      --hello-check-blue: #53bdeb;
       --danger: #ea0038;
       --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
     body.dark-theme {
-      --wa-teal: #00a884;
-      --wa-teal-dark: #008069;
-      --wa-bg: #0b141a;
-      --wa-sidebar: #111b21;
-      --wa-card: #202c33;
-      --wa-border: #222d34;
-      --wa-text: #e9edef;
-      --wa-text-muted: #8696a0;
-      --wa-bubble-in: #202c33;
-      --wa-bubble-out: #005c4b;
+      --hello-teal: #00a884;
+      --hello-teal-dark: #008069;
+      --hello-bg: #0b141a;
+      --hello-sidebar: #111b21;
+      --hello-card: #202c33;
+      --hello-border: #222d34;
+      --hello-text: #e9edef;
+      --hello-text-muted: #8696a0;
+      --hello-bubble-in: #202c33;
+      --hello-bubble-out: #005c4b;
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
       margin: 0;
       background: #dadfe2;
-      color: var(--wa-text);
+      color: var(--hello-text);
       font-family: var(--font-main);
       height: 100dvh;
       overflow: hidden;
@@ -63,21 +63,21 @@
     button { cursor: pointer; border: 0; outline: none; background: transparent; }
     input, textarea, select {
       width: 100%;
-      border: 1px solid var(--wa-border);
-      background: var(--wa-card);
+      border: 1px solid var(--hello-border);
+      background: var(--hello-card);
       border-radius: 8px;
       padding: 10px 14px;
       outline: none;
       font-size: 14px;
     }
-    input:focus, textarea:focus { border-color: var(--wa-teal); }
+    input:focus, textarea:focus { border-color: var(--hello-teal); }
 
     .app {
       display: flex;
       height: 100dvh;
       width: 100vw;
       max-width: 1600px;
-      background: var(--wa-sidebar);
+      background: var(--hello-sidebar);
       overflow: hidden;
       position: relative;
     }
@@ -85,22 +85,22 @@
     /* BARRA LATERAL */
     .sidebar {
       width: 440px;
-      border-right: 1px solid var(--wa-border);
+      border-right: 1px solid var(--hello-border);
       display: flex;
       flex-direction: column;
-      background: var(--wa-sidebar);
+      background: var(--hello-sidebar);
       flex-shrink: 0;
       position: relative;
     }
 
     .sidebar-header {
-      background: var(--wa-card);
+      background: var(--hello-card);
       padding: 10px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       height: 64px;
-      border-bottom: 1px solid var(--wa-border);
+      border-bottom: 1px solid var(--hello-border);
     }
 
     .user-avatar-badge { display: flex; align-items: center; gap: 12px; cursor: pointer; }
@@ -108,7 +108,7 @@
       width: 42px;
       height: 42px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--wa-teal), var(--wa-teal-dark));
+      background: linear-gradient(135deg, var(--hello-teal), var(--hello-teal-dark));
       color: #ffffff;
       font-weight: 700;
       display: grid;
@@ -119,11 +119,11 @@
     }
     .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .user-avatar-badge strong { font-size: 15px; font-weight: 700; }
-    .user-avatar-badge small { display: block; color: var(--wa-teal); font-weight: 700; font-size: 11.5px; }
+    .user-avatar-badge small { display: block; color: var(--hello-teal); font-weight: 700; font-size: 11.5px; }
 
     .header-icons { display: flex; align-items: center; gap: 2px; }
     .icon-btn {
-      color: var(--wa-text-muted);
+      color: var(--hello-text-muted);
       font-size: 19px;
       width: 38px;
       height: 38px;
@@ -134,15 +134,15 @@
     }
     .icon-btn:hover { background: rgba(0, 0, 0, 0.06); }
 
-    /* MENÚ KEBAB (TRES PUNTOS) */
+    /* MENÚ DESPLEGABLE */
     .kebab-dropdown {
       position: absolute;
       top: 56px;
       right: 14px;
-      background: var(--wa-sidebar);
+      background: var(--hello-sidebar);
       border-radius: 12px;
       box-shadow: 0 10px 32px rgba(0,0,0,0.18);
-      border: 1px solid var(--wa-border);
+      border: 1px solid var(--hello-border);
       width: 230px;
       z-index: 1000;
       display: none;
@@ -159,14 +159,14 @@
       align-items: center;
       gap: 12px;
     }
-    .kebab-dropdown button:hover { background: var(--wa-card); }
+    .kebab-dropdown button:hover { background: var(--hello-card); }
 
-    /* PESTAÑAS NATIVAS */
-    .nav-tabs { display: flex; background: var(--wa-sidebar); border-bottom: 1px solid var(--wa-border); }
+    /* PESTAÑAS */
+    .nav-tabs { display: flex; background: var(--hello-sidebar); border-bottom: 1px solid var(--hello-border); }
     .nav-tab-btn {
       flex: 1;
       padding: 13px 0;
-      color: var(--wa-text-muted);
+      color: var(--hello-text-muted);
       font-weight: 700;
       font-size: 12px;
       text-transform: uppercase;
@@ -174,13 +174,13 @@
       border-bottom: 3px solid transparent;
       transition: all 0.2s;
     }
-    .nav-tab-btn.active { color: var(--wa-teal); border-bottom-color: var(--wa-teal); }
+    .nav-tab-btn.active { color: var(--hello-teal); border-bottom-color: var(--hello-teal); }
 
-    .search-wrapper { padding: 8px 14px; background: var(--wa-sidebar); border-bottom: 1px solid var(--wa-border); }
-    .search-bar { display: flex; align-items: center; background: var(--wa-card); border-radius: 8px; padding: 0 12px; }
+    .search-wrapper { padding: 8px 14px; background: var(--hello-sidebar); border-bottom: 1px solid var(--hello-border); }
+    .search-bar { display: flex; align-items: center; background: var(--hello-card); border-radius: 8px; padding: 0 12px; }
     .search-bar input { border: 0; background: transparent; padding: 8px 10px; font-size: 14px; }
 
-    .tab-content-area { flex: 1; overflow-y: auto; background: var(--wa-sidebar); }
+    .tab-content-area { flex: 1; overflow-y: auto; background: var(--hello-sidebar); }
 
     .chat-item {
       display: flex;
@@ -189,24 +189,24 @@
       padding: 12px 16px;
       width: 100%;
       text-align: left;
-      border-bottom: 1px solid var(--wa-border);
+      border-bottom: 1px solid var(--hello-border);
       transition: background 0.15s;
     }
-    .chat-item:hover, .chat-item.selected { background: var(--wa-card); }
+    .chat-item:hover, .chat-item.selected { background: var(--hello-card); }
     .chat-item .avatar { width: 48px; height: 48px; font-size: 19px; }
     .chat-details { flex: 1; min-width: 0; }
     .title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
     .title-row strong { font-size: 15.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .title-row .time { font-size: 11px; font-weight: 600; color: var(--wa-text-muted); }
-    .desc-row { font-size: 13.5px; color: var(--wa-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .title-row .time { font-size: 11px; font-weight: 600; color: var(--hello-text-muted); }
+    .desc-row { font-size: 13.5px; color: var(--hello-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    /* ÁREA DE CHAT PRINCIPAL */
+    /* ÁREA PRINCIPAL */
     .main-chat {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
-      background: var(--wa-bg);
+      background: var(--hello-bg);
       position: relative;
     }
     .main-chat::before {
@@ -214,15 +214,15 @@
       position: absolute;
       inset: 0;
       opacity: 0.25;
-      background-image: radial-gradient(var(--wa-text-muted) 1px, transparent 1px);
+      background-image: radial-gradient(var(--hello-text-muted) 1px, transparent 1px);
       background-size: 24px 24px;
       pointer-events: none;
     }
 
     .main-header {
       height: 64px;
-      background: var(--wa-card);
-      border-bottom: 1px solid var(--wa-border);
+      background: var(--hello-card);
+      border-bottom: 1px solid var(--hello-border);
       padding: 8px 16px;
       display: flex;
       align-items: center;
@@ -231,13 +231,13 @@
     }
     .contact-summary { display: flex; align-items: center; gap: 12px; cursor: pointer; flex: 1; min-width: 0; }
     .contact-summary strong { font-size: 15.5px; font-weight: 700; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .contact-summary small { font-size: 12px; font-weight: 600; color: var(--wa-text-muted); display: block; }
+    .contact-summary small { font-size: 12px; font-weight: 600; color: var(--hello-text-muted); display: block; }
 
     .in-chat-search-bar {
       display: none;
       padding: 8px 16px;
-      background: var(--wa-sidebar);
-      border-bottom: 1px solid var(--wa-border);
+      background: var(--hello-sidebar);
+      border-bottom: 1px solid var(--hello-border);
       align-items: center;
       gap: 10px;
       z-index: 3;
@@ -265,60 +265,67 @@
       user-select: none;
       cursor: pointer;
     }
-    .bubble.them { background: var(--wa-bubble-in); align-self: flex-start; border-top-left-radius: 0; }
-    .bubble.mine { background: var(--wa-bubble-out); align-self: flex-end; border-top-right-radius: 0; }
-    .bubble .quote-box { background: rgba(0,0,0,0.06); border-left: 4px solid var(--wa-teal); padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-bottom: 4px; }
-    .bubble .meta { display: flex; align-items: center; justify-content: flex-end; gap: 4px; font-size: 10px; font-weight: 600; color: var(--wa-text-muted); margin-top: 4px; float: right; padding-left: 10px; }
+    .bubble.them { background: var(--hello-bubble-in); align-self: flex-start; border-top-left-radius: 0; }
+    .bubble.mine { background: var(--hello-bubble-out); align-self: flex-end; border-top-right-radius: 0; }
+    .bubble .meta { display: flex; align-items: center; justify-content: flex-end; gap: 4px; font-size: 10px; font-weight: 600; color: var(--hello-text-muted); margin-top: 4px; float: right; padding-left: 10px; }
     .bubble img.chat-photo-bubble { max-width: 100%; border-radius: 6px; display: block; margin-bottom: 4px; cursor: pointer; }
 
-    /* BARRA INFERIOR DE CHAT */
     .chat-footer {
       min-height: 64px;
-      background: var(--wa-card);
+      background: var(--hello-card);
       padding: 8px 12px;
       display: flex;
       align-items: center;
       gap: 6px;
       z-index: 2;
     }
-    .input-box { flex: 1; background: var(--wa-sidebar); border-radius: 22px; padding: 10px 16px; border: 0; outline: none; font-size: 14.5px; }
-    
+    .input-box { flex: 1; background: var(--hello-sidebar); border-radius: 22px; padding: 10px 16px; border: 0; outline: none; font-size: 14.5px; }
+
     .btn-action-round { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; font-size: 18px; flex-shrink: 0; transition: all 0.2s; }
-    .btn-send-text { background: var(--wa-teal); color: #ffffff; }
+    .btn-send-text { background: var(--hello-teal); color: #ffffff; }
     .btn-voice-note { background: #0284c7; color: #ffffff; }
     .btn-voice-note.recording { background: var(--danger); animation: pulse 1s infinite; }
     .btn-ptt-mic { background: #334155; color: #ffffff; width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; font-size: 18px; flex-shrink: 0; user-select: none; touch-action: none; }
     .btn-ptt-mic.transmitting { background: var(--danger); animation: pulse 0.9s infinite; }
     @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.12); } 100% { transform: scale(1); } }
 
-    /* OVERLAYS Y MODALES */
-    #authOverlay { position: fixed; inset: 0; background: var(--wa-bg); z-index: 999999; display: flex; align-items: center; justify-content: center; padding: 20px; }
-    .auth-card { background: var(--wa-sidebar); border: 1px solid var(--wa-border); border-radius: 20px; width: 100%; max-width: 400px; padding: 34px 26px; box-shadow: 0 20px 48px rgba(0,0,0,0.12); text-align: center; }
-    
-    dialog { background: var(--wa-sidebar); color: var(--wa-text); border: 0; border-radius: 16px; max-width: 440px; width: 90vw; padding: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.25); }
+    /* OVERLAY DE AUTENTICACIÓN - OCULTO POR DEFECTO PARA NO BLOQUEAR LA PANTALLA */
+    #authOverlay {
+      position: fixed;
+      inset: 0;
+      background: var(--hello-bg);
+      z-index: 999999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .auth-card { background: var(--hello-sidebar); border: 1px solid var(--hello-border); border-radius: 20px; width: 100%; max-width: 400px; padding: 34px 26px; box-shadow: 0 20px 48px rgba(0,0,0,0.12); text-align: center; }
+
+    dialog { background: var(--hello-sidebar); color: var(--hello-text); border: 0; border-radius: 16px; max-width: 440px; width: 90vw; padding: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.25); }
     dialog::backdrop { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(3px); }
-    
-    .btn-wa-primary { background: var(--wa-teal); color: #ffffff; font-weight: 700; padding: 12px 20px; border-radius: 24px; font-size: 14.5px; width: 100%; text-align: center; margin-top: 10px; }
+
+    .btn-hello-primary { background: var(--hello-teal); color: #ffffff; font-weight: 700; padding: 12px 20px; border-radius: 24px; font-size: 14.5px; width: 100%; text-align: center; margin-top: 10px; }
 
     #liveRadioAlert { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); background: var(--danger); color: #ffffff; padding: 9px 22px; border-radius: 30px; font-weight: 800; font-size: 13px; display: none; align-items: center; gap: 10px; box-shadow: 0 8px 24px rgba(234, 0, 56, 0.4); z-index: 99999; }
-    
+
     #incomingCallDialog { text-align: center; padding: 28px 20px; border-radius: 18px; width: 320px; }
     .btn-call-action { width: 56px; height: 56px; border-radius: 50%; font-size: 24px; display: grid; place-items: center; color: #ffffff; margin: 0 10px; }
-    
+
     #callOverlay { position: fixed; inset: 0; background: #111b21; color: #ffffff; z-index: 100000; display: none; flex-direction: column; align-items: center; justify-content: space-between; padding: 34px 20px; }
     .call-videos-container { position: relative; width: 100%; height: 60vh; display: flex; align-items: center; justify-content: center; }
     #remoteVideo { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; background: #202c33; }
     #localVideo { position: absolute; top: 14px; right: 14px; width: 110px; height: 150px; object-fit: cover; border-radius: 10px; border: 2px solid #ffffff; background: #000000; }
     .call-controls { display: flex; align-items: center; gap: 18px; }
     .btn-call-ctrl { width: 54px; height: 54px; border-radius: 50%; background: rgba(255,255,255,0.15); color: #ffffff; font-size: 22px; display: grid; place-items: center; }
-    
-    #msgContextMenu { position: fixed; background: var(--wa-sidebar); border: 1px solid var(--wa-border); border-radius: 14px; box-shadow: 0 12px 36px rgba(0,0,0,0.22); z-index: 20000; display: none; flex-direction: column; width: 210px; padding: 6px 0; }
+
+    #msgContextMenu { position: fixed; background: var(--hello-sidebar); border: 1px solid var(--hello-border); border-radius: 14px; box-shadow: 0 12px 36px rgba(0,0,0,0.22); z-index: 20000; display: none; flex-direction: column; width: 210px; padding: 6px 0; }
     #msgContextMenu button { padding: 10px 16px; text-align: left; font-size: 13.5px; font-weight: 600; display: flex; align-items: center; gap: 12px; }
-    #msgContextMenu button:hover { background: var(--wa-card); }
-    .reactions-bar { display: flex; justify-content: space-around; padding: 8px 12px; border-bottom: 1px solid var(--wa-border); font-size: 22px; }
+    #msgContextMenu button:hover { background: var(--hello-card); }
+    .reactions-bar { display: flex; justify-content: space-around; padding: 8px 12px; border-bottom: 1px solid var(--hello-border); font-size: 22px; }
     .reactions-bar span { cursor: pointer; transition: transform 0.15s; }
     .reactions-bar span:hover { transform: scale(1.3); }
-    
+
     .attachment-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 12px 0; text-align: center; }
     .attach-item { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; }
     .attach-icon-circle { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; font-size: 22px; color: #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
@@ -338,33 +345,32 @@
 </head>
 <body>
 
-  <!-- AUTENTICACIÓN POR PIN -->
+  <!-- PANTALLA DE ACCESO POR PIN -->
   <div id="authOverlay">
     <div class="auth-card">
       <div style="font-size: 46px; margin-bottom: 6px;">✦</div>
-      <h2 style="margin: 0 0 6px; font-size: 22px; font-weight: 800;">HELLO WhatsApp</h2>
-      <p style="font-size: 13px; color: var(--wa-text-muted); margin: 0 0 22px;">Mensajería, Radio y Llamadas Seguras</p>
+      <h2 style="margin: 0 0 6px; font-size: 22px; font-weight: 800;">HELLO</h2>
+      <p style="font-size: 13px; color: var(--hello-text-muted); margin: 0 0 22px;">Mensajería y Radio P2P sin número telefónico</p>
       
-      <div style="display:flex;gap:6px;background:var(--wa-card);padding:4px;border-radius:10px;margin-bottom:20px">
+      <div style="display:flex;gap:6px;background:var(--hello-card);padding:4px;border-radius:10px;margin-bottom:20px">
         <button type="button" class="nav-tab-btn active" id="tabBtnNewPin" onclick="switchPinView('new')">Nuevo PIN</button>
         <button type="button" class="nav-tab-btn" id="tabBtnLogPin" onclick="switchPinView('login')">Ingresar PIN</button>
       </div>
 
       <div id="viewNewPin">
-        <p style="font-size: 13px; color: var(--wa-text-muted); text-align: left; margin: 0 0 18px; line-height: 1.5;">
-          Genera un identificador cifrado para chatear sin número de celular.
+        <p style="font-size: 13px; color: var(--hello-text-muted); text-align: left; margin: 0 0 18px; line-height: 1.5;">
+          Genera un identificador cifrado para chatear con total privacidad.
         </p>
-        <button class="btn-wa-primary" onclick="generateAccountPin()">✨ Generar mi PIN y Entrar</button>
+        <button class="btn-hello-primary" onclick="generateAccountPin()">✨ Generar mi PIN y Entrar</button>
       </div>
 
       <form id="viewLogPin" onsubmit="loginWithPin(event)" style="display: none;">
         <input id="inputPinLog" placeholder="Ej. A8F2K9M1" required maxlength="8" style="text-transform:uppercase;font-weight:800;letter-spacing:3px;text-align:center;font-size:18px;margin-bottom:16px;padding:12px">
-        <button class="btn-wa-primary" id="btnRestoring">Restaurar mis Chats</button>
+        <button class="btn-hello-primary" id="btnRestoring">Restaurar mis Chats</button>
       </form>
     </div>
   </div>
 
-  <!-- RADIO PTT GLOBAL ALERTS -->
   <div id="liveRadioAlert"><span>📻</span> <span id="radioAlertSender">Canal SOS en vivo...</span></div>
   <audio id="liveSpeaker" autoplay playsinline></audio>
 
@@ -372,18 +378,18 @@
   <dialog id="incomingCallDialog">
     <div class="avatar" id="incAvatar" style="width:72px;height:72px;margin:0 auto 12px;font-size:26px">U</div>
     <h3 id="incName" style="margin:0 0 4px">Contacto</h3>
-    <p id="incType" style="margin:0 0 24px;font-size:13px;color:var(--wa-text-muted)">Llamada entrante...</p>
+    <p id="incType" style="margin:0 0 24px;font-size:13px;color:var(--hello-text-muted)">Llamada entrante...</p>
     <div style="display:flex;justify-content:center;gap:36px">
       <button class="btn-call-action" style="background:var(--danger)" onclick="rejectIncomingCall()">✕</button>
-      <button class="btn-call-action" style="background:var(--wa-green)" onclick="acceptIncomingCall()">📞</button>
+      <button class="btn-call-action" style="background:var(--hello-green)" onclick="acceptIncomingCall()">📞</button>
     </div>
   </dialog>
 
-  <!-- OVERLAY DE LLAMADA WEBRTC -->
+  <!-- OVERLAY DE LLAMADA -->
   <div id="callOverlay">
     <div style="text-align:center">
       <h3 id="callContactTitle" style="margin:0 0 4px;font-size:20px">Llamando...</h3>
-      <p id="callStateLabel" style="margin:0;font-size:13px;opacity:0.8">Conexión Segura WebRTC</p>
+      <p id="callStateLabel" style="margin:0;font-size:13px;opacity:0.8">Conexión Directa P2P</p>
     </div>
     <div class="call-videos-container" id="videoContainerBox">
       <video id="remoteVideo" autoplay playsinline></video>
@@ -396,7 +402,7 @@
     </div>
   </div>
 
-  <!-- MENU CONTEXTUAL PARA MENSAJES -->
+  <!-- MENÚ CONTEXTUAL DE MENSAJE -->
   <div id="msgContextMenu">
     <div class="reactions-bar">
       <span onclick="reactToMessage('👍')">👍</span>
@@ -409,14 +415,14 @@
     <button onclick="contextAction('reply')">↩️ Responder</button>
     <button onclick="contextAction('copy')">📋 Copiar texto</button>
     <button onclick="contextAction('star')">⭐ Destacar / Quitar</button>
-    <button onclick="contextAction('info')">ℹ️ Info del mensaje</button>
+    <button onclick="contextAction('info')">ℹ️ Información</button>
     <button onclick="contextAction('delete')" style="color:var(--danger)">🗑️ Eliminar mensaje</button>
   </div>
 
-  <!-- ESTRUCTURA PRINCIPAL DE LA APP -->
+  <!-- APLICACIÓN PRINCIPAL -->
   <div class="app" id="appShell">
     
-    <!-- BARRA LATERAL (Pestañas y Listas) -->
+    <!-- BARRA LATERAL -->
     <div class="sidebar">
       <div class="sidebar-header">
         <div class="user-avatar-badge" onclick="openProfileSection()">
@@ -430,17 +436,17 @@
         </div>
       </div>
 
-      <!-- KEBAB MENU -->
+      <!-- MENÚ DE TRES PUNTOS -->
       <div class="kebab-dropdown" id="kebabDropdown">
         <button onclick="openCreateGroupModal(); toggleKebabMenu();">👥 Nuevo grupo</button>
         <button onclick="openCreateCommunityModal(); toggleKebabMenu();">🌐 Nueva comunidad</button>
         <button onclick="openStoryShareModal(); toggleKebabMenu();">📱 Compartir Tarjeta QR</button>
         <button onclick="openStarredMessagesModal(); toggleKebabMenu();">⭐ Mensajes destacados</button>
-        <button onclick="openSettingsSection(); toggleKebabMenu();">⚙️ Ajustes de WhatsApp</button>
+        <button onclick="openSettingsSection(); toggleKebabMenu();">⚙️ Ajustes</button>
         <button onclick="executePanicKillSwitch()" style="color:var(--danger)">🚨 Botón de Pánico</button>
       </div>
 
-      <!-- PESTAÑAS (4 Nativas) -->
+      <!-- PESTAÑAS -->
       <div class="nav-tabs">
         <button class="nav-tab-btn active" id="tabBtnChats" onclick="switchMainTab('chats')">Chats</button>
         <button class="nav-tab-btn" id="tabBtnUpdates" onclick="switchMainTab('updates')">Novedades</button>
@@ -455,26 +461,22 @@
         </div>
       </div>
 
-      <!-- CONTENEDOR DE LAS LISTAS -->
       <div class="tab-content-area" id="tabContentList"></div>
     </div>
 
-    <!-- ÁREA CENTRAL DE CHAT -->
+    <!-- ÁREA DE CHAT -->
     <div class="main-chat" id="mainArea">
-      <!-- Se llena dinámicamente con JavaScript -->
-      <div style="display:grid;place-items:center;height:100%;color:var(--wa-text-muted);text-align:center">
+      <div style="display:grid;place-items:center;height:100%;color:var(--hello-text-muted);text-align:center">
         <div>
           <div style="font-size:64px;margin-bottom:16px;opacity:0.3">💬</div>
-          <h2 style="color:var(--wa-text);margin:0 0 8px;font-weight:800">WhatsApp HELLO</h2>
-          <p style="max-width:360px;font-size:14px;line-height:1.5">Conexión cifrada sin número telefónico mediante PIN.</p>
+          <h2 style="color:var(--hello-text);margin:0 0 8px;font-weight:800">HELLO</h2>
+          <p style="max-width:360px;font-size:14px;line-height:1.5">Conexión cifrada directa sin número telefónico mediante PIN.</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- MODALES DE FUNCIONALIDADES -->
-  
-  <!-- 1. Menú 9 Adjuntos -->
+  <!-- MODALES -->
   <dialog id="attachDialog">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
       <strong style="font-size:16px">Adjuntar...</strong>
@@ -515,24 +517,21 @@
   <input type="file" id="directCameraInput" accept="image/*" capture="environment" hidden onchange="handleCameraPhotoPicked(event)">
   <input type="file" id="profilePicInput" accept="image/*" hidden onchange="processProfilePhotoUpload(event)">
 
-  <!-- 2. Crear Encuesta -->
   <dialog id="pollModal">
     <h3 style="margin:0 0 12px;font-size:17px">Crear Encuesta</h3>
     <input id="pollQuestion" placeholder="Escribe tu pregunta..." style="margin-bottom:10px">
     <input id="pollOpt1" placeholder="Opción 1" style="margin-bottom:8px">
     <input id="pollOpt2" placeholder="Opción 2" style="margin-bottom:8px">
-    <button class="btn-wa-primary" onclick="submitSendPoll()">Enviar Encuesta</button>
+    <button class="btn-hello-primary" onclick="submitSendPoll()">Enviar Encuesta</button>
   </dialog>
 
-  <!-- 3. Evento -->
   <dialog id="eventModal">
     <h3 style="margin:0 0 12px;font-size:17px">Crear Evento</h3>
     <input id="eventTitle" placeholder="Nombre del evento..." style="margin-bottom:10px">
     <input id="eventDate" type="date" style="margin-bottom:14px">
-    <button class="btn-wa-primary" onclick="submitSendEvent()">Compartir Evento</button>
+    <button class="btn-hello-primary" onclick="submitSendEvent()">Compartir Evento</button>
   </dialog>
 
-  <!-- 4. Compartir Contacto -->
   <dialog id="shareContactModal">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
       <strong style="font-size:16px">Enviar Contacto</strong>
@@ -541,23 +540,20 @@
     <div id="contactShareList" style="max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:8px"></div>
   </dialog>
 
-  <!-- 5. Estado de Texto -->
   <dialog id="textStatusModal">
-    <h3 style="margin:0 0 12px;font-size:17px">Mi Estado de Novedades</h3>
+    <h3 style="margin:0 0 12px;font-size:17px">Mi Estado</h3>
     <textarea id="textStatusContent" placeholder="¿Qué estás pensando?" style="min-height:90px;margin-bottom:12px"></textarea>
-    <button class="btn-wa-primary" onclick="confirmPublishTextStatus()">Publicar Actualización</button>
+    <button class="btn-hello-primary" onclick="confirmPublishTextStatus()">Publicar Actualización</button>
   </dialog>
 
-  <!-- 6. Nuevo Chat PIN -->
   <dialog id="quickAddModal">
     <h3 style="margin:0 0 12px;font-size:17px">Nuevo Chat por PIN</h3>
     <form onsubmit="confirmAddPin(event)">
       <input id="addPinInput" placeholder="Ej. VA7K2M9X" maxlength="8" style="text-transform:uppercase;letter-spacing:2px;font-weight:800;text-align:center;font-size:18px;margin-bottom:14px" required>
-      <button class="btn-wa-primary">Conectar</button>
+      <button class="btn-hello-primary">Conectar</button>
     </form>
   </dialog>
 
-  <!-- 7. Nuevo Grupo -->
   <dialog id="createGroupModal">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
       <strong style="font-size:16px">Nuevo Grupo</strong>
@@ -565,7 +561,7 @@
     </div>
     <input id="newGroupNameInput" placeholder="Asunto del grupo..." required style="margin-bottom:12px">
     <div id="groupMembersCheckboxes" style="max-height:160px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:14px"></div>
-    <button class="btn-wa-primary" onclick="confirmCreateGroup()">Crear Grupo P2P</button>
+    <button class="btn-hello-primary" onclick="confirmCreateGroup()">Crear Grupo P2P</button>
   </dialog>
 
   <dialog id="manageGroupModal">
@@ -576,7 +572,6 @@
     <div id="manageGroupContent"></div>
   </dialog>
 
-  <!-- 8. Tarjeta QR para Historias -->
   <dialog id="storyShareModal">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
       <strong style="font-size:16px">Compartir Tarjeta QR</strong>
@@ -590,7 +585,6 @@
     </div>
   </dialog>
 
-  <!-- 9. Selector Emojis Gigante (120+ Emojis) -->
   <dialog id="emojiDialog">
     <div style="display:flex;justify-content:space-between;align-items:center"><strong style="font-size:16px">Emojis</strong><button class="icon-btn" onclick="emojiDialog.close()">✕</button></div>
     <div id="emojiGridBox" style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;max-height:280px;overflow-y:auto;margin-top:10px"></div>
@@ -606,7 +600,6 @@
     const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const SERVER_URL = 'https://hello-server-p2p.onrender.com';
 
-    // RESTRICCIONES ESTRICTAS PARA ELIMINAR EL ECO
     const cleanAudioConstraints = {
       echoCancellation: true,
       noiseSuppression: true,
@@ -618,7 +611,6 @@
       let r = ''; for (let i = 0; i < len; i++) r += chars.charAt(Math.floor(Math.random() * chars.length)); return r;
     }
 
-    // --- SÍNTESIS DE AUDIO PARA LLAMADAS Y PTT ---
     let ringCtx = null, ringTimer = null, dialTimer = null;
     function getAudioCtx() {
       if (!ringCtx) ringCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -634,9 +626,9 @@
         const gain = ctx.createGain();
         osc.connect(gain); gain.connect(ctx.destination);
         const now = ctx.currentTime;
-        osc.frequency.setValueAtTime(587.33, now);       // D5
-        osc.frequency.setValueAtTime(880.00, now + 0.15); // A5
-        osc.frequency.setValueAtTime(1174.66, now + 0.3); // D6
+        osc.frequency.setValueAtTime(587.33, now);
+        osc.frequency.setValueAtTime(880.00, now + 0.15);
+        osc.frequency.setValueAtTime(1174.66, now + 0.3);
         gain.gain.setValueAtTime(0.2, now);
         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
         osc.start(now); osc.stop(now + 0.8);
@@ -682,7 +674,7 @@
       } catch (e) {}
     }
 
-    // --- ACCESO Y SEGURIDAD ---
+    // --- GESTIÓN DE ACCESO POR PIN ---
     function switchPinView(v) {
       if (v === 'new') {
         $('tabBtnNewPin').classList.add('active'); $('tabBtnLogPin').classList.remove('active');
@@ -697,6 +689,7 @@
       const p = generateId(8);
       localStorage.helloCurrentPin = p;
       localStorage['helloName_' + p] = 'Usuario ' + p.slice(0, 4);
+      $('authOverlay').style.display = 'none';
       syncToCloud();
       location.reload();
     }
@@ -715,20 +708,18 @@
           if (d.name) localStorage['helloName_' + p] = d.name;
           if (d.status) localStorage['helloStatus_' + p] = d.status;
           if (d.photo) localStorage['helloPhoto_' + p] = d.photo;
-          if (d.msgs) {
-            const database = await openPinDatabase(p);
-            const tx = database.transaction('chats', 'readwrite');
-            const store = tx.objectStore('chats');
-            store.clear();
-            for (const t in d.msgs) { d.msgs[t].forEach(m => { m.targetPin = t; store.add(m); }); }
-          }
         }
       } catch(err){}
+      $('authOverlay').style.display = 'none';
       location.reload();
     }
 
     const myPin = localStorage.helloCurrentPin || '';
-    if (!myPin) $('authOverlay').style.display = 'flex';
+    if (!myPin) {
+      $('authOverlay').style.display = 'flex';
+    } else {
+      $('authOverlay').style.display = 'none';
+    }
 
     let myName = localStorage['helloName_' + myPin] || ('Usuario ' + (myPin ? myPin.slice(0, 4) : ''));
     let myStatus = localStorage['helloStatus_' + myPin] || 'Disponible en HELLO';
@@ -749,7 +740,7 @@
     }
     updateHeaderIdentity();
 
-    // --- BASE DE DATOS Y RESPALDO EN NUBE ---
+    // --- BASE DE DATOS LOCAL Y NUBE ---
     let db = null;
     function openPinDatabase(customPin = null) {
       const p = customPin || myPin;
@@ -820,7 +811,6 @@
       });
     }
 
-    // --- FORMATEADOR DE TEXTO (NEGRITA, CURSIVA, ETC) ---
     function formatWhatsAppText(txt) {
       if (!txt) return '';
       let res = esc(txt);
@@ -831,7 +821,7 @@
       return res;
     }
 
-    // --- WEBRTC, LLAMADAS Y SEÑALIZACIÓN ---
+    // --- CONEXIONES P2P ---
     const peerServerConfig = {
       host: 'hello-server-p2p.onrender.com', port: 443, path: '/myapp', secure: true,
       config: {
@@ -865,7 +855,6 @@
           $('incomingCallDialog').showModal();
           startIncomingRingtone();
         } else {
-          // Walkie Talkie - Auto respuesta
           call.answer();
           call.on('stream', stream => {
             const p = $('liveSpeaker'); p.srcObject = stream; p.play().catch(e=>{});
@@ -918,7 +907,7 @@
       navigator.mediaDevices.getUserMedia({ audio: cleanAudioConstraints, video: isVideo }).then(stream => {
         activeCallStream = stream;
         $('localVideo').srcObject = stream;
-        $('localVideo').muted = true; // IMPORTANT: NO ECO
+        $('localVideo').muted = true;
         pendingIncomingCall.answer(stream);
         handleCallStream(pendingIncomingCall, isVideo);
       }).catch(err => { alert('Permiso de micrófono requerido.'); endActiveCall(); });
@@ -1005,7 +994,7 @@
       filterMainList('');
     }
 
-    // --- NAVEGACIÓN Y PESTAÑAS ---
+    // --- CONTROL DE PESTAÑAS ---
     function switchMainTab(tab) {
       currentMainTab = tab;
       document.querySelectorAll('.nav-tab-btn').forEach(b => b.classList.remove('active'));
@@ -1039,7 +1028,7 @@
       `;
 
       if (!filtered.length) {
-        container.innerHTML = sosHtml + `<div style="text-align:center;padding:50px 20px;color:var(--wa-text-muted)"><div style="font-size:38px;margin-bottom:8px">💬</div><strong>Sin chats activos</strong><p style="font-size:13px">Toca ✏️ para iniciar una conversación.</p></div>`;
+        container.innerHTML = sosHtml + `<div style="text-align:center;padding:50px 20px;color:var(--hello-text-muted)"><div style="font-size:38px;margin-bottom:8px">💬</div><strong>Sin chats activos</strong><p style="font-size:13px">Toca ✏️ para iniciar una conversación.</p></div>`;
         return;
       }
 
@@ -1065,13 +1054,13 @@
             <button class="icon-btn" onclick="$('textStatusModal').showModal()">✏️</button>
           </div>
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;cursor:pointer" onclick="$('textStatusModal').showModal()">
-            <div class="avatar" style="border:2px dashed var(--wa-teal);background:transparent;color:var(--wa-teal)">＋</div>
-            <div><strong>Mi estado</strong><small style="display:block;color:var(--wa-text-muted)">Publicar novedad (24h)</small></div>
+            <div class="avatar" style="border:2px dashed var(--hello-teal);background:transparent;color:var(--hello-teal)">＋</div>
+            <div><strong>Mi estado</strong><small style="display:block;color:var(--hello-text-muted)">Publicar novedad (24h)</small></div>
           </div>
           <div style="margin-bottom:24px">
             ${userStates.map(s => `
               <div class="chat-item" style="padding:8px 0">
-                <div class="avatar" style="background:var(--wa-teal)">${esc(s.name.charAt(0))}</div>
+                <div class="avatar" style="background:var(--hello-teal)">${esc(s.name.charAt(0))}</div>
                 <div class="chat-details">
                   <div class="title-row"><strong>${esc(s.name)}</strong><span class="time">${s.time}</span></div>
                   <div class="desc-row">${esc(s.text)}</div>
@@ -1088,8 +1077,8 @@
         <div style="padding:24px 18px;text-align:center">
           <div style="font-size:48px;margin-bottom:10px">🌐</div>
           <h3 style="margin:0 0 8px">Crea tu comunidad</h3>
-          <p style="font-size:13px;color:var(--wa-text-muted);margin:0 0 20px;line-height:1.5">Agrupa y administra todos tus grupos fácilmente.</p>
-          <button class="btn-wa-primary" onclick="openCreateCommunityModal()">Iniciar Comunidad</button>
+          <p style="font-size:13px;color:var(--hello-text-muted);margin:0 0 20px;line-height:1.5">Agrupa y administra todos tus grupos fácilmente.</p>
+          <button class="btn-hello-primary" onclick="openCreateCommunityModal()">Iniciar Comunidad</button>
         </div>
       `;
     }
@@ -1098,14 +1087,14 @@
       $('tabContentList').innerHTML = `
         <div style="padding:14px 16px">
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;cursor:pointer" onclick="openQuickAddModal()">
-            <div class="avatar" style="background:var(--wa-teal)">🔗</div>
-            <div><strong>Nueva Llamada</strong><small style="display:block;color:var(--wa-text-muted)">Llama por PIN de forma privada</small></div>
+            <div class="avatar" style="background:var(--hello-teal)">🔗</div>
+            <div><strong>Nueva Llamada</strong><small style="display:block;color:var(--hello-text-muted)">Llama por PIN de forma privada</small></div>
           </div>
-          <strong style="font-size:14px;display:block;margin-bottom:10px;color:var(--wa-text-muted)">Historial</strong>
+          <strong style="font-size:14px;display:block;margin-bottom:10px;color:var(--hello-text-muted)">Historial</strong>
           <div style="display:flex;flex-direction:column;gap:12px">
             ${callLogs.map(l => `
               <div style="display:flex;justify-content:space-between;align-items:center">
-                <div><strong>${esc(l.contact)}</strong><small style="display:block;color:var(--wa-text-muted)">${l.type} • ${l.time}</small></div>
+                <div><strong>${esc(l.contact)}</strong><small style="display:block;color:var(--hello-text-muted)">${l.type} • ${l.time}</small></div>
                 <button class="icon-btn" onclick="startCallWithContact('${l.pin}', ${l.type.includes('Video')})">${l.type.includes('Video') ? '📹' : '📞'}</button>
               </div>
             `).join('')}
@@ -1114,20 +1103,18 @@
       `;
     }
 
-    // --- RENDER DE CHAT PRINCIPAL ---
+    // --- ACCIONES DENTRO DEL CHAT ---
     function selectChat(idx) {
       activeChatIndex = idx; const c = contacts[idx];
       if (!c) {
-        $('mainArea').innerHTML = `<div style="display:grid;place-items:center;height:100%;text-align:center"><div><div style="font-size:64px;margin-bottom:16px;opacity:0.3">💬</div><h2 style="font-weight:800">WhatsApp HELLO</h2><p style="font-size:14px">Conexión cifrada sin número telefónico.</p></div></div>`;
+        $('mainArea').innerHTML = `<div style="display:grid;place-items:center;height:100%;text-align:center"><div><div style="font-size:64px;margin-bottom:16px;opacity:0.3">💬</div><h2 style="font-weight:800">HELLO</h2><p style="font-size:14px">Conexión cifrada sin número telefónico.</p></div></div>`;
         return;
       }
       $('appShell').classList.add('chat-open');
 
-      const headerAction = c.isGroup ? `<button class="icon-btn" title="Info de grupo" onclick="openManageGroupModal('${c.pin}')">⚙️</button>` : '';
-
       $('mainArea').innerHTML = `
         <div class="main-header">
-          <div class="contact-summary" onclick="alert('PIN de contacto: ${c.pin}')">
+          <div class="contact-summary" onclick="alert('PIN: ${c.pin}')">
             <button class="icon-btn mobile-back" onclick="$('appShell').classList.remove('chat-open')">‹</button>
             <div class="avatar" style="width:40px;height:40px">${c.photo ? `<img src="${c.photo}">` : (c.isGroup ? '👥' : esc(c.name.charAt(0)))}</div>
             <div><strong>${esc(c.name)}</strong><small>PIN: ${esc(c.pin)}</small></div>
@@ -1173,7 +1160,7 @@
       box.innerHTML = (msgs[c.pin] || []).map((m) => {
         let t = m.text || '';
         let match = t.toLowerCase().includes(q.toLowerCase());
-        return `<div class="bubble ${m.mine ? 'mine' : 'them'}" style="${match ? 'border:2px solid var(--wa-teal)' : ''}">${formatWhatsAppText(t)}<div class="meta"><span>${m.time}</span></div></div>`;
+        return `<div class="bubble ${m.mine ? 'mine' : 'them'}" style="${match ? 'border:2px solid var(--hello-teal)' : ''}">${formatWhatsAppText(t)}<div class="meta"><span>${m.time}</span></div></div>`;
       }).join('');
     }
 
@@ -1186,18 +1173,18 @@
         let cnt = '';
         if (m.text) cnt = formatWhatsAppText(m.text);
         if (m.photo) cnt = `<img src="${m.photo}" class="chat-photo-bubble" onclick="window.open('${m.photo}')">`;
-        if (m.file) cnt = `<div style="display:flex;align-items:center;gap:8px"><span>📄</span><a href="${m.file.data}" download="${esc(m.file.name)}" style="color:var(--wa-teal);font-weight:700">${esc(m.file.name)}</a></div>`;
+        if (m.file) cnt = `<div style="display:flex;align-items:center;gap:8px"><span>📄</span><a href="${m.file.data}" download="${esc(m.file.name)}" style="color:var(--hello-teal);font-weight:700">${esc(m.file.name)}</a></div>`;
         if (m.audio) cnt = `<audio controls src="${m.audio}" style="max-width:240px;height:36px"></audio>`;
-        if (m.location) cnt = `<div style="font-weight:700">📍 Ubicación compartida</div><a href="https://maps.google.com/?q=${m.location.lat},${m.location.lng}" target="_blank" style="color:var(--wa-teal);font-size:12px">Ver Maps</a>`;
-        if (m.event) cnt = `<div style="border:1px dashed var(--wa-teal);padding:8px;border-radius:6px">📅 <strong>${esc(m.event.title)}</strong><div style="font-size:12px">Fecha: ${m.event.date}</div></div>`;
+        if (m.location) cnt = `<div style="font-weight:700">📍 Ubicación compartida</div><a href="https://maps.google.com/?q=${m.location.lat},${m.location.lng}" target="_blank" style="color:var(--hello-teal);font-size:12px">Ver Maps</a>`;
+        if (m.event) cnt = `<div style="border:1px dashed var(--hello-teal);padding:8px;border-radius:6px">📅 <strong>${esc(m.event.title)}</strong><div style="font-size:12px">Fecha: ${m.event.date}</div></div>`;
         if (m.poll) cnt = `<div style="font-weight:700;margin-bottom:6px">📊 ${esc(m.poll.question)}</div>${m.poll.options.map(o => `<div style="background:rgba(0,0,0,0.06);padding:6px;border-radius:6px;margin:3px 0;font-size:13px">${esc(o)}</div>`).join('')}`;
 
         const star = m.starred ? '<span style="font-size:10px;color:#f59e0b;margin-right:2px">★</span>' : '';
-        const react = m.reaction ? `<span style="position:absolute;bottom:-10px;right:8px;background:var(--wa-sidebar);border:1px solid var(--wa-border);border-radius:12px;padding:1px 6px;font-size:13px">${m.reaction}</span>` : '';
+        const react = m.reaction ? `<span style="position:absolute;bottom:-10px;right:8px;background:var(--hello-sidebar);border:1px solid var(--hello-border);border-radius:12px;padding:1px 6px;font-size:13px">${m.reaction}</span>` : '';
         
         return `<div class="bubble ${m.mine ? 'mine' : 'them'}" oncontextmenu="event.preventDefault(); openMsgContext(event, ${idx})" onclick="openMsgContext(event, ${idx})">
-          ${m.replyTo ? `<div style="background:rgba(0,0,0,0.06);border-left:4px solid var(--wa-teal);padding:4px 8px;border-radius:4px;font-size:12px;margin-bottom:4px">${esc(m.replyTo)}</div>` : ''}
-          ${cnt}${react}<div class="meta">${star}<span>${m.time}</span> ${m.mine ? '<span style="color:var(--wa-check-blue)">✓✓</span>' : ''}</div>
+          ${m.replyTo ? `<div style="background:rgba(0,0,0,0.06);border-left:4px solid var(--hello-teal);padding:4px 8px;border-radius:4px;font-size:12px;margin-bottom:4px">${esc(m.replyTo)}</div>` : ''}
+          ${cnt}${react}<div class="meta">${star}<span>${m.time}</span> ${m.mine ? '<span style="color:var(--hello-check-blue)">✓✓</span>' : ''}</div>
         </div>`;
       }).join('');
       box.scrollTop = box.scrollHeight;
@@ -1226,7 +1213,6 @@
       input.value = ''; drawChatMessages(); filterMainList('');
     }
 
-    // --- ACCIONES CONTEXTUALES DE MENSAJE ---
     let selectedMsgIdx = null;
     function openMsgContext(e, idx) {
       selectedMsgIdx = idx; const menu = $('msgContextMenu');
@@ -1250,7 +1236,6 @@
       $('msgContextMenu').style.display = 'none';
     }
 
-    // --- NOTAS DE VOZ ---
     let mediaRecorder = null; let voiceChunks = []; let isRecordingVoice = false;
     async function toggleVoiceNote() {
       const c = contacts[activeChatIndex]; const btn = $('btnVoiceNote');
@@ -1281,7 +1266,6 @@
       }
     }
 
-    // --- WALKIE-TALKIE PTT ---
     let pttStream = null; let pttCall = null;
     function bindPttEvents(contact) {
       const btn = $('btnPtt'); if (!btn) return;
@@ -1306,7 +1290,6 @@
       btn.onpointerup = stop; btn.onpointercancel = stop;
     }
 
-    // --- ADJUNTOS ACTIVOS ---
     function triggerFilePicker(accept) { $('genericFileInput').accept = accept; $('genericFileInput').click(); attachDialog.close(); }
     function handleFilePicked(e) {
       const file = e.target.files[0]; if (!file) return;
@@ -1381,9 +1364,9 @@
     function openShareContactModal() {
       attachDialog.close();
       $('contactShareList').innerHTML = contacts.map(c => `
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid var(--wa-border)">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid var(--hello-border)">
           <span>${esc(c.name)} (${esc(c.pin)})</span>
-          <button class="btn-wa-primary" style="width:auto;padding:4px 10px;font-size:12px" onclick="sendSharedContact('${c.name}', '${c.pin}')">Enviar</button>
+          <button class="btn-hello-primary" style="width:auto;padding:4px 10px;font-size:12px;margin:0" onclick="sendSharedContact('${c.name}', '${c.pin}')">Enviar</button>
         </div>
       `).join('');
       $('shareContactModal').showModal();
@@ -1393,7 +1376,6 @@
       $('shareContactModal').close(); handleSendText();
     }
 
-    // --- MENÚS, MODALES DE SOPORTE Y GRUPOS ---
     function toggleChatKebab() {
       if (confirm('¿Exportar este chat en archivo .txt?')) {
         const c = contacts[activeChatIndex];
@@ -1434,11 +1416,11 @@
       const g = contacts.find(c => c.pin === groupPin); if (!g) return;
       $('manageGroupContent').innerHTML = `
         <div style="margin-bottom:14px"><strong style="display:block;margin-bottom:8px">Participantes (${g.members.length})</strong>
-          <div style="max-height:160px;overflow-y:auto;border:1px solid var(--wa-border);border-radius:8px;padding:0 12px">
-            ${[...new Set(g.members)].map(m => `<div style="padding:10px 0;border-bottom:1px solid var(--wa-border)">${esc(m===myPin?'Tú':'PIN: '+m)}</div>`).join('')}
+          <div style="max-height:160px;overflow-y:auto;border:1px solid var(--hello-border);border-radius:8px;padding:0 12px">
+            ${[...new Set(g.members)].map(m => `<div style="padding:10px 0;border-bottom:1px solid var(--hello-border)">${esc(m===myPin?'Tú':'PIN: '+m)}</div>`).join('')}
           </div>
         </div>
-        <button class="btn-wa-primary" style="background:#fee2e2;color:var(--danger);width:100%" onclick="deleteGroup('${groupPin}')">Salir y Eliminar Grupo</button>
+        <button class="btn-hello-primary" style="background:#fee2e2;color:var(--danger);width:100%" onclick="deleteGroup('${groupPin}')">Salir y Eliminar Grupo</button>
       `;
       $('manageGroupModal').showModal();
     }
@@ -1454,9 +1436,8 @@
       $('qrPinLabel').textContent = 'PIN: ' + myPin; $('storyShareModal').showModal();
     }
     
-    function openCreateCommunityModal() { alert('Función de Comunidades activada.'); switchMainTab('communities'); }
+    function openCreateCommunityModal() { alert('Función de Comunidades activa.'); switchMainTab('communities'); }
 
-    // --- EMOJIS (120+) ---
     const FULL_EMOJIS = ['😀','😃','😄','😁','😆','😅','😂','🤣','🥲','🥹','😊','😇','🙂','🙃','😉','😌','😍','🥰','😘','😗','😙','😚','😋','😛','😝','😜','🤪','🤨','🧐','🤓','😎','🥸','🤩','🥳','😏','😒','😞','😔','😟','😕','🙁','☹️','😣','😖','😫','😩','🥺','😢','😭','😮‍💨','😤','😠','😡','🤬','🤯','😳','🥵','🥶','😱','😨','😰','😥','😓','🫣','🤗','🫡','🤔','🫢','🤫','🤥','😶','😐','😑','😬','🫠','🙄','😯','😦','😧','😮','😲','🥱','😴','🤤','😪','😵','🤐','🥴','🤢','🤮','🤧','😷','🤒','🤕','🤑','🤠','😈','👿','👹','👺','🤡','💩','👻','💀','☠️','👽','👾','🤖','🎃','😺','😸','😹','😻','😼','👍','👎','👊','✊','🤛','🤜','👏','🙌','👐','🤲','🤝','🙏','✍️','💪','🦾','👂','👀','🧠','🫀','🫁','❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💔','❤️‍🔥','✨','🔥','🎉','⭐','🌟','⚡','💥'];
     function openEmojiDialog() {
       $('emojiGridBox').innerHTML = FULL_EMOJIS.map(e => `<button style="font-size:26px;padding:4px" onclick="insertEmoji('${e}')">${e}</button>`).join('');
@@ -1467,7 +1448,7 @@
     function openStarredMessagesModal() {
       const container = $('starredMessagesList'); let items = [];
       for (const p in msgs) { msgs[p].filter(m => m.starred).forEach(m => items.push(m)); }
-      container.innerHTML = items.length ? items.map(m => `<div class="bubble mine" style="cursor:default;box-shadow:none;border:1px solid var(--wa-border)">${esc(m.text || 'Archivo')}</div>`).join('') : '<p>Sin mensajes destacados.</p>';
+      container.innerHTML = items.length ? items.map(m => `<div class="bubble mine" style="cursor:default;box-shadow:none;border:1px solid var(--hello-border)">${esc(m.text || 'Archivo')}</div>`).join('') : '<p>Sin mensajes destacados.</p>';
       $('starredModal').showModal();
     }
 
@@ -1482,18 +1463,18 @@
       $('appShell').classList.add('chat-open');
       $('mainArea').innerHTML = `
         <div class="main-header"><div class="contact-summary"><button class="icon-btn mobile-back" onclick="$('appShell').classList.remove('chat-open')">‹</button><strong>Ajustes HELLO</strong></div></div>
-        <div style="padding:24px;overflow-y:auto;background:var(--wa-card);flex:1">
-          <div style="background:var(--wa-sidebar);border-radius:14px;padding:20px;text-align:center;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.08)">
+        <div style="padding:24px;overflow-y:auto;background:var(--hello-card);flex:1">
+          <div style="background:var(--hello-sidebar);border-radius:14px;padding:20px;text-align:center;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.08)">
             <div style="margin:0 auto 16px;display:flex;justify-content:center"><div class="avatar" style="width:120px;height:120px;font-size:48px">${myPhoto ? `<img src="${myPhoto}">` : myName.charAt(0)}</div></div>
-            <button class="btn-wa-primary" style="width:auto;margin-right:8px" onclick="$('profilePicInput').click()">Cambiar Foto</button>
-            <button class="btn-wa-primary" style="width:auto;background:var(--danger)" onclick="myPhoto='';saveState();updateHeaderIdentity();broadcastProfileUpdate();openSettingsSection()">Quitar</button>
+            <button class="btn-hello-primary" style="width:auto;margin-right:8px" onclick="$('profilePicInput').click()">Cambiar Foto</button>
+            <button class="btn-hello-primary" style="width:auto;background:var(--danger)" onclick="myPhoto='';saveState();updateHeaderIdentity();broadcastProfileUpdate();openSettingsSection()">Quitar</button>
           </div>
-          <div style="background:var(--wa-sidebar);border-radius:14px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.08);margin-bottom:16px">
+          <div style="background:var(--hello-sidebar);border-radius:14px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.08);margin-bottom:16px">
             <h3 style="margin:0 0 8px;font-size:16px">Nombre Visible</h3>
             <input id="setProfName" value="${esc(myName)}" style="margin-bottom:10px">
-            <button class="btn-wa-primary" onclick="myName=$('setProfName').value.trim()||myName;saveState();updateHeaderIdentity();broadcastProfileUpdate();alert('Nombre guardado')">Guardar Nombre</button>
+            <button class="btn-hello-primary" onclick="myName=$('setProfName').value.trim()||myName;saveState();updateHeaderIdentity();broadcastProfileUpdate();alert('Nombre guardado')">Guardar Nombre</button>
           </div>
-          <button class="btn-wa-primary" style="background:#fee2e2;color:var(--danger);border:1px solid #fecaca" onclick="executePanicKillSwitch()">🚨 Eliminar Cuenta y Salir</button>
+          <button class="btn-hello-primary" style="background:#fee2e2;color:var(--danger);border:1px solid #fecaca" onclick="executePanicKillSwitch()">🚨 Eliminar Cuenta y Salir</button>
         </div>
       `;
     }
